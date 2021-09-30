@@ -4,6 +4,7 @@ import { StyleSheet, SafeAreaView, View } from 'react-native'
 import { Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Searchbar, IconButton } from 'react-native-paper'
+import Logo from '../assets/logo.svg'
 
 const Home = ({ navigation }) => {
 	const categories = [
@@ -41,15 +42,21 @@ const Home = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<View style={styles.notificationContainer}>
-				<Text style={styles.notificationText}>10</Text>
-				<IconButton
-					raised
-					icon="bell"
-					color="#003C95"
-					style={styles.notification}
-				/>
+			<View style={styles.header}>
+				<View style={styles.imgContainer}>
+				<Logo width={150} height={150} fill="#000" />
+				</View>
+				<View style={styles.notificationContainer}>
+					<Text style={styles.notificationText}>10</Text>
+					<IconButton
+						raised
+						icon="bell"
+						color="#003C95"
+						style={styles.notification}
+					/>
+				</View>
 			</View>
+
 			<Searchbar style={styles.input} />
 
 			<View style={styles.categories}>
@@ -81,12 +88,24 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		height: '100%',
 	},
+	imgContainer: {
+		width: 50,
+		height: 50,
+		marginTop: -20,
+		marginLeft: 10,
+	},
+	header: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+	},
 	input: {
 		height: 40,
 		width: '90%',
 		borderRadius: 10,
 		fontSize: 18,
 		alignSelf: 'center',
+		marginTop: 10,
 	},
 	notificationContainer: {
 		position: 'relative',
