@@ -5,6 +5,7 @@ import Home from '../screens/Home'
 import Chats from '../screens/Chats'
 import Favorites from '../screens/Favorites'
 import Profile from '../screens/Profile'
+import PersonalChat from '../screens/PersonalChat'
 
 const Tabs = AnimatedTabBarNavigator()
 
