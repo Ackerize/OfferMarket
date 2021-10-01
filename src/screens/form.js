@@ -3,7 +3,7 @@ import {Text, StyleSheet, SafeAreaView, TextInput, View} from 'react-native';
 
 
 
-const App = () => {
+const Form = ({ navigation }) => {
   const [value, setValue] = useState(0);
   return (
     <SafeAreaView>
@@ -12,7 +12,7 @@ const App = () => {
         <TextInput placeholder="Nombre" />
         <TextInput placeholder="Marca" />
         <TextInput placeholder="Descripcion" />
-        <NumberInput placeholder="Precio" />
+        
         <TextInput placeholder="Category" />
         <TextInput placeholder="Condición" />
         <TextInput placeholder="Locación" />
@@ -23,4 +23,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Form;

@@ -6,7 +6,7 @@ import Chats from '../screens/Chats'
 import Favorites from '../screens/Favorites'
 import Profile from '../screens/Profile'
 import PersonalChat from '../screens/PersonalChat'
-import Form from "../screens/form"
+import Form from "../screens/Form"
 import { FAB } from 'react-native-elements';
 
 const Tabs = AnimatedTabBarNavigator()

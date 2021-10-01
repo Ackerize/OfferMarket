@@ -5,7 +5,7 @@ import { Button, Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Searchbar, IconButton } from 'react-native-paper'
 import Logo from '../assets/logo.svg'
-import Form from '../screens/form'
+import Form from './Form'
 
 const Home = ({ navigation }) => {
 	const categories = [
@@ -62,12 +62,11 @@ const Home = ({ navigation }) => {
 			<Searchbar style={styles.input} />
 
 			<View>
-				<Form/>
 				<IconButton
-					onPress={() => this.props.navigation.navigate('')}
+					
 					icon="plus"
 					color="#841584"
-
+					onPress={()=> navigation.navigate('FormProduct')}
 				/>
 			</View>
 

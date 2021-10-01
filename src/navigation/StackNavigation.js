@@ -6,7 +6,7 @@ import Favorites from '../screens/Favorites'
 import Chats from '../screens/Chats'
 import PersonalChat from '../screens/PersonalChat'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import Form from '../screens/form'
+import Form from '../screens/Form'
 
 const Stack = createStackNavigator()
 
