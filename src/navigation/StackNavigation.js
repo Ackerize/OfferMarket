@@ -6,7 +6,7 @@ import Favorites from '../screens/Favorites'
 import Chats from '../screens/Chats'
 import PersonalChat from '../screens/PersonalChat'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import Form from '../screens/Form'
+import Form from '../screens/form'
 
 const Stack = createStackNavigator()
 
@@ -46,7 +46,12 @@ export default function StackNavigation() {
 			<Stack.Screen
 				name="FormProduct"
 				component={Form}
-				options={{ headerTransparent: true, title: '' }}
+				options={{
+					tabBarIcon: ({ focused, color }) => (
+						<TabBarIcon focused={focused} tintColor={color} name="home" />
+					),
+					
+				}}
 			/>
 		</Stack.Navigator>
 	)

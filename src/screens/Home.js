@@ -5,7 +5,6 @@ import { Button, Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Searchbar, IconButton } from 'react-native-paper'
 import Logo from '../assets/logo.svg'
-import Form from './Form'
 
 const Home = ({ navigation }) => {
 	const categories = [
@@ -47,8 +46,18 @@ const Home = ({ navigation }) => {
 			<View style={styles.header}>
 				<View style={styles.imgContainer}>
 					<Logo width={150} height={150} fill="#000" />
-				</View>
-				<View style={styles.notificationContainer}>
+			</View>
+			
+			<View style={styles.notificationContainer}>
+				<IconButton style={styles.notificationContainer}
+					icon="plus"
+					color="#841584"
+					onPress={()=> navigation.navigate('FormProduct')}
+					style={styles.notification}
+				/>
+			</View>
+
+			<View style={styles.notificationContainer}>
 					<Text style={styles.notificationText}>10</Text>
 					<IconButton
 						raised
@@ -56,19 +65,12 @@ const Home = ({ navigation }) => {
 						color="#003C95"
 						style={styles.notification}
 					/>
-				</View>
+			</View>
+
 			</View>
 
 			<Searchbar style={styles.input} />
 
-			<View>
-				<IconButton
-					
-					icon="plus"
-					color="#841584"
-					onPress={()=> navigation.navigate('FormProduct')}
-				/>
-			</View>
 
 			<View style={styles.categories}>
 				<ScrollView
