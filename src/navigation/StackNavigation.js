@@ -6,7 +6,7 @@ import Favorites from '../screens/Favorites'
 import Chats from '../screens/Chats'
 import Login from '../screens/Login'
 import Register from '../screens/Register'
-
+import ArrowIcon from 'react-native-vector-icons/MaterialIcons'
 const Stack = createStackNavigator()
 
 export default function StackNavigation() {
@@ -35,9 +35,14 @@ export default function StackNavigation() {
 			<Stack.Screen
 				name="Register"
 				component={Register}
-				options={{ headerTransparent: true, title: '' }}
+				options={{
+					headerTransparent: true,
+					title: '',
+					headerBackImage: () => (
+						<ArrowIcon name="arrow-back-ios" size={30} color="#000" />
+					),
+				}}
 			/>
-
 		</Stack.Navigator>
 	)
 }

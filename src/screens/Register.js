@@ -8,11 +8,10 @@ import {
 	TouchableOpacity,
 } from 'react-native'
 import LoginImage from '../assets/register.svg'
-import Google from '../assets/google.svg'
-import Facebook from '../assets/facebook.svg'
 import Icon from 'react-native-vector-icons/dist/FontAwesome'
 
 const Register = ({ navigation }) => {
+
 	return (
 		<SafeAreaView style={styles.mainContainer}>
 			<View style={styles.imageContainer}>
@@ -37,7 +36,7 @@ const Register = ({ navigation }) => {
 						placeholderTextColor="#B7C6D9"
 					/>
 				</View>
-        <View style={styles.inputSection}>
+				<View style={styles.inputSection}>
 					<Icon style={styles.icon} name="lock" size={20} color="#000" />
 					<TextInput
 						style={styles.input}
@@ -48,7 +47,7 @@ const Register = ({ navigation }) => {
 				<TouchableOpacity style={styles.btn}>
 					<Text style={styles.btnText}>Crear Cuenta</Text>
 				</TouchableOpacity>
-				<View style={{marginTop: 10}}>
+				<View style={{ marginTop: 10 }}>
 					<Text style={{ textAlign: 'center' }}>
 						<Text>¿Ya tienes cuenta?</Text>
 						<Text
@@ -70,7 +69,6 @@ const styles = StyleSheet.create({
 	mainContainer: {
 		display: 'flex',
 		flexDirection: 'column',
-		justifyContent: 'center',
 		backgroundColor: '#FFFFFF',
 		height: '100%',
 		alignItems: 'center',
@@ -79,7 +77,8 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		width: '100%',
 		alignItems: 'center',
-		marginBottom: 30,
+		marginBottom: 10,
+		marginTop: 20,
 	},
 	secondContainer: {
 		width: '85%',
@@ -116,6 +115,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#003C95',
 		borderRadius: 10,
 		height: 55,
+		marginTop: 25,
 	},
 	btnText: {
 		textAlign: 'center',
@@ -125,5 +125,10 @@ const styles = StyleSheet.create({
 	},
 	registrate: {
 		color: '#003C95',
+	},
+	backArrow: {
+		marginHorizontal: 30,
+		backgroundColor: '#fff',
+		paddingTop: 15,
 	},
 })
