@@ -21,7 +21,7 @@ const TabBarIcon = props => {
 export default () => {
 	return (
 		<Tabs.Navigator
-			initialRouteName="Home"
+			initialRouteName="Home	"
 			tabBarOptions={{
 				activeTintColor: '#FFFFFF',
 				inactiveTintColor: '#191B32',
@@ -74,6 +74,8 @@ export default () => {
 					),
 				}}
 			/>
+
+			
 		</Tabs.Navigator>
 	)
 }

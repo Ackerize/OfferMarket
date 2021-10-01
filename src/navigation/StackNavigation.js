@@ -4,6 +4,7 @@ import AppNavigation from './AppNavigation'
 import Profile from '../screens/Profile'
 import Favorites from '../screens/Favorites'
 import Chats from '../screens/Chats'
+import Search from '../screens/Search'
 
 const Stack = createStackNavigator()
 
@@ -30,6 +31,13 @@ export default function StackNavigation() {
 				component={Chats}
 				options={{ headerTransparent: true, title: '' }}
 			/>
+
+			<Stack.Screen
+				name="Search"
+				component={Search}
+				options={{ headerTransparent: true, title: '' }}
+			/>
+
 		</Stack.Navigator>
 	)
 }

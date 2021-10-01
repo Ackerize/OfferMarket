@@ -1,10 +1,11 @@
 import { map } from 'lodash'
 import React, { useState } from 'react'
 import { StyleSheet, SafeAreaView, View } from 'react-native'
-import { Text } from 'react-native-elements'
+import { Button, Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Searchbar, IconButton } from 'react-native-paper'
 import Logo from '../assets/logo.svg'
+import Search from './Search'
 
 const Home = ({ navigation }) => {
 	const categories = [
@@ -53,11 +54,13 @@ const Home = ({ navigation }) => {
 						icon="bell"
 						color="#003C95"
 						style={styles.notification}
+						onPress={() => navigation.navigate('Search')}
 					/>
 				</View>
 			</View>
 
-			<Searchbar style={styles.input} />
+			<IconButton icon='magnify' style={styles.search}   onPress={() => navigation.navigate('Search')}/>
+			
 
 			<View style={styles.categories}>
 				<ScrollView
@@ -107,6 +110,28 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginTop: 10,
 	},
+
+	search: {
+		height: 50,
+		color: '#fff',
+		width: '90%',
+		borderRadius: 10,
+		fontSize: 18,
+		alignSelf: 'center',
+		alignItems: 'flex-start',
+		padding: 15,
+		backgroundColor: '#fff',
+		borderColor: '#fff',
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 3.84,
+		elevation: 5,
+	},
+
 	notificationContainer: {
 		position: 'relative',
 		width: 60,
