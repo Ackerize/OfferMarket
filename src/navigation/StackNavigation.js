@@ -4,20 +4,22 @@ import AppNavigation from './AppNavigation'
 import Profile from '../screens/Profile'
 import Favorites from '../screens/Favorites'
 import Chats from '../screens/Chats'
+import Login from '../screens/Login'
+import Register from '../screens/Register'
 
 const Stack = createStackNavigator()
 
 export default function StackNavigation() {
 	return (
 		<Stack.Navigator>
-			<Stack.Screen
+			{/* <Stack.Screen
 				name="Home"
 				component={AppNavigation}
 				options={{ headerTransparent: true, title: '' }}
-			/>
+			/> */}
 			<Stack.Screen
-				name="Profile"
-				component={Profile}
+				name="Login"
+				component={Login}
 				options={{ headerTransparent: true, title: '', headerLeft: false }}
 			/>
 			<Stack.Screen
@@ -30,6 +32,12 @@ export default function StackNavigation() {
 				component={Chats}
 				options={{ headerTransparent: true, title: '' }}
 			/>
+			<Stack.Screen
+				name="Register"
+				component={Register}
+				options={{ headerTransparent: true, title: '' }}
+			/>
+
 		</Stack.Navigator>
 	)
 }

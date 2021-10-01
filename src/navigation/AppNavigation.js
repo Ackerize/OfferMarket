@@ -5,6 +5,7 @@ import Home from '../screens/Home'
 import Chats from '../screens/Chats'
 import Favorites from '../screens/Favorites'
 import Profile from '../screens/Profile'
+import Login from '../screens/Login'
 
 const Tabs = AnimatedTabBarNavigator()
 
@@ -30,6 +31,15 @@ export default () => {
 			appearance={{
 				floating: true,
 			}}>
+			<Tabs.Screen
+				name="Login"
+				component={Login}
+				options={{
+					tabBarIcon: ({ focused, color }) => (
+						<TabBarIcon focused={focused} tintColor={color} name="person" />
+					),
+				}}
+			/>
 			<Tabs.Screen
 				name="Inicio"
 				component={Home}
@@ -62,15 +72,6 @@ export default () => {
 							tintColor={color}
 							name="chat-bubble-outline"
 						/>
-					),
-				}}
-			/>
-			<Tabs.Screen
-				name="Perfil"
-				component={Profile}
-				options={{
-					tabBarIcon: ({ focused, color }) => (
-						<TabBarIcon focused={focused} tintColor={color} name="person" />
 					),
 				}}
 			/>
