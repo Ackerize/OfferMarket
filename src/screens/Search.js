@@ -7,14 +7,8 @@ const Search = ({navigation}) => {
     return (
         <SafeAreaView>
             <View style={styles.header}>
-                <Icon
-					name="arrow-back-ios"
-					size={30}
-					color="#003C95"
-					style={styles.backArrow}
-					onPress={() => navigation.goBack()}
-				/>
-                <Searchbar style={styles.search} ></Searchbar>
+                <Searchbar style={styles.search} iconColor="#003C95" autoFocus={true}></Searchbar>
+                
             </View>
 
             
@@ -29,25 +23,20 @@ export default Search
 const styles = StyleSheet.create({
     header: {
         
-		paddingVertical: 10,
+		paddingVertical: 3,
 		flexDirection: 'row',
-		alignItems: 'flex-start',
-		justifyContent: 'flex-start',
-	},
-
-    backArrow: {
-        
-        marginTop:5,
-		marginHorizontal: 10,
+		alignItems: 'flex-end',
+		justifyContent: 'flex-end',
 	},
 
     search: {
 		height: 50,
-		width: '70%',
+		width: '83%',
 		borderRadius: 10,
 		fontSize: 18,
 		alignSelf: 'center',
 		marginTop: 5,
+        marginRight: 10,
 		shadowColor: '#000',
 		shadowOffset: {
 		    width: 0,

@@ -54,12 +54,12 @@ const Home = ({ navigation }) => {
 						icon="bell"
 						color="#003C95"
 						style={styles.notification}
-						onPress={() => navigation.navigate('Search')}
+						onPress={() => navigation.navigate('Notifications')}
 					/>
 				</View>
 			</View>
 
-			<IconButton icon='magnify' style={styles.search}   onPress={() => navigation.navigate('Search')}/>
+			<IconButton icon='magnify' style={styles.search} color="#003C95"  onPress={() => navigation.navigate('Search')}/>
 			
 
 			<View style={styles.categories}>
