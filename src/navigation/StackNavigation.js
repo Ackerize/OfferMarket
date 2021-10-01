@@ -5,10 +5,12 @@ import Profile from '../screens/Profile'
 import Favorites from '../screens/Favorites'
 import Chats from '../screens/Chats'
 import PersonalChat from '../screens/PersonalChat'
+import Icon from 'react-native-vector-icons/MaterialIcons'
 
 const Stack = createStackNavigator()
 
-export default function StackNavigation() {
+export default function StackNavigation(props) {
+	console.log(props)
 	return (
 		<Stack.Navigator>
 			<Stack.Screen
@@ -34,7 +36,11 @@ export default function StackNavigation() {
 			<Stack.Screen
 				name="PersonalChat"
 				component={PersonalChat}
-				options={{ headerTransparent: true, title: '', headerLeft: false }}
+				options={{
+					headerTransparent: true,
+					title: '',
+					headerBackImage: () => <Icon name="arrow-back-ios" size={30} color="#000" />,
+				}}
 			/>
 		</Stack.Navigator>
 	)

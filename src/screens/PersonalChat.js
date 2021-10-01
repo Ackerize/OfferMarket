@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { StyleSheet, SafeAreaView, View, Image } from 'react-native'
-import { Avatar, Text, IconButton, Menu } from 'react-native-paper'
+import { Avatar, Text, Menu, IconButton, Colors } from 'react-native-paper'
 import avatarImg from '../assets/person.jpg'
 import sofaImg from '../assets/sofa.png'
-import Icon from 'react-native-vector-icons/MaterialIcons'
+
 
 const PersonalChat = ({ navigation }) => {
 	const [visible, setVisible] = useState(false)
@@ -15,13 +15,6 @@ const PersonalChat = ({ navigation }) => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.header}>
-				<Icon
-					name="arrow-back-ios"
-					size={24}
-					color="black"
-					style={styles.backArrow}
-					onPress={() => navigation.goBack()}
-				/>
 				<View style={styles.contactInformation}>
 					<Avatar.Image size={55} source={avatarImg} />
 					<Text style={styles.name}>Juan Gallardo</Text>
@@ -30,13 +23,15 @@ const PersonalChat = ({ navigation }) => {
 					visible={visible}
 					onDismiss={closeMenu}
 					anchor={
-						<IconButton
-							icon="dots-vertical"
-							size={24}
-							color="black"
-							onPress={openMenu}
-						/>
+						<View>
+							<IconButton
+								icon="dots-vertical"
+								color={Colors.red500}
+								onPress={() => console.log('HI')}
+							/>
+						</View>
 					}>
+					<Menu.Item onPress={() => {}} title="Ver perfil" />
 					<Menu.Item onPress={() => {}} title="Calificar vendedor" />
 					<Menu.Item onPress={() => {}} title="Borrar chat" />
 				</Menu>
@@ -104,15 +99,19 @@ const styles = StyleSheet.create({
 		height: '100%',
 		backgroundColor: '#EBEDF1',
 	},
+	dots: {
+		backgroundColor: 'red',
+		width: 30,
+		height: 50,
+		marginRight: 30,
+	},
 	header: {
 		backgroundColor: '#fff',
 		paddingVertical: 10,
+		paddingLeft:80,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-	},
-	backArrow: {
-		marginHorizontal: 20,
 	},
 	contactInformation: {
 		flexDirection: 'row',
@@ -189,7 +188,7 @@ const styles = StyleSheet.create({
 	},
 	messageSend: {
 		backgroundColor: '#003C95',
-        display: 'flex',
+		display: 'flex',
 		flexDirection: 'row',
 		padding: 10,
 		paddingHorizontal: 15,
@@ -204,7 +203,7 @@ const styles = StyleSheet.create({
 	messageSendContent: {
 		color: '#fff',
 		fontSize: 16,
-        maxWidth: '90%',
+		maxWidth: '90%',
 	},
 	sendTime: {
 		fontSize: 13,
