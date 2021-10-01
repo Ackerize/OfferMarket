@@ -4,6 +4,7 @@ import AppNavigation from './AppNavigation'
 import Profile from '../screens/Profile'
 import Favorites from '../screens/Favorites'
 import Chats from '../screens/Chats'
+import PersonalChat from '../screens/PersonalChat'
 
 const Stack = createStackNavigator()
 
@@ -29,6 +30,11 @@ export default function StackNavigation() {
 				name="Chats"
 				component={Chats}
 				options={{ headerTransparent: true, title: '' }}
+			/>
+			<Stack.Screen
+				name="PersonalChat"
+				component={PersonalChat}
+				options={{ headerTransparent: true, title: '', headerLeft: false }}
 			/>
 		</Stack.Navigator>
 	)
