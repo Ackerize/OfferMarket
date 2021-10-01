@@ -9,8 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 
 const Stack = createStackNavigator()
 
-export default function StackNavigation(props) {
-	console.log(props)
+export default function StackNavigation() {
 	return (
 		<Stack.Navigator>
 			<Stack.Screen
@@ -39,7 +38,8 @@ export default function StackNavigation(props) {
 				options={{
 					headerTransparent: true,
 					title: '',
-					headerBackImage: () => <Icon name="arrow-back-ios" size={30} color="#000" />,
+					headerBackImage: () => <Icon name="arrow-back-ios" size={30} color="#000" style={{ paddingTop: 20, paddingLeft: 15}} />,
+					headerRight: null
 				}}
 			/>
 		</Stack.Navigator>
