@@ -12,7 +12,7 @@ const Notifications = ( { navigation }) => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<Title style={styles.title}>Notificaciones</Title>
-			<TouchableWithoutFeedback>
+			<View style={styles.newNotiContainer}>
 				<View style={styles.messageContainer}>
 					<Avatar.Image size={60} source={avatarImg} />
 					<View style={styles.informationContainer}>
@@ -22,7 +22,7 @@ const Notifications = ( { navigation }) => {
 						<View style={styles.line} />
 					</View>
 				</View>
-			</TouchableWithoutFeedback>
+			</View>
 			<View style={styles.messageContainer}>
 				<Avatar.Image size={60} source={avatarImg} />
 				<View style={styles.informationContainer}>
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
 		width: '95%',
 		backgroundColor: '#DCE5EE',
 		marginTop: 5,
-		marginBottom: 5,
+		marginBottom: 0,
 	},
 	title: {
 		fontSize: 24,
@@ -80,6 +80,15 @@ const styles = StyleSheet.create({
 		marginHorizontal: 20,
 		marginTop: 30,
 	},
+
+    newNotiContainer: {
+        backgroundColor: '#F4F6FA',
+		flexDirection: 'row',
+		marginTop: 30,
+        paddingBottom: 0,
+        paddingRight: 40,
+	},
+
 	informationContainer: {
 		marginHorizontal: 20,
 		height: 75,

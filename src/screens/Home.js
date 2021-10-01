@@ -48,7 +48,7 @@ const Home = ({ navigation }) => {
 				<Logo width={150} height={150} fill="#000" />
 				</View>
 				<View style={styles.notificationContainer}>
-					<Text style={styles.notificationText}>10</Text>
+					<Text style={styles.notificationText}>1</Text>
 					<IconButton
 						raised
 						icon="bell"
