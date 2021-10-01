@@ -1,10 +1,11 @@
 import { map } from 'lodash'
 import React, { useState } from 'react'
 import { StyleSheet, SafeAreaView, View } from 'react-native'
-import { Text } from 'react-native-elements'
+import { Button, Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Searchbar, IconButton } from 'react-native-paper'
 import Logo from '../assets/logo.svg'
+import Form from '../screens/form'
 
 const Home = ({ navigation }) => {
 	const categories = [
@@ -40,11 +41,12 @@ const Home = ({ navigation }) => {
 		setCategorySelected(category)
 	}
 
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.header}>
 				<View style={styles.imgContainer}>
-				<Logo width={150} height={150} fill="#000" />
+					<Logo width={150} height={150} fill="#000" />
 				</View>
 				<View style={styles.notificationContainer}>
 					<Text style={styles.notificationText}>10</Text>
@@ -58,6 +60,16 @@ const Home = ({ navigation }) => {
 			</View>
 
 			<Searchbar style={styles.input} />
+
+			<View>
+				<Form/>
+				<IconButton
+					onPress={() => this.props.navigation.navigate('')}
+					icon="plus"
+					color="#841584"
+
+				/>
+			</View>
 
 			<View style={styles.categories}>
 				<ScrollView

@@ -6,6 +6,8 @@ import Chats from '../screens/Chats'
 import Favorites from '../screens/Favorites'
 import Profile from '../screens/Profile'
 import PersonalChat from '../screens/PersonalChat'
+import Form from "../screens/form"
+import { FAB } from 'react-native-elements';
 
 const Tabs = AnimatedTabBarNavigator()
 
@@ -30,7 +32,8 @@ export default () => {
 			}}
 			appearance={{
 				floating: true,
-			}}>
+			}}
+			>
 			<Tabs.Screen
 				name="Inicio"
 				component={Home}
@@ -38,8 +41,11 @@ export default () => {
 					tabBarIcon: ({ focused, color }) => (
 						<TabBarIcon focused={focused} tintColor={color} name="home" />
 					),
+					
 				}}
+				
 			/>
+			
 			<Tabs.Screen
 				name="Favoritos"
 				component={Favorites}

@@ -6,6 +6,7 @@ import Favorites from '../screens/Favorites'
 import Chats from '../screens/Chats'
 import PersonalChat from '../screens/PersonalChat'
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import Form from '../screens/form'
 
 const Stack = createStackNavigator()
 
@@ -41,6 +42,11 @@ export default function StackNavigation() {
 					headerBackImage: () => <Icon name="arrow-back-ios" size={30} color="#000" style={{ paddingTop: 20, paddingLeft: 15}} />,
 					headerRight: null
 				}}
+			/>
+			<Stack.Screen
+				name="FormProduct"
+				component={Form}
+				options={{ headerTransparent: true, title: '' }}
 			/>
 		</Stack.Navigator>
 	)
