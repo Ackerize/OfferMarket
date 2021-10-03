@@ -4,7 +4,7 @@ import { StyleSheet, SafeAreaView, View } from 'react-native'
 import { Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Searchbar, IconButton } from 'react-native-paper'
-import Logo from '../assets/logo.svg'
+import Logo from '../assets/img/logo.svg'
 
 const Home = ({ navigation }) => {
 	const categories = [

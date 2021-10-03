@@ -1,18 +1,39 @@
-import React, { useState } from 'react'
-import { StyleSheet, SafeAreaView, View, Image, TextInput, ScrollView, Dimensions } from 'react-native'
-import { Avatar, Text, Menu, IconButton } from 'react-native-paper'
+import React, { useState, useRef, useEffect } from 'react'
+import {
+	StyleSheet,
+	SafeAreaView,
+	View,
+	Image,
+	TextInput,
+	ScrollView,
+	Dimensions,
+} from 'react-native'
+import {
+	Avatar,
+	Text,
+	Menu,
+	IconButton,
+	TouchableRipple,
+} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import avatarImg from '../assets/person.jpg'
-import sofaImg from '../assets/sofa.png'
+import avatarImg from '../assets/img/person.jpg'
+import sofaImg from '../assets/img/sofa.png'
+import ModalRating from '../components/Modals/ModalRating'
 
-const windowHeight = Dimensions.get('window').height;
+const windowHeight = Dimensions.get('window').height
 
 const PersonalChat = ({ navigation }) => {
 	const [visible, setVisible] = useState(false)
+	const [showModal, setShowModal] = useState(false)
+	const chatScrollRef = useRef()
 
 	const openMenu = () => setVisible(true)
 
 	const closeMenu = () => setVisible(false)
+
+	useEffect(() => {
+		chatScrollRef.current.scrollTo({ y: windowHeight })
+	}, [])
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -21,22 +42,30 @@ const PersonalChat = ({ navigation }) => {
 					<Avatar.Image size={55} source={avatarImg} />
 					<Text style={styles.name}>Juan Gallardo</Text>
 				</View>
-				<Menu
-					visible={visible}
-					onDismiss={closeMenu}
-					anchor={
-						<IconButton
-							icon="dots-vertical"
-							color="#060948"
-							onPress={openMenu}
+				<TouchableRipple onPress={openMenu} style={styles.touchable}>
+					<Menu
+						visible={visible}
+						onDismiss={closeMenu}
+						anchor={
+							<IconButton
+								icon="dots-vertical"
+								color="#060948"
+							/>
+						}>
+						<Menu.Item onPress={() => {}} title="Ver perfil" />
+						<Menu.Item
+							onPress={() => {
+								setShowModal(true)
+								closeMenu()
+							}}
+							title="Calificar vendedor"
 						/>
-					}>
-					<Menu.Item onPress={() => {}} title="Ver perfil" />
-					<Menu.Item onPress={() => {}} title="Calificar vendedor" />
-					<Menu.Item onPress={() => {}} title="Borrar chat" />
-				</Menu>
+						<Menu.Item onPress={() => {}} title="Borrar chat" />
+					</Menu>
+				</TouchableRipple>
 			</View>
-			<ScrollView style={styles.chat}>
+			<ModalRating visible={showModal} setVisible={setShowModal} />
+			<ScrollView style={styles.chat} ref={chatScrollRef}>
 				<View style={styles.dateContainer}>
 					<Text style={styles.date}>Hoy</Text>
 				</View>
@@ -187,6 +216,10 @@ const styles = StyleSheet.create({
 		width: 30,
 		height: 50,
 		marginRight: 30,
+	},
+	touchable: {
+		marginRight: 5,
+		padding: 8,
 	},
 	header: {
 		backgroundColor: '#fff',

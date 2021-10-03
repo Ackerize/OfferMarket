@@ -6,7 +6,7 @@ import {
 	TouchableWithoutFeedback,
 } from 'react-native'
 import { Title, Avatar, Text } from 'react-native-paper'
-import avatarImg from '../assets/person.jpg'
+import avatarImg from '../assets/img/person.jpg'
 
 const Chats = ( { navigation }) => {
 	return (
