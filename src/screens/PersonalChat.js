@@ -18,6 +18,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import avatarImg from '../assets/img/person.jpg'
 import sofaImg from '../assets/img/sofa.png'
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 import ModalRating from '../components/Modals/ModalRating'
 
 const windowHeight = Dimensions.get('window').height
@@ -37,6 +38,7 @@ const PersonalChat = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
+			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.header}>
 				<View style={styles.contactInformation}>
 					<Avatar.Image size={55} source={avatarImg} />
@@ -46,7 +48,7 @@ const PersonalChat = ({ navigation }) => {
 					<Menu
 						visible={visible}
 						onDismiss={closeMenu}
-						anchor={<IconButton icon="dots-vertical" color="#060948" />}>
+						anchor={<Icon name="more-vert" color="#060948" size={30} />}>
 						<Menu.Item
 							onPress={() => {
 								closeMenu()

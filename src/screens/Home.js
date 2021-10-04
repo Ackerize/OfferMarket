@@ -5,6 +5,7 @@ import { Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { IconButton } from 'react-native-paper'
 import Logo from '../assets/img/logo.svg'
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 
 const Home = ({ navigation }) => {
 	const categories = [
@@ -42,6 +43,7 @@ const Home = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
+			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.header}>
 				<View style={styles.imgContainer}>
 					<Logo width={150} height={150} fill="#000" />
