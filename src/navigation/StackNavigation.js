@@ -8,17 +8,19 @@ import PersonalChat from '../screens/PersonalChat'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Login from '../screens/Login'
 import Register from '../screens/Register'
+import Search from '../screens/Search'
+import Notifications from '../screens/Notifications'
 
 const Stack = createStackNavigator()
 
 export default function StackNavigation() {
 	return (
-		<Stack.Navigator initialRouteName="Login">
-			{/* <Stack.Screen
+		<Stack.Navigator initialRouteName="Home">
+			<Stack.Screen
 				name="Home"
 				component={AppNavigation}
 				options={{ headerTransparent: true, title: '' }}
-			/> */}
+			/>
 			<Stack.Screen
 				name="Profile"
 				component={Profile}
@@ -59,6 +61,21 @@ export default function StackNavigation() {
 						<Icon name="arrow-back-ios" size={30} color="#000" />
 					),
 				}}
+			/>
+			<Stack.Screen
+				name="Search"
+				component={Search}
+				options={{ headerTransparent: true, title: '',
+				headerBackImage: () => <Icon name="arrow-back-ios" size={30} color="#003C95" />,
+			 }}
+			/>
+
+			<Stack.Screen
+				name="Notifications"
+				component={Notifications}
+				options={{ headerTransparent: true, title: '',
+				headerBackImage: () => <Icon name="arrow-back-ios" size={30} color="#003C95" />,
+			 }}
 			/>
 		</Stack.Navigator>
 	)
