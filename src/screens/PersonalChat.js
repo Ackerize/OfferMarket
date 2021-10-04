@@ -46,19 +46,20 @@ const PersonalChat = ({ navigation }) => {
 					<Menu
 						visible={visible}
 						onDismiss={closeMenu}
-						anchor={
-							<IconButton
-								icon="dots-vertical"
-								color="#060948"
-							/>
-						}>
-						<Menu.Item onPress={() => {}} title="Ver perfil" />
+						anchor={<IconButton icon="dots-vertical" color="#060948" />}>
+						<Menu.Item
+							onPress={() => {
+								closeMenu()
+								navigation.navigate('Profile')
+							}}
+							title="Ver perfil"
+						/>
 						<Menu.Item
 							onPress={() => {
 								setShowModal(true)
 								closeMenu()
 							}}
-							title="Calificar vendedor"
+							title="Calificar usuario"
 						/>
 						<Menu.Item onPress={() => {}} title="Borrar chat" />
 					</Menu>
