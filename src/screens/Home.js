@@ -1,11 +1,14 @@
 import { map } from 'lodash'
 import React, { useState } from 'react'
-import { StyleSheet, SafeAreaView, View } from 'react-native'
+import { StyleSheet, SafeAreaView, View, Dimensions } from 'react-native'
 import { Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { IconButton } from 'react-native-paper'
 import Logo from '../assets/img/logo.svg'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
+import ProductCard from '../components/ProductCard'
+
+const heightSize = Dimensions.get('window').height
 
 const Home = ({ navigation }) => {
 	const categories = [
@@ -84,6 +87,17 @@ const Home = ({ navigation }) => {
 						</Text>
 					))}
 				</ScrollView>
+				<ScrollView showsVerticalScrollIndicator={false} style={styles.ScrollView}>
+					<View style={styles.itemsContainer}>
+						<ProductCard />
+						<ProductCard />
+						<ProductCard />
+						<ProductCard />
+						<ProductCard />
+						<ProductCard />
+						<ProductCard />
+					</View>
+				</ScrollView>
 			</View>
 		</SafeAreaView>
 	)
@@ -106,6 +120,7 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		marginTop: -10,
 	},
 	input: {
 		height: 40,
@@ -115,7 +130,6 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginTop: 10,
 	},
-
 	search: {
 		height: 50,
 		color: '#fff',
@@ -205,5 +219,16 @@ const styles = StyleSheet.create({
 	categorySelec: {
 		backgroundColor: '#003C95',
 		color: '#fff',
+	},
+	ScrollView: {
+		maxHeight: heightSize - 150,
+	},
+	itemsContainer: {
+		display: 'flex',
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		justifyContent: 'space-between',
+		paddingHorizontal: 18,
+		paddingBottom: 200,
 	},
 })

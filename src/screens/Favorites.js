@@ -5,14 +5,12 @@ import { Title } from 'react-native-paper'
 import ProductCard from '../components/ProductCard'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 
-const heightSize = Dimensions.get('window').height
-
 const Favorites = () => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<Title style={styles.title}>Favoritos</Title>
-			<ScrollView style={styles.ScrollView}>
+			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={styles.itemsContainer}>
 					<ProductCard />
 					<ProductCard />
@@ -39,11 +37,8 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 24,
 		textAlign: 'center',
-		marginVertical: 20,
+		marginVertical: 10,
 		color: '#191B32',
-	},
-	ScrollView: {
-		maxHeight: heightSize - 150,
 	},
 	itemsContainer: {
 		display: 'flex',
@@ -51,6 +46,6 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
 		paddingHorizontal: 18,
-		paddingBottom: 20,
+		paddingBottom: 100,
 	},
 })
