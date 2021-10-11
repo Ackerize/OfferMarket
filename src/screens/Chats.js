@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 24,
 		textAlign: 'center',
-		marginTop: 20,
+		marginTop: 10,
 		color: '#191B32',
 	},
 	scrollView: {

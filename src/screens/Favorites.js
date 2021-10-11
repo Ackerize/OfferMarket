@@ -4,6 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { Title } from 'react-native-paper'
 import ProductCard from '../components/ProductCard'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
+import ProductList from '../components/ProductList'
 
 const Favorites = () => {
 	return (
@@ -11,16 +12,7 @@ const Favorites = () => {
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<Title style={styles.title}>Favoritos</Title>
 			<ScrollView showsVerticalScrollIndicator={false}>
-				<View style={styles.itemsContainer}>
-					<ProductCard />
-					<ProductCard />
-					<ProductCard />
-					<ProductCard />
-					<ProductCard />
-					<ProductCard />
-					<ProductCard />
-					<ProductCard />
-				</View>
+				<ProductList />
 			</ScrollView>
 		</SafeAreaView>
 	)
@@ -39,13 +31,5 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		marginVertical: 10,
 		color: '#191B32',
-	},
-	itemsContainer: {
-		display: 'flex',
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-		paddingHorizontal: 18,
-		paddingBottom: 100,
 	},
 })

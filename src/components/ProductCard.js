@@ -71,4 +71,12 @@ const styles = StyleSheet.create({
 		backgroundColor: '#F2F8FD',
 		borderRadius: 5,
 	},
+	itemsContainer: {
+		display: 'flex',
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		justifyContent: 'space-between',
+		paddingHorizontal: 18,
+		paddingBottom: 100,
+	},
 })

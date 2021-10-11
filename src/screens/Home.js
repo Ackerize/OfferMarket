@@ -7,6 +7,7 @@ import { IconButton } from 'react-native-paper'
 import Logo from '../assets/img/logo.svg'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 import ProductCard from '../components/ProductCard'
+import ProductList from '../components/ProductList'
 
 const heightSize = Dimensions.get('window').height
 
@@ -87,16 +88,10 @@ const Home = ({ navigation }) => {
 						</Text>
 					))}
 				</ScrollView>
-				<ScrollView showsVerticalScrollIndicator={false} style={styles.ScrollView}>
-					<View style={styles.itemsContainer}>
-						<ProductCard />
-						<ProductCard />
-						<ProductCard />
-						<ProductCard />
-						<ProductCard />
-						<ProductCard />
-						<ProductCard />
-					</View>
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					style={styles.ScrollView}>
+					<ProductList />
 				</ScrollView>
 			</View>
 		</SafeAreaView>
@@ -221,14 +216,6 @@ const styles = StyleSheet.create({
 		color: '#fff',
 	},
 	ScrollView: {
-		maxHeight: heightSize - 150,
-	},
-	itemsContainer: {
-		display: 'flex',
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-		paddingHorizontal: 18,
-		paddingBottom: 200,
+		maxHeight: heightSize - 230,
 	},
 })
