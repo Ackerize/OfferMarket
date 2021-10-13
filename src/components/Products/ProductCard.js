@@ -2,7 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, View, Image, Dimensions } from 'react-native'
 import { TouchableRipple } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import Laptop from '../assets/img/laptop.png'
+import Laptop from '../../assets/img/laptop.png'
 
 const width = Dimensions.get('window').width
 const targetWidth = width / 2 - 25

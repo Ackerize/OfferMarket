@@ -6,8 +6,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { IconButton } from 'react-native-paper'
 import Logo from '../assets/img/logo.svg'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import ProductCard from '../components/ProductCard'
-import ProductList from '../components/ProductList'
+import ProductList from '../components/Products/ProductList'
 
 const heightSize = Dimensions.get('window').height
 

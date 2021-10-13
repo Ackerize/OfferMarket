@@ -2,9 +2,8 @@ import React from 'react'
 import { StyleSheet, SafeAreaView, Dimensions, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Title } from 'react-native-paper'
-import ProductCard from '../components/ProductCard'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import ProductList from '../components/ProductList'
+import ProductList from '../components/Products/ProductList'
 
 const Favorites = () => {
 	return (

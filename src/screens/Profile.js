@@ -12,7 +12,9 @@ import { AirbnbRating } from 'react-native-elements'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 import avatarImg from '../assets/img/person.jpg'
 import { ScrollView } from 'react-native-gesture-handler'
-import ProductList from '../components/ProductList'
+import ProductList from '../components/Products/ProductList'
+import ContactInfo from '../components/ContactInfo'
+import Reviews from '../components/Reviews/Reviews'
 
 const heightScreen = Dimensions.get('window').height
 
@@ -62,10 +64,10 @@ const Profile = () => {
 							Productos
 						</Text>
 					</TouchableWithoutFeedback>
-					<TouchableWithoutFeedback onPress={() => setActiveTab('location')}>
+					<TouchableWithoutFeedback onPress={() => setActiveTab('contact')}>
 						<Text
-							style={[styles.tab, activeTab == 'location' && styles.activeTab]}>
-							Ubicación
+							style={[styles.tab, activeTab == 'contact' && styles.activeTab]}>
+							Contacto
 						</Text>
 					</TouchableWithoutFeedback>
 					<TouchableWithoutFeedback onPress={() => setActiveTab('reviews')}>
@@ -79,6 +81,8 @@ const Profile = () => {
 					style={styles.scrollView}
 					showsVerticalScrollIndicator={false}>
 					{activeTab == 'products' && <ProductList />}
+					{activeTab == "contact" && <ContactInfo />}
+					{activeTab == "reviews" && <Reviews />}
 				</ScrollView>
 			</View>
 		</SafeAreaView>
