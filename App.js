@@ -7,19 +7,29 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { LogBox } from 'react-native'
 import Root from './src/components/Modals/Root'
 
+import { Provider } from 'react-redux'
+import reduxStore from './src/store/store'
+import { PersistGate } from 'redux-persist/integration/react'
+
 LogBox.ignoreAllLogs(true)
 
 const App = () => {
+	const { store, persistor } = reduxStore()
+
 	return (
-		<SafeAreaProvider>
-			<PaperProvider>
-				<Root>
-					<NavigationContainer>
-						<StackNavigation />
-					</NavigationContainer>
-				</Root>
-			</PaperProvider>
-		</SafeAreaProvider>
+		<Provider store={store}>
+			<PersistGate loading={null} persistor={persistor}>
+				<SafeAreaProvider>
+					<PaperProvider>
+						<Root>
+							<NavigationContainer>
+								<StackNavigation />
+							</NavigationContainer>
+						</Root>
+					</PaperProvider>
+				</SafeAreaProvider>
+			</PersistGate>
+		</Provider>
 	)
 }
 

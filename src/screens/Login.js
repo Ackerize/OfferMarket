@@ -13,7 +13,12 @@ import Facebook from '../assets/img/facebook.svg'
 import Icon from 'react-native-vector-icons/dist/FontAwesome'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 
+import { useSelector } from 'react-redux'
+
 const Login = ({ navigation }) => {
+
+	const state = useSelector(state => state)
+	console.log(state); 
 	return (
 		<SafeAreaView style={styles.mainContainer}>
             <FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />

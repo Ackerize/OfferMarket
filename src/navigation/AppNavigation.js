@@ -32,7 +32,7 @@ export default () => {
 			appearance={{
 				floating: true,
 			}}>
-			<Tabs.Screen
+			{/* <Tabs.Screen
 				name="Login"
 				component={Login}
 				options={{
@@ -40,7 +40,7 @@ export default () => {
 						<TabBarIcon focused={focused} tintColor={color} name="person" />
 					),
 				}}
-			/>
+			/> */}
 			<Tabs.Screen
 				name="Inicio"
 				component={Home}
