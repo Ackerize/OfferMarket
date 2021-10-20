@@ -11,14 +11,14 @@ export const startLoginEmailPassword = (email, password) => {
 	}
 }
 
-export const startGoogleLogin = async () => {
+export const startGoogleLogin = () => {
 	console.log('clicked')
 	return dispatch => {
 		// const { idToken } =  GoogleSignin.signIn();
     // console.log(idToken);
     firebase.auth().signInWithPopup( googleAuthProvider )
-      .then( userCred => {
-        console.log(userCred);
+      .then( ({ user }) => {
+        dispatch(login(user.uid, user.displayName, user.email))
       })
 	}
 }
