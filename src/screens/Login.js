@@ -7,14 +7,16 @@ import {
 	TextInput,
 	TouchableOpacity,
 } from 'react-native'
-import LoginImage from '../assets/login.svg'
-import Google from '../assets/google.svg'
-import Facebook from '../assets/facebook.svg'
+import LoginImage from '../assets/img/login.svg'
+import Google from '../assets/img/google.svg'
+import Facebook from '../assets/img/facebook.svg'
 import Icon from 'react-native-vector-icons/dist/FontAwesome'
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 
 const Login = ({ navigation }) => {
 	return (
 		<SafeAreaView style={styles.mainContainer}>
+            <FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.imageContainer}>
 				<LoginImage />
 			</View>

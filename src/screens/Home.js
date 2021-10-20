@@ -1,10 +1,14 @@
 import { map } from 'lodash'
 import React, { useState } from 'react'
-import { StyleSheet, SafeAreaView, View } from 'react-native'
+import { StyleSheet, SafeAreaView, View, Dimensions } from 'react-native'
 import { Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
-import { Searchbar, IconButton } from 'react-native-paper'
-import Logo from '../assets/logo.svg'
+import { IconButton } from 'react-native-paper'
+import Logo from '../assets/img/logo.svg'
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
+import ProductList from '../components/Products/ProductList'
+
+const heightSize = Dimensions.get('window').height
 
 const Home = ({ navigation }) => {
 	const categories = [
@@ -42,22 +46,29 @@ const Home = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
+			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.header}>
 				<View style={styles.imgContainer}>
-				<Logo width={150} height={150} fill="#000" />
+					<Logo width={150} height={150} fill="#000" />
 				</View>
 				<View style={styles.notificationContainer}>
-					<Text style={styles.notificationText}>10</Text>
+					<Text style={styles.notificationText}>1</Text>
 					<IconButton
 						raised
 						icon="bell"
 						color="#003C95"
 						style={styles.notification}
+						onPress={() => navigation.navigate('Notifications')}
 					/>
 				</View>
 			</View>
 
-			<Searchbar style={styles.input} />
+			<IconButton
+				icon="magnify"
+				style={styles.search}
+				color="#003C95"
+				onPress={() => navigation.navigate('Search')}
+			/>
 
 			<View style={styles.categories}>
 				<ScrollView
@@ -75,6 +86,11 @@ const Home = ({ navigation }) => {
 							{catg.name}
 						</Text>
 					))}
+				</ScrollView>
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					style={styles.ScrollView}>
+					<ProductList />
 				</ScrollView>
 			</View>
 		</SafeAreaView>
@@ -98,6 +114,7 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		marginTop: -10,
 	},
 	input: {
 		height: 40,
@@ -107,6 +124,27 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginTop: 10,
 	},
+	search: {
+		height: 50,
+		color: '#fff',
+		width: '90%',
+		borderRadius: 10,
+		fontSize: 18,
+		alignSelf: 'center',
+		alignItems: 'flex-start',
+		padding: 15,
+		backgroundColor: '#fff',
+		borderColor: '#fff',
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 3.84,
+		elevation: 5,
+	},
+
 	notificationContainer: {
 		position: 'relative',
 		width: 60,
@@ -175,5 +213,8 @@ const styles = StyleSheet.create({
 	categorySelec: {
 		backgroundColor: '#003C95',
 		color: '#fff',
+	},
+	ScrollView: {
+		maxHeight: heightSize - 230,
 	},
 })

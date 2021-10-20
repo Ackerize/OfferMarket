@@ -7,13 +7,14 @@ import {
 	TextInput,
 	TouchableOpacity,
 } from 'react-native'
-import LoginImage from '../assets/register.svg'
+import LoginImage from '../assets/img/register.svg'
 import Icon from 'react-native-vector-icons/dist/FontAwesome'
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 
 const Register = ({ navigation }) => {
-
 	return (
 		<SafeAreaView style={styles.mainContainer}>
+            <FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.imageContainer}>
 				<LoginImage />
 			</View>
