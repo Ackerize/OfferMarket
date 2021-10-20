@@ -8,13 +8,16 @@ import PersonalChat from '../screens/PersonalChat'
 import Search from '../screens/Search'
 import Notifications from '../screens/Notifications'
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import Login from '../screens/Login'
+import Register from '../screens/Register'
+import Search from '../screens/Search'
+import Notifications from '../screens/Notifications'
 
 const Stack = createStackNavigator()
 
-export default function StackNavigation(props) {
-	console.log(props)
+export default function StackNavigation() {
 	return (
-		<Stack.Navigator>
+		<Stack.Navigator initialRouteName="Home">
 			<Stack.Screen
 				name="Home"
 				component={AppNavigation}
@@ -41,10 +44,26 @@ export default function StackNavigation(props) {
 				options={{
 					headerTransparent: true,
 					title: '',
-					headerBackImage: () => <Icon name="arrow-back-ios" size={30} color="#000" />,
+					headerBackImage: () => <Icon name="arrow-back-ios" size={30} color="#000" style={{ paddingTop: 20, paddingLeft: 15}} />,
+					headerRight: null
 				}}
 			/>
-
+			<Stack.Screen
+				name="Login"
+				component={Login}
+				options={{ headerTransparent: true, title: '', headerLeft: false }}
+			/>
+			<Stack.Screen
+				name="Register"
+				component={Register}
+				options={{
+					headerTransparent: true,
+					title: '',
+					headerBackImage: () => (
+						<Icon name="arrow-back-ios" size={30} color="#000" />
+					),
+				}}
+			/>
 			<Stack.Screen
 				name="Search"
 				component={Search}
@@ -60,7 +79,6 @@ export default function StackNavigation(props) {
 				headerBackImage: () => <Icon name="arrow-back-ios" size={30} color="#003C95" />,
 			 }}
 			/>
-
 		</Stack.Navigator>
 	)
 }

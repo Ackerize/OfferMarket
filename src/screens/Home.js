@@ -3,9 +3,9 @@ import React, { useState } from 'react'
 import { StyleSheet, SafeAreaView, View } from 'react-native'
 import { Button, Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
-import { Searchbar, IconButton } from 'react-native-paper'
-import Logo from '../assets/logo.svg'
-import Search from './Search'
+import { IconButton } from 'react-native-paper'
+import Logo from '../assets/img/logo.svg'
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 
 const Home = ({ navigation }) => {
 	const categories = [
@@ -43,9 +43,10 @@ const Home = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
+			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.header}>
 				<View style={styles.imgContainer}>
-				<Logo width={150} height={150} fill="#000" />
+					<Logo width={150} height={150} fill="#000" />
 				</View>
 				<View style={styles.notificationContainer}>
 					<Text style={styles.notificationText}>1</Text>
@@ -59,8 +60,12 @@ const Home = ({ navigation }) => {
 				</View>
 			</View>
 
-			<IconButton icon='magnify' style={styles.search} color="#003C95"  onPress={() => navigation.navigate('Search')}/>
-			
+			<IconButton
+				icon="magnify"
+				style={styles.search}
+				color="#003C95"
+				onPress={() => navigation.navigate('Search')}
+			/>
 
 			<View style={styles.categories}>
 				<ScrollView
