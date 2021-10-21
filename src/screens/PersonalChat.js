@@ -12,7 +12,6 @@ import {
 	Avatar,
 	Text,
 	Menu,
-	IconButton,
 	TouchableRipple,
 } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialIcons'

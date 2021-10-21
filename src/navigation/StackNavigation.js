@@ -10,9 +10,9 @@ import Login from '../screens/Login'
 import Register from '../screens/Register'
 import Search from '../screens/Search'
 import Notifications from '../screens/Notifications'
-import firebase from 'firebase'
 import { useDispatch } from 'react-redux'
-import { login } from '../actions/auth'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import auth from '@react-native-firebase/auth'
 
 const Stack = createStackNavigator()
 
@@ -21,13 +21,19 @@ export default function StackNavigation() {
 	const dispatch = useDispatch()
 
 	useEffect(() => {
-		firebase.auth().onAuthStateChanged(user => {
+		auth().onAuthStateChanged(user => {
 			if (user?.uid) {
-				dispatch(login(user.uid, user.displayName, user.email))
 				setLoggedIn(true)
 			} else {
 				setLoggedIn(false)
 			}
+		})
+	}, [])
+
+	useEffect(() => {
+		GoogleSignin.configure({
+			webClientId:
+				'1082374728024-9nkb75rmoh9gilgl1g9nuhufd38iq5hn.apps.googleusercontent.com',
 		})
 	}, [])
 
@@ -48,6 +54,11 @@ export default function StackNavigation() {
 					<Stack.Screen
 						name="Chats"
 						component={Chats}
+						options={{ headerTransparent: true, title: '' }}
+					/>
+					<Stack.Screen
+						name="Profile"
+						component={Profile}
 						options={{ headerTransparent: true, title: '' }}
 					/>
 					<Stack.Screen

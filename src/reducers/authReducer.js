@@ -4,6 +4,7 @@ const initialState = {
   uid: null,
   name: null,
   email: null,
+  typeLogin: null,
 }
 
 export const authReducer = (state = initialState, action) => {
@@ -14,6 +15,7 @@ export const authReducer = (state = initialState, action) => {
 				uid: action.payload.uid,
 				name: action.payload.displayName,
 				email: action.payload.email,
+				typeLogin: action.payload.typeLogin,
 			}
 		case types.logout:
 			return {
@@ -21,6 +23,7 @@ export const authReducer = (state = initialState, action) => {
 				uid: null,
 				name: null,
 				email: null,
+				typeLogin: null,
 			}
 
 		default:

@@ -14,8 +14,7 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 import { useFormik } from 'formik'
 import { useSelector, useDispatch } from 'react-redux'
-import { startGoogleLogin, startLoginEmailPassword } from '../actions/auth'
-import { ScrollView } from 'react-native'
+import { startFacebookLogin, startGoogleLogin, startLoginEmailPassword } from '../actions/auth'
 
 const Login = ({ navigation }) => {
 
@@ -38,6 +37,10 @@ const Login = ({ navigation }) => {
 
 	const handleGoogleLogin = () =>{
 		dispatch(startGoogleLogin())
+	}
+
+	const handleFacebookLogin = () =>{
+		dispatch(startFacebookLogin())
 	}
 	const state = useSelector(state => state)
 	console.log(state);
@@ -84,9 +87,9 @@ const Login = ({ navigation }) => {
 					<TouchableOpacity onPress={handleGoogleLogin} style={styles.btnSocial}>
 						<Google />
 					</TouchableOpacity>
-					<View style={styles.btnSocial}>
+					<TouchableOpacity onPress={handleFacebookLogin} style={styles.btnSocial}>
 						<Facebook />
-					</View>
+					</TouchableOpacity>
 				</View>
 				<View>
 					<Text style={{ textAlign: 'center' }}>

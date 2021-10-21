@@ -9,16 +9,13 @@ import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 import ProductList from '../components/Products/ProductList'
 import Icon from 'react-native-vector-icons/dist/FontAwesome'
 const heightSize = Dimensions.get('window').height
-import { useDispatch, useSelector } from 'react-redux'
-import { startLogout } from '../actions/auth'
+import { useSelector } from 'react-redux'
 
 const Home = ({ navigation }) => {
 
-	const dispatch = useDispatch();
 	const auth = useSelector(state => state.auth)
 	const { name } = auth
-	
-	console.log(name);
+
 
 	const categories = [
 		{
@@ -53,11 +50,6 @@ const Home = ({ navigation }) => {
 		setCategorySelected(category)
 	}
 
-	const handleLogOut = () =>{
-		dispatch(startLogout());
-	}
-
-
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
@@ -77,14 +69,9 @@ const Home = ({ navigation }) => {
 							onPress={() => navigation.navigate('Notifications')}
 						/>
 					</View>
-					<TouchableOpacity onPress={ handleLogOut } style={styles.logout}>
-						<Icon name="sign-out" size={20} color="#000"/>
-						<Text>Log out</Text>
-					</TouchableOpacity>
 				</View>
 				
 			</View>
-			<Text style={{marginLeft: 20,marginBottom: 20}}>{`Hola, ${name}`}</Text>
 			<IconButton
 				icon="magnify"
 				style={styles.search}
