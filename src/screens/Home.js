@@ -1,13 +1,25 @@
 import { map } from 'lodash'
 import React, { useState } from 'react'
-import { StyleSheet, SafeAreaView, View } from 'react-native'
-import { Button, Text } from 'react-native-elements'
+import { StyleSheet, SafeAreaView, View, Dimensions,TouchableOpacity } from 'react-native'
+import { Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { IconButton } from 'react-native-paper'
 import Logo from '../assets/img/logo.svg'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
+import ProductList from '../components/Products/ProductList'
+import Icon from 'react-native-vector-icons/dist/FontAwesome'
+const heightSize = Dimensions.get('window').height
+import { useDispatch, useSelector } from 'react-redux'
+import { startLogout } from '../actions/auth'
 
 const Home = ({ navigation }) => {
+
+	const dispatch = useDispatch();
+	const auth = useSelector(state => state.auth)
+	const { name } = auth
+
+	console.log(name);
+
 	const categories = [
 		{
 			id: 1,
@@ -41,6 +53,11 @@ const Home = ({ navigation }) => {
 		setCategorySelected(category)
 	}
 
+	const handleLogOut = () =>{
+		dispatch(startLogout());
+	}
+
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
@@ -48,18 +65,26 @@ const Home = ({ navigation }) => {
 				<View style={styles.imgContainer}>
 					<Logo width={150} height={150} fill="#000" />
 				</View>
-				<View style={styles.notificationContainer}>
-					<Text style={styles.notificationText}>1</Text>
-					<IconButton
-						raised
-						icon="bell"
-						color="#003C95"
-						style={styles.notification}
-						onPress={() => navigation.navigate('Notifications')}
-					/>
-				</View>
-			</View>
 
+				<View>
+					<View style={styles.notificationContainer}>
+						<Text style={styles.notificationText}>1</Text>
+						<IconButton
+							raised
+							icon="bell"
+							color="#003C95"
+							style={styles.notification}
+							onPress={() => navigation.navigate('Notifications')}
+						/>
+					</View>
+					<TouchableOpacity onPress={ handleLogOut } style={styles.logout}>
+						<Icon name="sign-out" size={20} color="#000"/>
+						<Text>Log out</Text>
+					</TouchableOpacity>
+				</View>
+
+			</View>
+			<Text style={{marginLeft: 20,marginBottom: 20}}>{`Hola, ${name}`}</Text>
 			<IconButton
 				icon="magnify"
 				style={styles.search}
@@ -84,6 +109,11 @@ const Home = ({ navigation }) => {
 						</Text>
 					))}
 				</ScrollView>
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					style={styles.ScrollView}>
+					<ProductList />
+				</ScrollView>
 			</View>
 		</SafeAreaView>
 	)
@@ -96,6 +126,11 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		height: '100%',
 	},
+	logout:{
+		display: 'flex',
+		flexDirection: 'row',
+		marginBottom: 10,
+	},
 	imgContainer: {
 		width: 50,
 		height: 50,
@@ -106,6 +141,7 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		marginTop: -10,
 	},
 	input: {
 		height: 40,
@@ -115,7 +151,6 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginTop: 10,
 	},
-
 	search: {
 		height: 50,
 		color: '#fff',
@@ -142,7 +177,7 @@ const styles = StyleSheet.create({
 		width: 60,
 		height: 60,
 		alignSelf: 'flex-end',
-		marginBottom: 40,
+		marginBottom: 20,
 		marginRight: 20,
 		marginTop: 20,
 	},
@@ -205,5 +240,8 @@ const styles = StyleSheet.create({
 	categorySelec: {
 		backgroundColor: '#003C95',
 		color: '#fff',
+	},
+	ScrollView: {
+		maxHeight: heightSize - 230,
 	},
 })

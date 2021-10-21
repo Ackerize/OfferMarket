@@ -12,8 +12,35 @@ import Google from '../assets/img/google.svg'
 import Facebook from '../assets/img/facebook.svg'
 import Icon from 'react-native-vector-icons/dist/FontAwesome'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
+import { useFormik } from 'formik'
+import { useSelector, useDispatch } from 'react-redux'
+import { startGoogleLogin, startLoginEmailPassword } from '../actions/auth'
+import { ScrollView } from 'react-native'
 
 const Login = ({ navigation }) => {
+
+	const dispatch = useDispatch();
+
+	const loginForm = useFormik({
+		initialValues:{
+			email: "",
+			password: ""
+		},
+	})
+
+	const { email,password } = loginForm.values
+
+	const handleNormalLogin = (e) =>{
+		e.preventDefault()
+		console.log('hola');
+		dispatch(startLoginEmailPassword(email, password))
+	}
+
+	const handleGoogleLogin = () =>{
+		dispatch(startGoogleLogin())
+	}
+	const state = useSelector(state => state)
+	console.log(state);
 	return (
 		<SafeAreaView style={styles.mainContainer}>
             <FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
@@ -25,6 +52,9 @@ const Login = ({ navigation }) => {
 				<View style={styles.inputSection}>
 					<Icon style={styles.icon} name="at" size={20} color="#000" />
 					<TextInput
+						nativeID="email"
+						value={loginForm.values.email}
+						onChangeText={loginForm.handleChange('email')}
 						style={styles.input}
 						placeholder="Correo"
 						placeholderTextColor="#B7C6D9"
@@ -34,12 +64,15 @@ const Login = ({ navigation }) => {
 				<View style={styles.inputSection}>
 					<Icon style={styles.icon} name="lock" size={20} color="#000" />
 					<TextInput
+						nativeID="password"
+						value={loginForm.values.password}
+						onChangeText={loginForm.handleChange('password')}
 						style={styles.input}
 						placeholder="Contraseña"
 						placeholderTextColor="#B7C6D9"
 					/>
 				</View>
-				<TouchableOpacity style={styles.btn}>
+				<TouchableOpacity onPress={handleNormalLogin} style={styles.btn}>
 					<Text style={styles.btnText}>Iniciar sesión</Text>
 				</TouchableOpacity>
 				<View style={styles.containerLines}>
@@ -48,9 +81,9 @@ const Login = ({ navigation }) => {
 					<View style={styles.line} />
 				</View>
 				<View style={styles.socialContainer}>
-					<View style={styles.btnSocial}>
+					<TouchableOpacity onPress={handleGoogleLogin} style={styles.btnSocial}>
 						<Google />
-					</View>
+					</TouchableOpacity>
 					<View style={styles.btnSocial}>
 						<Facebook />
 					</View>

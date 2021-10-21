@@ -1,12 +1,11 @@
 import React from 'react'
 import { StyleSheet, Text, SafeAreaView, View } from 'react-native'
 import { Searchbar } from 'react-native-paper'
-import Icon from 'react-native-vector-icons/MaterialIcons'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 
 const Search = ({ navigation }) => {
 	return (
-		<SafeAreaView>
+		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.header}>
 				<Searchbar style={styles.search} iconColor="#003C95" autoFocus={true} />
@@ -18,6 +17,11 @@ const Search = ({ navigation }) => {
 export default Search
 
 const styles = StyleSheet.create({
+	container: {
+		width: '100%',
+		height: '100%',
+		backgroundColor: 'white',
+	},
 	header: {
 		paddingVertical: 3,
 		flexDirection: 'row',
