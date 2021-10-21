@@ -15,6 +15,7 @@ import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 import { useFormik } from 'formik'
 import { useSelector, useDispatch } from 'react-redux'
 import { startGoogleLogin, startLoginEmailPassword } from '../actions/auth'
+import { ScrollView } from 'react-native'
 
 const Login = ({ navigation }) => {
 
