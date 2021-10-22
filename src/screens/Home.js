@@ -1,38 +1,17 @@
 import { map } from 'lodash'
 import React, { useState } from 'react'
-import { StyleSheet, SafeAreaView, View } from 'react-native'
-import { Button, Text } from 'react-native-elements'
+import { StyleSheet, SafeAreaView, View, Dimensions } from 'react-native'
+import { Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
-import { Searchbar, IconButton } from 'react-native-paper'
-import Logo from '../assets/logo.svg'
+import { IconButton } from 'react-native-paper'
+import Logo from '../assets/img/logo.svg'
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
+import ProductList from '../components/Products/ProductList'
+import Tag from '../components/Tag'
+import { categories } from '../utils/category'
+const heightSize = Dimensions.get('window').height
 
 const Home = ({ navigation }) => {
-	const categories = [
-		{
-			id: 1,
-			name: 'Reciente',
-		},
-		{
-			id: 2,
-			name: 'Hogar',
-		},
-		{
-			id: 3,
-			name: 'Belleza',
-		},
-		{
-			id: 4,
-			name: 'Ropa',
-		},
-		{
-			id: 5,
-			name: 'Telefonos',
-		},
-		{
-			id: 6,
-			name: 'Computadoras',
-		},
-	]
 
 	const [categorySelected, setCategorySelected] = useState(1)
 
@@ -43,33 +22,31 @@ const Home = ({ navigation }) => {
 
 	return (
 		<SafeAreaView style={styles.container}>
+			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.header}>
 				<View style={styles.imgContainer}>
 					<Logo width={150} height={150} fill="#000" />
-			</View>
-			
-			<View style={styles.notificationContainer}>
-				<IconButton style={styles.notificationContainer}
-					icon="plus"
-					color="#841584"
-					onPress={()=> navigation.navigate('FormProduct')}
-					style={styles.notification}
-				/>
-			</View>
+				</View>
 
-			<View style={styles.notificationContainer}>
-					<Text style={styles.notificationText}>10</Text>
-					<IconButton
-						raised
-						icon="bell"
-						color="#003C95"
-						style={styles.notification}
-					/>
+				<View>
+					<View style={styles.notificationContainer}>
+						<Text style={styles.notificationText}>1</Text>
+						<IconButton
+							raised
+							icon="bell"
+							color="#003C95"
+							style={styles.notification}
+							onPress={() => navigation.navigate('Filter')}
+						/>
+					</View>
+				</View>
 			</View>
-
-			</View>
-
-			<Searchbar style={styles.input} />
+			<IconButton
+				icon="magnify"
+				style={styles.search}
+				color="#003C95"
+				onPress={() => navigation.navigate('Search')}
+			/>
 
 
 			<View style={styles.categories}>
@@ -78,16 +55,18 @@ const Home = ({ navigation }) => {
 					showsHorizontalScrollIndicator={false}
 					style={styles.categoryList}>
 					{map(categories, catg => (
-						<Text
+						<Tag
 							key={catg.id}
-							style={[
-								styles.category,
-								categorySelected === catg.id && styles.categorySelec,
-							]}
-							onPress={() => onChangeCategory(catg.id)}>
-							{catg.name}
-						</Text>
+							selected={categorySelected === catg.id}
+							onPress={() => onChangeCategory(catg.id)}
+							name={catg.name}
+						/>
 					))}
+				</ScrollView>
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					style={styles.ScrollView}>
+					<ProductList />
 				</ScrollView>
 			</View>
 		</SafeAreaView>
@@ -101,6 +80,11 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		height: '100%',
 	},
+	logout: {
+		display: 'flex',
+		flexDirection: 'row',
+		marginBottom: 10,
+	},
 	imgContainer: {
 		width: 50,
 		height: 50,
@@ -111,6 +95,7 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		marginTop: -10,
 	},
 	input: {
 		height: 40,
@@ -120,12 +105,33 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		marginTop: 10,
 	},
+	search: {
+		height: 50,
+		color: '#fff',
+		width: '90%',
+		borderRadius: 10,
+		fontSize: 18,
+		alignSelf: 'center',
+		alignItems: 'flex-start',
+		padding: 15,
+		backgroundColor: '#fff',
+		borderColor: '#fff',
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 3.84,
+		elevation: 5,
+	},
+
 	notificationContainer: {
 		position: 'relative',
 		width: 60,
 		height: 60,
 		alignSelf: 'flex-end',
-		marginBottom: 40,
+		marginBottom: 20,
 		marginRight: 20,
 		marginTop: 20,
 	},
@@ -170,23 +176,8 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 		marginHorizontal: 20,
 	},
-	category: {
-		marginHorizontal: 5,
-		fontSize: 16,
-		borderWidth: 1,
-		paddingHorizontal: 10,
-		paddingVertical: 5,
-		borderRadius: 10,
-		fontFamily: 'Roboto',
-		fontWeight: 'bold',
-		backgroundColor: '#fff',
-		borderColor: '#E6E6E6',
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	categorySelec: {
-		backgroundColor: '#003C95',
-		color: '#fff',
+
+	ScrollView: {
+		maxHeight: heightSize - 230,
 	},
 })

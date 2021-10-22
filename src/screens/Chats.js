@@ -1,58 +1,85 @@
 import React from 'react'
-import {
-	StyleSheet,
-	View,
-	SafeAreaView,
-	TouchableWithoutFeedback,
-} from 'react-native'
-import { Title, Avatar, Text } from 'react-native-paper'
-import avatarImg from '../assets/person.jpg'
+import { StyleSheet, SafeAreaView, Dimensions } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { Title, } from 'react-native-paper'
+import avatarImg from '../assets/img/person.jpg'
+import Person from '../components/Person'
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 
-const Chats = ( { navigation }) => {
+const heightSize = Dimensions.get('window').height
+
+const Chats = ({ navigation }) => {
+	const action = () => navigation.navigate('PersonalChat')
 	return (
 		<SafeAreaView style={styles.container}>
+			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<Title style={styles.title}>Mensajes</Title>
-			<TouchableWithoutFeedback onPress={() => navigation.navigate('PersonalChat')}>
-				<View style={styles.messageContainer}>
-					<Avatar.Image size={60} source={avatarImg} />
-					<View style={styles.informationContainer}>
-						<Text style={styles.date}>hace 20 min</Text>
-						<Text style={styles.person}>Fernando Portillo</Text>
-						<Text style={styles.message}>¡Muchas gracias!</Text>
-						<Text style={styles.notificationText}>10</Text>
-						<View style={styles.line} />
-					</View>
-				</View>
-			</TouchableWithoutFeedback>
-			<View style={styles.messageContainer}>
-				<Avatar.Image size={60} source={avatarImg} />
-				<View style={styles.informationContainer}>
-					<Text style={styles.date}>hace 2 días</Text>
-					<Text style={styles.person}>Juan Gómez</Text>
-					<Text style={styles.message}>Ok, nos vemos a esa hora.</Text>
-					<Text style={styles.notificationText}>2</Text>
-					<View style={styles.line} />
-				</View>
-			</View>
-			<View style={styles.messageContainer}>
-				<Avatar.Image size={60} source={avatarImg} />
-				<View style={styles.informationContainer}>
-					<Text style={styles.date}>hace 3 días</Text>
-					<Text style={styles.person}>Juan Gómez</Text>
-					<Text style={styles.message}>Estoy interesada en la laptop</Text>
-					<Text style={styles.notificationText}>1</Text>
-					<View style={styles.line} />
-				</View>
-			</View>
-			<View style={styles.messageContainer}>
-				<Avatar.Image size={60} source={avatarImg} />
-				<View style={styles.informationContainer}>
-					<Text style={styles.date}>10 de marzo</Text>
-					<Text style={styles.person}>Aaron Palacios</Text>
-					<Text style={styles.message}>Muy buen producto, gracias.</Text>
-					<View style={styles.line} />
-				</View>
-			</View>
+			<ScrollView style={styles.scrollView}>
+				<Person
+					avatar={avatarImg}
+					title="Juan Gómez"
+					subtitle="Ok, nos vemos a esa hora."
+					date="Hace 20 min"
+					notifications={0}
+					action={action}
+				/>
+				<Person
+					avatar={avatarImg}
+					title="Juan Gómez"
+					subtitle="Ok, nos vemos a esa hora."
+					date="Hace 2 días"
+					notifications={0}
+					action={action}
+				/>
+				<Person
+					avatar={avatarImg}
+					title="Juan Gómez"
+					subtitle="Ok, nos vemos a esa hora."
+					date="Hace 20 min"
+					notifications={10}
+					action={action}
+				/>
+				<Person
+					avatar={avatarImg}
+					title="Juan Gómez"
+					subtitle="Ok, nos vemos a esa hora."
+					date="Hace 2 días"
+					notifications={2}
+					action={action}
+				/>
+				<Person
+					avatar={avatarImg}
+					title="Juan Gómez"
+					subtitle="Ok, nos vemos a esa hora."
+					date="Hace 20 min"
+					notifications={1}
+					action={action}
+				/>
+				<Person
+					avatar={avatarImg}
+					title="Juan Gómez"
+					subtitle="Ok, nos vemos a esa hora."
+					date="Hace 2 días"
+					notifications={0}
+					action={action}
+				/>
+				<Person
+					avatar={avatarImg}
+					title="Juan Gómez"
+					subtitle="Ok, nos vemos a esa hora."
+					date="Hace 20 min"
+					notifications={1}
+					action={action}
+				/>
+				<Person
+					avatar={avatarImg}
+					title="Juan Gómez"
+					subtitle="Ok, nos vemos a esa hora."
+					date="Hace 2 días"
+					notifications={0}
+					action={action}
+				/>
+			</ScrollView>
 		</SafeAreaView>
 	)
 }
@@ -65,60 +92,13 @@ const styles = StyleSheet.create({
 		height: '100%',
 		backgroundColor: '#fff',
 	},
-	line: {
-		height: 1,
-		width: '95%',
-		backgroundColor: '#DCE5EE',
-		marginTop: 5,
-		marginBottom: 5,
-	},
 	title: {
 		fontSize: 24,
 		textAlign: 'center',
-		marginTop: 20,
+		marginTop: 10,
 		color: '#191B32',
 	},
-	messageContainer: {
-		flexDirection: 'row',
-		marginHorizontal: 20,
-		marginTop: 30,
-	},
-	informationContainer: {
-		marginHorizontal: 20,
-		height: 75,
-		width: '80%',
-		justifyContent: 'space-between',
-		paddingTop: 5,
-		position: 'relative',
-	},
-	notificationText: {
-		position: 'absolute',
-		borderRadius: 100,
-		backgroundColor: '#060948',
-		fontWeight: 'bold',
-		color: '#fff',
-		height: 24,
-		width: 24,
-		textAlign: 'center',
-		textAlignVertical: 'center',
-		right: 20,
-		top: 30,
-	},
-	date: {
-		position: 'absolute',
-		color: '#9D9D9D',
-		top: 0,
-		right: 5,
-	},
-	person: {
-		fontSize: 17,
-		color: '#000',
-		fontWeight: 'bold',
-		lineHeight: 20,
-	},
-	message: {
-		fontSize: 17,
-		color: '#9D9D9D',
-		lineHeight: 20,
+	scrollView: {
+		maxHeight: heightSize - 150,
 	},
 })
