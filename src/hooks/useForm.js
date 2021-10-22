@@ -1,20 +1,18 @@
-import { useState } from "react"
+import { useState } from 'react'
 
-export const useForm = ( initialState = {} ) => {
-    
-    const [values, setValues] = useState(initialState)
+export const useForm = (initialState = {}) => {
+	const [values, setValues] = useState(initialState)
 
-    const reset = () => {
-        setValues( initialState )
-    }
+	const reset = () => {
+		setValues(initialState)
+	}
 
-    const handleInputChange = (name, {nativeEvent}) => {
+	const handleInputChange = (name, value) => {
+		setValues({
+			...values,
+			[name]: value.substring(2),
+		})
+	}
 
-        setValues({
-            ...values,
-            [ name ]: nativeEvent.text
-        });
-    }
-
-    return [ values, handleInputChange, reset ];
+	return [values, handleInputChange, reset]
 }

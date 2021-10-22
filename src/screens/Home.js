@@ -1,48 +1,17 @@
 import { map } from 'lodash'
 import React, { useState } from 'react'
-import { StyleSheet, SafeAreaView, View, Dimensions,TouchableOpacity } from 'react-native'
+import { StyleSheet, SafeAreaView, View, Dimensions } from 'react-native'
 import { Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { IconButton } from 'react-native-paper'
 import Logo from '../assets/img/logo.svg'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 import ProductList from '../components/Products/ProductList'
-import Icon from 'react-native-vector-icons/dist/FontAwesome'
+import Tag from '../components/Tag'
+import { categories } from '../utils/category'
 const heightSize = Dimensions.get('window').height
-import { useSelector } from 'react-redux'
 
 const Home = ({ navigation }) => {
-
-	const auth = useSelector(state => state.auth)
-	const { name } = auth
-
-
-	const categories = [
-		{
-			id: 1,
-			name: 'Reciente',
-		},
-		{
-			id: 2,
-			name: 'Hogar',
-		},
-		{
-			id: 3,
-			name: 'Belleza',
-		},
-		{
-			id: 4,
-			name: 'Ropa',
-		},
-		{
-			id: 5,
-			name: 'Telefonos',
-		},
-		{
-			id: 6,
-			name: 'Computadoras',
-		},
-	]
 
 	const [categorySelected, setCategorySelected] = useState(1)
 
@@ -57,7 +26,7 @@ const Home = ({ navigation }) => {
 				<View style={styles.imgContainer}>
 					<Logo width={150} height={150} fill="#000" />
 				</View>
-				
+
 				<View>
 					<View style={styles.notificationContainer}>
 						<Text style={styles.notificationText}>1</Text>
@@ -66,11 +35,10 @@ const Home = ({ navigation }) => {
 							icon="bell"
 							color="#003C95"
 							style={styles.notification}
-							onPress={() => navigation.navigate('Notifications')}
+							onPress={() => navigation.navigate('Filter')}
 						/>
 					</View>
 				</View>
-				
 			</View>
 			<IconButton
 				icon="magnify"
@@ -85,15 +53,12 @@ const Home = ({ navigation }) => {
 					showsHorizontalScrollIndicator={false}
 					style={styles.categoryList}>
 					{map(categories, catg => (
-						<Text
+						<Tag
 							key={catg.id}
-							style={[
-								styles.category,
-								categorySelected === catg.id && styles.categorySelec,
-							]}
-							onPress={() => onChangeCategory(catg.id)}>
-							{catg.name}
-						</Text>
+							selected={categorySelected === catg.id}
+							onPress={() => onChangeCategory(catg.id)}
+							name={catg.name}
+						/>
 					))}
 				</ScrollView>
 				<ScrollView
@@ -113,7 +78,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		height: '100%',
 	},
-	logout:{
+	logout: {
 		display: 'flex',
 		flexDirection: 'row',
 		marginBottom: 10,
@@ -209,25 +174,7 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 		marginHorizontal: 20,
 	},
-	category: {
-		marginHorizontal: 5,
-		fontSize: 16,
-		borderWidth: 1,
-		paddingHorizontal: 10,
-		paddingVertical: 5,
-		borderRadius: 10,
-		fontFamily: 'Roboto',
-		fontWeight: 'bold',
-		backgroundColor: '#fff',
-		borderColor: '#E6E6E6',
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	categorySelec: {
-		backgroundColor: '#003C95',
-		color: '#fff',
-	},
+
 	ScrollView: {
 		maxHeight: heightSize - 230,
 	},

@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
 		width: '80%',
 	},
 	btnPrimary: {
-		backgroundColor: '#060948',
+		backgroundColor: '#070B59',
 		borderRadius: 10,
 	},
 	btnSecundary: {

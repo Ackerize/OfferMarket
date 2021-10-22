@@ -13,13 +13,12 @@ import Notifications from '../screens/Notifications'
 import { useDispatch } from 'react-redux'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import auth from '@react-native-firebase/auth'
+import Filter from '../screens/Filter'
 
 const Stack = createStackNavigator()
 
 export default function StackNavigation() {
 	const [loggedIn, setLoggedIn] = useState(false)
-	const dispatch = useDispatch()
-
 	useEffect(() => {
 		auth().onAuthStateChanged(user => {
 			if (user?.uid) {
@@ -60,6 +59,27 @@ export default function StackNavigation() {
 						name="Profile"
 						component={Profile}
 						options={{ headerTransparent: true, title: '' }}
+					/>
+					<Stack.Screen
+						name="Filter"
+						component={Filter}
+						options={{
+							headerTransparent: true,
+							title: 'Filtros',
+							headerTitleAlign: 'center',
+							headerTitleStyle: {
+								fontSize: 22,
+							},
+							headerBackImage: () => (
+								<Icon
+									name="arrow-back-ios"
+									size={30}
+									color="#000"
+									style={{ paddingLeft: 15 }}
+								/>
+							),
+							headerRight: null,
+						}}
 					/>
 					<Stack.Screen
 						name="PersonalChat"
