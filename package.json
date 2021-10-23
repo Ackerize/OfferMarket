@@ -30,6 +30,7 @@
 		"react-native-elements": "^3.4.1",
 		"react-native-fbsdk-next": "^4.6.0",
 		"react-native-gesture-handler": "^1.10.3",
+		"react-native-image-picker": "^4.1.2",
 		"react-native-modal-datetime-picker": "^9.2.3",
 		"react-native-paper": "^4.8.1",
 		"react-native-reanimated": "^1.8.0",

@@ -27,7 +27,7 @@ import { startLogout } from '../actions/auth'
 
 const heightScreen = Dimensions.get('window').height
 
-const Profile = () => {
+const Profile = ({ navigation }) => {
 	const [activeTab, setActiveTab] = useState('products')
 	const [visible, setVisible] = useState(false)
 
@@ -83,7 +83,7 @@ const Profile = () => {
 					<Button
 						mode="contained"
 						style={styles.btnSecundary}
-						onPress={() => console.log('Click')}>
+						onPress={() => navigation.navigate('ProfileForm', { name: "Editar perfil", screen: "Profile"})}>
 						<Text style={[styles.btnText, styles.btnSecundaryText]}>
 							Editar perfil
 						</Text>

@@ -93,13 +93,14 @@ export const startRegisterWithEmailAndPassword = (
 	}
 }
 
-export const login = (uid, displayName, email, typeLogin) => ({
+export const login = (uid, displayName, email, typeLogin, photoURL) => ({
 	type: types.login,
 	payload: {
 		uid,
 		displayName,
 		email,
 		typeLogin,
+		photoURL
 	},
 })
 

@@ -35,7 +35,7 @@ const Home = ({ navigation }) => {
 							icon="bell"
 							color="#003C95"
 							style={styles.notification}
-							onPress={() => navigation.navigate('Filter')}
+							onPress={() => navigation.navigate('ProfileForm', { name: "Crear perfil"})}
 						/>
 					</View>
 				</View>

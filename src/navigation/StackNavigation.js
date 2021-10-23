@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import auth from '@react-native-firebase/auth'
 import Filter from '../screens/Filter'
+import ProfileForm from '../screens/ProfileForm'
 
 const Stack = createStackNavigator()
 
@@ -59,6 +60,26 @@ export default function StackNavigation() {
 						name="Profile"
 						component={Profile}
 						options={{ headerTransparent: true, title: '' }}
+					/>
+					<Stack.Screen
+						name="ProfileForm"
+						component={ProfileForm}
+						options={({ route }) => ({
+							title: route.params.name,
+							headerTitleAlign: 'center',
+							headerTitleStyle: {
+								fontSize: 22,
+							},
+							headerBackImage: () => (
+								<Icon
+									name="arrow-back-ios"
+									size={30}
+									color="#000"
+									style={{ paddingLeft: 15 }}
+								/>
+							),
+							headerRight: null,
+						})}
 					/>
 					<Stack.Screen
 						name="Filter"

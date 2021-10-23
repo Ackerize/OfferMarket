@@ -7,8 +7,8 @@ import Tag from '../components/Tag'
 import { useForm } from '../hooks/useForm'
 import { categories } from '../utils/category'
 import { ScrollView } from 'react-native-gesture-handler'
-import { TouchableRipple, Button } from 'react-native-paper'
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import LocationInput from '../components/Inputs/LocationInput'
+import SaveButton from '../components/SaveButton'
 
 const Filter = ({ navigation }) => {
 	const [values, handleInputChange] = useForm({
@@ -72,20 +72,14 @@ const Filter = ({ navigation }) => {
 						))}
 					</ScrollView>
 				</View>
-				<Text style={styles.label}>Ubicación (radio de 5km):</Text>
+				<Text style={styles.label}>Ubicación (radio de 5km): </Text>
 				<View style={styles.optionsContainer}>
-					<View style={styles.locationInput}>
-						<Icon name="location-on" size={30} color="black" />
-						<Text style={styles.locationLabeL}>Elige una ubicación</Text>
-						<TouchableRipple
-							onPress={() => console.log('HEREEEEE')}
-							style={styles.btn}
-							borderless>
-							<Icon name="chevron-right" size={30} color="#060948" />
-						</TouchableRipple>
-					</View>
+					<LocationInput onPress={() => console.log('UBICACIÓN')} />
 				</View>
-                <Button mode="contained" style={styles.saveBtn} onPress={() => navigation.navigate("Home")}>Aplicar</Button>
+				<SaveButton
+					onPress={() => navigation.navigate('Home')}
+					text="Aplicar"
+				/>
 			</ScrollView>
 		</SafeAreaView>
 	)
@@ -129,30 +123,22 @@ const styles = StyleSheet.create({
 	btn: {
 		backgroundColor: '#FFF',
 		borderRadius: 10,
-        paddingHorizontal: 2,
-        paddingVertical: 2,
+		paddingHorizontal: 2,
+		paddingVertical: 2,
 	},
-    locationInput: {
-        backgroundColor: "#EDEFF1",
-        width: "95%",
-        marginHorizontal: 10,
-        borderRadius: 10,
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        justifyContent: "space-between",
-    },
-    locationLabeL: {
-        color: "#060948",
-        fontSize: 15
-    },
-    saveBtn: {
-        width: "40%",
-        alignSelf: "center",
-        marginTop: 20,
-        paddingVertical: 2,
-        backgroundColor: '#070B59',
+	locationInput: {
+		backgroundColor: '#EDEFF1',
+		width: '95%',
+		marginHorizontal: 10,
 		borderRadius: 10,
-    }
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: 15,
+		paddingVertical: 10,
+		justifyContent: 'space-between',
+	},
+	locationLabeL: {
+		color: '#060948',
+		fontSize: 15,
+	},
 })
