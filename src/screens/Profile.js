@@ -75,7 +75,7 @@ const Profile = ({ navigation }) => {
 					<Button
 						mode="contained"
 						style={styles.btnPrimary}
-						onPress={() => console.log('Click')}>
+						onPress={() => navigation.navigate("ProductForm", { name: "Nuevo producto"})}>
 						<Text style={[styles.btnText, styles.btnPrimaryText]}>
 							Nuevo producto
 						</Text>

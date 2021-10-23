@@ -10,11 +10,11 @@ import Login from '../screens/Login'
 import Register from '../screens/Register'
 import Search from '../screens/Search'
 import Notifications from '../screens/Notifications'
-import { useDispatch } from 'react-redux'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import auth from '@react-native-firebase/auth'
 import Filter from '../screens/Filter'
 import ProfileForm from '../screens/ProfileForm'
+import ProductForm from '../screens/ProductForm'
 
 const Stack = createStackNavigator()
 
@@ -36,6 +36,15 @@ export default function StackNavigation() {
 				'1082374728024-9nkb75rmoh9gilgl1g9nuhufd38iq5hn.apps.googleusercontent.com',
 		})
 	}, [])
+
+	const buttonLeft = () => (
+		<Icon
+			name="arrow-back-ios"
+			size={30}
+			color="#000"
+			style={{ paddingLeft: 15 }}
+		/>
+	)
 
 	return (
 		<Stack.Navigator initialRouteName="Home">
@@ -59,7 +68,25 @@ export default function StackNavigation() {
 					<Stack.Screen
 						name="Profile"
 						component={Profile}
-						options={{ headerTransparent: true, title: '' }}
+						options={{
+							headerTransparent: true,
+							title: '',
+							headerBackImage: () => buttonLeft(),
+							headerRight: null,
+						}}
+					/>
+					<Stack.Screen
+						name="ProductForm"
+						component={ProductForm}
+						options={({ route }) => ({
+							title: route.params.name,
+							headerTitleAlign: 'center',
+							headerTitleStyle: {
+								fontSize: 22,
+							},
+							headerBackImage: () => buttonLeft(),
+							headerRight: null,
+						})}
 					/>
 					<Stack.Screen
 						name="ProfileForm"
@@ -70,14 +97,7 @@ export default function StackNavigation() {
 							headerTitleStyle: {
 								fontSize: 22,
 							},
-							headerBackImage: () => (
-								<Icon
-									name="arrow-back-ios"
-									size={30}
-									color="#000"
-									style={{ paddingLeft: 15 }}
-								/>
-							),
+							headerBackImage: () => buttonLeft(),
 							headerRight: null,
 						})}
 					/>
@@ -91,14 +111,7 @@ export default function StackNavigation() {
 							headerTitleStyle: {
 								fontSize: 22,
 							},
-							headerBackImage: () => (
-								<Icon
-									name="arrow-back-ios"
-									size={30}
-									color="#000"
-									style={{ paddingLeft: 15 }}
-								/>
-							),
+							headerBackImage: () => buttonLeft(),
 							headerRight: null,
 						}}
 					/>
@@ -108,14 +121,7 @@ export default function StackNavigation() {
 						options={{
 							headerTransparent: true,
 							title: '',
-							headerBackImage: () => (
-								<Icon
-									name="arrow-back-ios"
-									size={30}
-									color="#000"
-									style={{ paddingTop: 20, paddingLeft: 15 }}
-								/>
-							),
+							headerBackImage: () => buttonLeft(),
 							headerRight: null,
 						}}
 					/>
@@ -125,9 +131,8 @@ export default function StackNavigation() {
 						options={{
 							headerTransparent: true,
 							title: '',
-							headerBackImage: () => (
-								<Icon name="arrow-back-ios" size={30} color="#003C95" />
-							),
+							headerBackImage: () => buttonLeft(),
+							headerRight: null,
 						}}
 					/>
 
@@ -137,9 +142,8 @@ export default function StackNavigation() {
 						options={{
 							headerTransparent: true,
 							title: '',
-							headerBackImage: () => (
-								<Icon name="arrow-back-ios" size={30} color="#003C95" />
-							),
+							headerBackImage: () => buttonLeft(),
+							headerRight: null,
 						}}
 					/>
 				</>
@@ -156,9 +160,8 @@ export default function StackNavigation() {
 						options={{
 							headerTransparent: true,
 							title: '',
-							headerBackImage: () => (
-								<Icon name="arrow-back-ios" size={30} color="#000" />
-							),
+							headerBackImage: () => buttonLeft(),
+							headerRight: null,
 						}}
 					/>
 				</>

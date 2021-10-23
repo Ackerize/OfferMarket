@@ -4,9 +4,10 @@ import { TouchableRipple } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import PropTypes from 'prop-types'
 
-const ImageCard = ({ source, onPress }) => {
+const ImageCard = ({ source, onPress, multiple = false }) => {
+	const containerStyle = multiple ? styles.multiple : null
 	return (
-		<View>
+		<View style={containerStyle}>
 			<Image source={source} style={styles.image} />
 			<TouchableRipple style={styles.closeBtn} borderless onPress={onPress}>
 				<Icon name="close" size={22} color="#FFFFFF" />
@@ -19,9 +20,9 @@ export default ImageCard
 
 const styles = StyleSheet.create({
 	image: {
-        borderColor: '#E6E6E6',
+		borderColor: '#E6E6E6',
 		borderWidth: 2,
-        borderRadius: 10,
+		borderRadius: 10,
 		width: 150,
 		height: 150,
 		marginHorizontal: 3,
@@ -36,9 +37,13 @@ const styles = StyleSheet.create({
 		padding: 3,
 		elevation: 5,
 	},
+	multiple: {
+		marginHorizontal: 8,
+	},
 })
 
 ImageCard.propTypes = {
-    source: PropTypes.object.isRequired,
-    onPress: PropTypes.func.isRequired,
+	source: PropTypes.object.isRequired,
+	onPress: PropTypes.func.isRequired,
+	multiple: PropTypes.bool,
 }

@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 const ImageInput = ({ label, onPress, type = 'empty' }) => {
 	const conditionContainer = type === 'card' ? styles.cardSelect : {}
 	const conditionLabel = type === 'card' ? styles.cardLabel : {}
-	const labelText = label.replace(' ', '\n')
+	const labelText = type === 'card' ? label.replace(' ', '\n') : label
 	return (
 		<TouchableRipple
 			style={[styles.select, conditionContainer]}
