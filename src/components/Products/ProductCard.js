@@ -7,7 +7,8 @@ import Laptop from '../../assets/img/laptop.png'
 const width = Dimensions.get('window').width
 const targetWidth = width / 2 - 25
 
-const ProductCard = () => {
+const ProductCard = ({ navigation }) => {
+
 	return (
 		<View style={styles.container}>
 			<Image source={Laptop} style={styles.image} />
@@ -18,7 +19,7 @@ const ProductCard = () => {
 				<Text>Asus</Text>
 				<Text style={styles.title}>$720.00</Text>
 				<TouchableRipple
-					onPress={() => console.log('HEREEEEE')}
+					onPress={() => navigation.navigate("Detail")}
 					style={styles.btn}
 					borderless>
 					<Icon name="chevron-right" size={30} color="#060948" />

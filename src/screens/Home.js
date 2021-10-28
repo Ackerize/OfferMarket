@@ -99,7 +99,7 @@ const Home = ({ navigation }) => {
 				<ScrollView
 					showsVerticalScrollIndicator={false}
 					style={styles.ScrollView}>
-					<ProductList />
+					<ProductList navigation={navigation}/>
 				</ScrollView>
 			</View>
 		</SafeAreaView>

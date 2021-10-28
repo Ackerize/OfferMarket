@@ -13,6 +13,7 @@ import Notifications from '../screens/Notifications'
 import { useDispatch } from 'react-redux'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import auth from '@react-native-firebase/auth'
+import Detail from '../screens/Detail'
 
 const Stack = createStackNavigator()
 
@@ -93,6 +94,17 @@ export default function StackNavigation() {
 					<Stack.Screen
 						name="Notifications"
 						component={Notifications}
+						options={{
+							headerTransparent: true,
+							title: '',
+							headerBackImage: () => (
+								<Icon name="arrow-back-ios" size={30} color="#003C95" />
+							),
+						}}
+					/>
+					<Stack.Screen
+						name="Detail"
+						component={Detail}
 						options={{
 							headerTransparent: true,
 							title: '',
