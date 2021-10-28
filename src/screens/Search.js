@@ -2,6 +2,8 @@ import React from 'react'
 import { StyleSheet, Text, SafeAreaView, View } from 'react-native'
 import { Searchbar } from 'react-native-paper'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
+import { ScrollView } from 'react-native-gesture-handler'
+import ProductList from '../components/Products/ProductList'
 
 const Search = ({ navigation }) => {
 	return (
@@ -10,7 +12,14 @@ const Search = ({ navigation }) => {
 			<View style={styles.header}>
 				<Searchbar style={styles.search} iconColor="#003C95" autoFocus={true} />
 			</View>
+
+			<ScrollView
+				showsVerticalScrollIndicator={false}
+				style={styles.ScrollView}>
+				<ProductList />
+			</ScrollView>
 		</SafeAreaView>
+		
 	)
 }
 
