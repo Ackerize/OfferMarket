@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import AppNavigation from './AppNavigation';
 import Profile from '../screens/Profile';
@@ -11,12 +11,12 @@ import Register from '../screens/Register';
 import Search from '../screens/Search';
 import Notifications from '../screens/Notifications';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
 import Filter from '../screens/Filter';
 import ProfileForm from '../screens/ProfileForm';
 import ProductForm from '../screens/ProductForm';
 import SearchLocation from '../screens/SearchLocation';
 import { useSelector } from 'react-redux';
+import Detail from '../screens/Detail'
 
 const Stack = createStackNavigator();
 
@@ -169,6 +169,15 @@ export default function StackNavigation() {
 							title: '',
 							headerBackImage: () => buttonLeft(),
 							headerRight: null,
+						}}
+					/>
+					<Stack.Screen
+						name="Detail"
+						component={Detail}
+						options={{
+							headerTransparent: true,
+							title: '',
+							headerBackImage: () => buttonLeft(),
 						}}
 					/>
 					<Stack.Screen
