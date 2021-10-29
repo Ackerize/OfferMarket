@@ -6,17 +6,19 @@ import {
 	SafeAreaView,
 	TextInput,
 	TouchableOpacity,
-	ScrollView
+	ScrollView,
 } from 'react-native'
 import LoginImage from '../assets/img/register.svg'
 import Icon from 'react-native-vector-icons/dist/FontAwesome'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 import { useFormik } from 'formik'
 import { startRegisterWithEmailAndPassword } from '../actions/auth'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import Loading from 'react-native-loading-spinner-overlay';
 
 const Register = ({ navigation }) => {
-	const dispatch = useDispatch();
+	const { loading } = useSelector(state => state.ui);
+	const dispatch = useDispatch()
 	const formRegister = useFormik({
 		initialValues: {
 			displayName: '',
@@ -26,80 +28,89 @@ const Register = ({ navigation }) => {
 		},
 	})
 
-	const {email, password, displayName} = formRegister.values
+	const { email, password, displayName } = formRegister.values
 
-	const handleRegister = (e) =>{
-		e.preventDefault();
-		dispatch(startRegisterWithEmailAndPassword(email,password, displayName))
+	const handleRegister = e => {
+		e.preventDefault()
+		dispatch(startRegisterWithEmailAndPassword(email, password, displayName))
 	}
 
 	return (
 		<SafeAreaView style={styles.mainContainer}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
-			<View style={styles.imageContainer}>
-				<LoginImage />
-			</View>
-			<View style={styles.secondContainer}>
-				<Text style={styles.title}>Registrarse</Text>
-				<View style={styles.inputSection}>
-					<Icon style={styles.icon} name="user" size={20} color="#000" />
-					<TextInput
-						nativeID="displayName"
-						value={formRegister.values.displayName}
-						onChangeText={formRegister.handleChange('displayName')}
-						style={styles.input}
-						placeholder="Nombre"
-						placeholderTextColor="#B7C6D9"
-					/>
+			<Loading
+				visible={loading}
+				textContent={'Loading...'}
+			/>
+			<ScrollView
+				style={styles.viewContainer}
+				contentContainerStyle={styles.positionView}
+				showsVerticalScrollIndicator={false}>
+				<View style={styles.imageContainer}>
+					<LoginImage />
 				</View>
-				<View style={styles.inputSection}>
-					<Icon style={styles.icon} name="at" size={20} color="#000" />
-					<TextInput
-						nativeID="email"
-						value={formRegister.values.email}
-						onChangeText={formRegister.handleChange('email')}
-						style={styles.input}
-						placeholder="Correo"
-						placeholderTextColor="#B7C6D9"
-					/>
-				</View>
-				<View style={styles.inputSection}>
-					<Icon style={styles.icon} name="lock" size={20} color="#000" />
-					<TextInput
-						nativeID="password"
-						value={formRegister.values.password}
-						onChangeText={formRegister.handleChange('password')}
-						style={styles.input}
-						placeholder="Contraseña"
-						placeholderTextColor="#B7C6D9"
-					/>
-				</View>
-				<View style={styles.inputSection}>
-					<Icon style={styles.icon} name="lock" size={20} color="#000" />
-					<TextInput
-						nativeID="repeatPassword"
-						value={formRegister.values.repeatPassword}
-						onChangeText={formRegister.handleChange('repeatPassword')}
-						style={styles.input}
-						placeholder="Repetir Contraseña"
-						placeholderTextColor="#B7C6D9"
-					/>
-				</View>
-				<TouchableOpacity onPress={ handleRegister } style={styles.btn}>
-					<Text style={styles.btnText}>Crear Cuenta</Text>
-				</TouchableOpacity>
-				<View style={{ marginTop: 10 }}>
-					<Text style={{ textAlign: 'center' }}>
-						<Text>¿Ya tienes cuenta?</Text>
-						<Text
-							style={styles.registrate}
-							onPress={() => navigation.navigate('Login')}>
-							{' '}
-							Inicia sesión
+				<View style={styles.secondContainer}>
+					<Text style={styles.title}>Registrarse</Text>
+					<View style={styles.inputSection}>
+						<Icon style={styles.icon} name="user" size={20} color="#000" />
+						<TextInput
+							nativeID="displayName"
+							value={formRegister.values.displayName}
+							onChangeText={formRegister.handleChange('displayName')}
+							style={styles.input}
+							placeholder="Nombre"
+							placeholderTextColor="#B7C6D9"
+						/>
+					</View>
+					<View style={styles.inputSection}>
+						<Icon style={styles.icon} name="at" size={20} color="#000" />
+						<TextInput
+							nativeID="email"
+							value={formRegister.values.email}
+							onChangeText={formRegister.handleChange('email')}
+							style={styles.input}
+							placeholder="Correo"
+							placeholderTextColor="#B7C6D9"
+						/>
+					</View>
+					<View style={styles.inputSection}>
+						<Icon style={styles.icon} name="lock" size={20} color="#000" />
+						<TextInput
+							nativeID="password"
+							value={formRegister.values.password}
+							onChangeText={formRegister.handleChange('password')}
+							style={styles.input}
+							placeholder="Contraseña"
+							placeholderTextColor="#B7C6D9"
+						/>
+					</View>
+					<View style={styles.inputSection}>
+						<Icon style={styles.icon} name="lock" size={20} color="#000" />
+						<TextInput
+							nativeID="repeatPassword"
+							value={formRegister.values.repeatPassword}
+							onChangeText={formRegister.handleChange('repeatPassword')}
+							style={styles.input}
+							placeholder="Repetir Contraseña"
+							placeholderTextColor="#B7C6D9"
+						/>
+					</View>
+					<TouchableOpacity onPress={handleRegister} style={styles.btn}>
+						<Text style={styles.btnText}>Crear Cuenta</Text>
+					</TouchableOpacity>
+					<View style={{ marginTop: 10 }}>
+						<Text style={{ textAlign: 'center' }}>
+							<Text>¿Ya tienes cuenta?</Text>
+							<Text
+								style={styles.registrate}
+								onPress={() => navigation.navigate('Login')}>
+								{' '}
+								Inicia sesión
+							</Text>
 						</Text>
-					</Text>
+					</View>
 				</View>
-			</View>
+			</ScrollView>
 		</SafeAreaView>
 	)
 }
@@ -108,12 +119,19 @@ export default Register
 
 const styles = StyleSheet.create({
 	mainContainer: {
-		display: 'flex',
-		flexDirection: 'column',
 		backgroundColor: '#FFFFFF',
 		height: '100%',
+		width: '100%',
+	},
+	viewContainer: {
+		width: '100%',
+		height: '100%',
+	},
+	positionView: {
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'center',
 		alignItems: 'center',
-		width: '100%'
 	},
 	imageContainer: {
 		display: 'flex',
@@ -124,6 +142,7 @@ const styles = StyleSheet.create({
 	},
 	secondContainer: {
 		width: '85%',
+		paddingBottom: 20,
 	},
 	title: {
 		fontSize: 30,

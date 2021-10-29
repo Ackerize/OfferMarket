@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import {
 	StyleSheet,
 	Text,
@@ -6,34 +6,90 @@ import {
 	View,
 	TouchableWithoutFeedback,
 	Dimensions,
-} from 'react-native'
-import { Title, Avatar, Button } from 'react-native-paper'
-import { AirbnbRating } from 'react-native-elements'
-import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import avatarImg from '../assets/img/person.jpg'
-import { ScrollView } from 'react-native-gesture-handler'
-import ProductList from '../components/Products/ProductList'
-import ContactInfo from '../components/ContactInfo'
-import Reviews from '../components/Reviews/Reviews'
+} from 'react-native';
+import {
+	Title,
+	Avatar,
+	Button,
+	TouchableRipple,
+	Menu,
+} from 'react-native-paper';
+import { useSelector, useDispatch } from 'react-redux';
+import { AirbnbRating } from 'react-native-elements';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import { ScrollView } from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import ProductList from '../components/Products/ProductList';
+import ContactInfo from '../components/ContactInfo';
+import Reviews from '../components/Reviews/Reviews';
+import { startLogout } from '../actions/auth';
+import { getProfile } from '../api/profiles';
+import Popup from '../components/Modals/Popup';
+import Spinner from '../components/Spinner';
 
-const heightScreen = Dimensions.get('window').height
+const heightScreen = Dimensions.get('window').height;
 
-const Profile = () => {
-	const [activeTab, setActiveTab] = useState('products')
+const Profile = ({ navigation }) => {
+	const [activeTab, setActiveTab] = useState('products');
+	const [visible, setVisible] = useState(false);
+	const [profile, setProfile] = useState(null);
 
+	const dispatch = useDispatch();
+	const { typeLogin, uid } = useSelector(state => state.auth);
+
+	const openMenu = () => setVisible(true);
+
+	const closeMenu = () => setVisible(false);
+
+	const handleLogOut = () => {
+		closeMenu();
+		dispatch(startLogout(typeLogin));
+	};
+
+	useEffect(() => {
+		getProfile(uid).then(data => {
+			const { error, message, data: profileInfo } = data;
+
+			if (error) {
+				Popup.show({
+					type: 'Danger',
+					title: '¡Oh no!',
+					textBody: message,
+					buttontext: 'Aceptar',
+					callback: () => Popup.hide(),
+				});
+			} else {
+				setProfile(profileInfo);
+			}
+		});
+	}, []);
+
+	if (!profile) return <Spinner />;
+
+	const { photo, name, rating, ...contactInfo } = profile;
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
-			<Title style={styles.title}>Perfil</Title>
+			<View style={styles.headerTitle}>
+				<Title style={styles.title}>Perfil</Title>
+				<TouchableRipple onPress={openMenu} style={styles.touchable}>
+					<Menu
+						visible={visible}
+						onDismiss={closeMenu}
+						anchor={<Icon name="more-vert" color="#060948" size={30} />}>
+						<Menu.Item onPress={handleLogOut} title="Cerrar sesión" />
+					</Menu>
+				</TouchableRipple>
+			</View>
 			<View style={styles.header}>
-				<Avatar.Image size={75} source={avatarImg} />
-				<Text style={styles.name}>Juan Hernández</Text>
+				<Avatar.Image size={75} source={{ uri: photo }} />
+
+				<Text style={styles.name}>{name}</Text>
 				<View style={styles.ratingContainer}>
-					<Text style={styles.countStar}>4.0</Text>
+					<Text style={styles.countStar}>{rating.toFixed(1)}</Text>
 					<AirbnbRating
 						showRating={false}
-						defaultRating={4}
-						onFinishRating={console.log}
+						defaultRating={rating}
 						starContainerStyle={styles.rating}
 						isDisabled={true}
 						starStyle={styles.star}
@@ -43,7 +99,9 @@ const Profile = () => {
 					<Button
 						mode="contained"
 						style={styles.btnPrimary}
-						onPress={() => console.log('Click')}>
+						onPress={() =>
+							navigation.navigate('ProductForm', { name: 'Nuevo producto' })
+						}>
 						<Text style={[styles.btnText, styles.btnPrimaryText]}>
 							Nuevo producto
 						</Text>
@@ -51,7 +109,12 @@ const Profile = () => {
 					<Button
 						mode="contained"
 						style={styles.btnSecundary}
-						onPress={() => console.log('Click')}>
+						onPress={() =>
+							navigation.navigate('ProfileForm', {
+								name: 'Editar perfil',
+								uid: profile?.uid,
+							})
+						}>
 						<Text style={[styles.btnText, styles.btnSecundaryText]}>
 							Editar perfil
 						</Text>
@@ -79,17 +142,24 @@ const Profile = () => {
 				</View>
 				<ScrollView
 					style={styles.scrollView}
-					showsVerticalScrollIndicator={false}>
+					showsVerticalScrollIndicator={true}>
 					{activeTab == 'products' && <ProductList />}
-					{activeTab == "contact" && <ContactInfo />}
-					{activeTab == "reviews" && <Reviews />}
+					{activeTab == 'contact' && (
+						<ContactInfo
+							info={{
+								name,
+								...contactInfo,
+							}}
+						/>
+					)}
+					{activeTab == 'reviews' && <Reviews />}
 				</ScrollView>
 			</View>
 		</SafeAreaView>
-	)
-}
+	);
+};
 
-export default Profile
+export default Profile;
 
 const styles = StyleSheet.create({
 	container: {
@@ -97,10 +167,19 @@ const styles = StyleSheet.create({
 		width: '100%',
 		backgroundColor: 'white',
 	},
+	headerTitle: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		paddingHorizontal: 15,
+		paddingRight: 10,
+		paddingTop: 10,
+	},
 	title: {
 		fontSize: 24,
-		textAlign: 'center',
 		marginVertical: 10,
+		width: '100%',
+		textAlign: 'center',
 		color: '#191B32',
 	},
 	header: {
@@ -137,7 +216,7 @@ const styles = StyleSheet.create({
 		width: '80%',
 	},
 	btnPrimary: {
-		backgroundColor: '#060948',
+		backgroundColor: '#070B59',
 		borderRadius: 10,
 	},
 	btnSecundary: {
@@ -172,7 +251,14 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 2,
 	},
 	scrollView: {
-		maxHeight: heightScreen - 325,
+		maxHeight: heightScreen - 340,
 		marginTop: 20,
 	},
-})
+	touchable: {
+		marginRight: 5,
+		padding: 8,
+		position: 'absolute',
+		right: 10,
+		top: 10,
+	},
+});

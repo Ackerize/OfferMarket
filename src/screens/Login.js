@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import {
 	StyleSheet,
 	Text,
@@ -6,44 +6,59 @@ import {
 	SafeAreaView,
 	TextInput,
 	TouchableOpacity,
-} from 'react-native'
-import LoginImage from '../assets/img/login.svg'
-import Google from '../assets/img/google.svg'
-import Facebook from '../assets/img/facebook.svg'
-import Icon from 'react-native-vector-icons/dist/FontAwesome'
-import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import { useFormik } from 'formik'
-import { useSelector, useDispatch } from 'react-redux'
-import { startGoogleLogin, startLoginEmailPassword } from '../actions/auth'
-import { ScrollView } from 'react-native'
+} from 'react-native';
+import LoginImage from '../assets/img/login.svg';
+import Google from '../assets/img/google.svg';
+import Facebook from '../assets/img/facebook.svg';
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import { useFormik } from 'formik';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+	startFacebookLogin,
+	startGoogleLogin,
+	startLoginEmailPassword,
+} from '../actions/auth';
+import Loading from 'react-native-loading-spinner-overlay';
 
 const Login = ({ navigation }) => {
-
 	const dispatch = useDispatch();
 
+	const ui = useSelector(state => state.ui);
+	console.log(ui);
+
+	const { loading } = ui;
+
 	const loginForm = useFormik({
-		initialValues:{
-			email: "",
-			password: ""
+		initialValues: {
+			email: '',
+			password: '',
 		},
-	})
+	});
 
-	const { email,password } = loginForm.values
+	const { email, password } = loginForm.values;
 
-	const handleNormalLogin = (e) =>{
-		e.preventDefault()
+	const handleNormalLogin = e => {
+		e.preventDefault();
 		console.log('hola');
-		dispatch(startLoginEmailPassword(email, password))
-	}
+		dispatch(startLoginEmailPassword(email, password));
+	};
 
-	const handleGoogleLogin = () =>{
-		dispatch(startGoogleLogin())
-	}
-	const state = useSelector(state => state)
-	console.log(state);
+	const handleGoogleLogin = () => {
+		dispatch(startGoogleLogin());
+	};
+
+	const handleFacebookLogin = () => {
+		dispatch(startFacebookLogin());
+	};
+
 	return (
 		<SafeAreaView style={styles.mainContainer}>
-            <FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
+			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
+			<Loading
+				visible={loading}
+				textContent={'Loading...'}
+			/>
 			<View style={styles.imageContainer}>
 				<LoginImage />
 			</View>
@@ -58,7 +73,6 @@ const Login = ({ navigation }) => {
 						style={styles.input}
 						placeholder="Correo"
 						placeholderTextColor="#B7C6D9"
-						sa
 					/>
 				</View>
 				<View style={styles.inputSection}>
@@ -81,12 +95,16 @@ const Login = ({ navigation }) => {
 					<View style={styles.line} />
 				</View>
 				<View style={styles.socialContainer}>
-					<TouchableOpacity onPress={handleGoogleLogin} style={styles.btnSocial}>
+					<TouchableOpacity
+						onPress={handleGoogleLogin}
+						style={styles.btnSocial}>
 						<Google />
 					</TouchableOpacity>
-					<View style={styles.btnSocial}>
+					<TouchableOpacity
+						onPress={handleFacebookLogin}
+						style={styles.btnSocial}>
 						<Facebook />
-					</View>
+					</TouchableOpacity>
 				</View>
 				<View>
 					<Text style={{ textAlign: 'center' }}>
@@ -101,10 +119,10 @@ const Login = ({ navigation }) => {
 				</View>
 			</View>
 		</SafeAreaView>
-	)
-}
+	);
+};
 
-export default Login
+export default Login;
 
 const styles = StyleSheet.create({
 	mainContainer: {
@@ -199,4 +217,4 @@ const styles = StyleSheet.create({
 	registrate: {
 		color: '#003C95',
 	},
-})
+});

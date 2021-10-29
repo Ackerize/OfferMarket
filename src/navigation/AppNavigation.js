@@ -5,8 +5,7 @@ import Home from '../screens/Home'
 import Chats from '../screens/Chats'
 import Favorites from '../screens/Favorites'
 import Profile from '../screens/Profile'
-import Login from '../screens/Login'
-import PersonalChat from '../screens/PersonalChat'
+import SearchUbication from '../screens/SearchLocation'
 
 const Tabs = AnimatedTabBarNavigator()
 
@@ -76,6 +75,24 @@ export default () => {
 					),
 				}}
 			/>
+			<Tabs.Screen
+				name="Perfil"
+				component={Profile}
+				options={{
+					tabBarIcon: ({ focused, color }) => (
+						<TabBarIcon focused={focused} tintColor={color} name="person" />
+					),
+				}}
+			/>
+			{/* <Tabs.Screen
+				name="Mapa"
+				component={SearchUbication}
+				options={{
+					tabBarIcon: ({ focused, color }) => (
+						<TabBarIcon focused={focused} tintColor={color} name="person" />
+					),
+				}}
+			/> */}
 		</Tabs.Navigator>
 	)
 }

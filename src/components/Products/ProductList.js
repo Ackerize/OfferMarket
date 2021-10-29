@@ -2,17 +2,18 @@ import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import ProductCard from './ProductCard'
 
-const ProductList = () => {
+const ProductList = ({ navigation }) => {
+
 	return (
 		<View style={styles.itemsContainer}>
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
+			<ProductCard navigation={navigation} />
+			<ProductCard navigation={navigation}/>
+			<ProductCard navigation={navigation}/>
+			<ProductCard navigation={navigation}/>
+			<ProductCard navigation={navigation}/>
+			<ProductCard navigation={navigation}/>
+			<ProductCard navigation={navigation}/>
+			<ProductCard navigation={navigation}/>
 		</View>
 	)
 }
