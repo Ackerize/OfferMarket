@@ -5,10 +5,11 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import PropTypes from 'prop-types'
 
 const LocationInput = ({ actualLocation = 'Elige una ubicación', onPress }) => {
+	const locationLabel = actualLocation === null ? 'Elige una ubicación' : actualLocation
 	return (
 		<View style={styles.locationInput}>
 			<Icon name="location-on" size={30} color="black" />
-			<Text style={styles.locationLabeL}>{actualLocation}</Text>
+			<Text style={styles.locationLabeL}>{locationLabel}</Text>
 			<TouchableRipple onPress={onPress} style={styles.btn} borderless>
 				<Icon name="chevron-right" size={30} color="#060948" />
 			</TouchableRipple>

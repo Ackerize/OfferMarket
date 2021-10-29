@@ -4,6 +4,7 @@ import { StyleSheet, SafeAreaView, View, Dimensions } from 'react-native'
 import { Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
 import { IconButton } from 'react-native-paper'
+import { useSelector } from 'react-redux'
 import Logo from '../assets/img/logo.svg'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 import ProductList from '../components/Products/ProductList'
@@ -12,6 +13,9 @@ import { categories } from '../utils/category'
 const heightSize = Dimensions.get('window').height
 
 const Home = ({ navigation }) => {
+
+	const state = useSelector(state => state);
+	console.log(state)
 
 	const [categorySelected, setCategorySelected] = useState(1)
 
@@ -35,7 +39,7 @@ const Home = ({ navigation }) => {
 							icon="bell"
 							color="#003C95"
 							style={styles.notification}
-							onPress={() => navigation.navigate('ProfileForm', { name: "Crear perfil"})}
+							onPress={() => navigation.navigate('Notifications')}
 						/>
 					</View>
 				</View>

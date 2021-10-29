@@ -2,12 +2,14 @@ import React from 'react'
 import { StyleSheet, Text, View, TextInput } from 'react-native'
 import PropTypes from 'prop-types'
 
-const Input = ({ label, type = 'default', value = "" }) => {
+const Input = ({ label, type = 'default', value, onBlur, onChangeText }) => {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.label}>{label} </Text>
 			<TextInput
 				keyboardType={type}
+				onBlur={onBlur}
+				onChangeText={onChangeText}
 				selectionColor="#060948"
 				style={styles.input}
 				value={value}

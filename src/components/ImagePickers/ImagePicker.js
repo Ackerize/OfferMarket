@@ -6,13 +6,19 @@ import ImageInput from '../Inputs/ImageInput'
 import ImageCard from './ImageCard'
 import { ScrollView } from 'react-native-gesture-handler'
 import PropTypes from 'prop-types'
+import { useSelector, useDispatch } from 'react-redux'
+import { selectPhoto } from '../../actions/profile'
 
 const ImagePicker = ({ multiple = false }) => {
+	const dispatch = useDispatch()
+	const { profileImage } = useSelector(state => state.profile)
+
 	const initialState = {
-		filePath: null,
+		filePath: profileImage,
 		fileUri: null,
 		images: [],
 	}
+
 	const [imageSelected, setImageSelected] = useState(initialState)
 
 	const chooseOnePicture = () => {
@@ -21,6 +27,8 @@ const ImagePicker = ({ multiple = false }) => {
 				skipBackup: true,
 				path: 'images',
 			},
+			includeBase64: true,
+			mediaType: 'photo',
 		}
 		launchImageLibrary(options, response => {
 			if (!response.didCancel && !response.error && !response.customButton) {
@@ -29,6 +37,7 @@ const ImagePicker = ({ multiple = false }) => {
 					fileUri: response.assets[0].uri,
 					images: [],
 				})
+				dispatch(selectPhoto(response.assets[0].base64))
 			}
 		})
 	}
@@ -51,7 +60,10 @@ const ImagePicker = ({ multiple = false }) => {
 				<View style={styles.imageContainer}>
 					<ImageCard
 						source={{ uri: imageSelected.fileUri }}
-						onPress={() => setImageSelected(initialState)}
+						onPress={() => {
+							setImageSelected(initialState)
+							dispatch(selectPhoto(null))
+						}}
 					/>
 					<ImageInput
 						label="Cambiar foto"

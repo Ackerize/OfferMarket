@@ -5,6 +5,7 @@ const initialState = {
 	name: null,
 	email: null,
 	typeLogin: null,
+	hasProfile: false,
 }
 
 export const authReducer = (state = initialState, action) => {
@@ -16,6 +17,7 @@ export const authReducer = (state = initialState, action) => {
 				name: action.payload.displayName,
 				email: action.payload.email,
 				typeLogin: action.payload.typeLogin,
+				hasProfile: action.payload.hasProfile,
 			}
 		case types.logout:
 			return {
@@ -24,8 +26,13 @@ export const authReducer = (state = initialState, action) => {
 				name: null,
 				email: null,
 				typeLogin: null,
+				hasProfile: false,
 			}
-
+		case types.updateHasProfile:
+			return {
+				...state,
+				hasProfile: true
+			}
 		default:
 			return state
 	}

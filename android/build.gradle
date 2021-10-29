@@ -8,6 +8,8 @@ buildscript {
         targetSdkVersion = 29
         supportLibVersion = "27.1.1"
         googlePlayServicesAuthVersion = "19.2.0" // <--- use this version or newer
+        playServicesVersion = "17.0.0" // or find latest version
+        androidMapsUtilsVersion = "2.3.0"
     }
     repositories {
         google()
