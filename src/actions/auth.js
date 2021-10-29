@@ -13,12 +13,14 @@ export const startLoginEmailPassword = (email, password) => {
 			.signInWithEmailAndPassword(email, password)
 			.then(async ({ user }) => {
 				try {
+					dispatch(startLoading());
 					const {
 						user: { hasProfile },
 					} = await createNewUser({ uid: user.uid, email: user.email });
 					dispatch(
 						login(user.uid, user.displayName, user.email, 'email', hasProfile),
 					);
+					dispatch(finishLoading());
 				} catch (e) {
 					console.log(e);
 				}
@@ -82,6 +84,7 @@ export const startFacebookLogin = () => {
 								.signInWithCredential(facebookCredential)
 								.then(async ({ user }) => {
 									try {
+										dispatch(startLoading());
 										const {
 											user: { hasProfile },
 										} = await createNewUser({
@@ -97,6 +100,7 @@ export const startFacebookLogin = () => {
 												hasProfile,
 											),
 										);
+										dispatch(finishLoading());
 									} catch (e) {
 										console.log(e);
 									}
@@ -127,6 +131,7 @@ export const startRegisterWithEmailAndPassword = (
 			.createUserWithEmailAndPassword(email, password)
 			.then(async ({ user }) => {
 				try {
+					dispatch(startLoading());
 					await user.updateProfile({ displayName: displayName });
 					const {
 						user: { hasProfile },
@@ -135,6 +140,7 @@ export const startRegisterWithEmailAndPassword = (
 					dispatch(
 						login(user.uid, user.displayName, user.email, 'email', hasProfile),
 					);
+					dispatch(finishLoading());
 				} catch (e) {
 					console.log(e);
 				}
