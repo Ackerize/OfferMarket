@@ -8,11 +8,15 @@ import { ScrollView } from 'react-native-gesture-handler';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectPhoto } from '../../actions/profile';
+import Popup from '../Modals/Popup';
+import { showToast } from '../Modals/CustomToast';
 
 const ImagePicker = ({
 	multiple = false,
 	urlImage = null,
 	onUpdate = () => {},
+	imagesArray = [],
+	setImagesArray = () => {},
 }) => {
 	const dispatch = useDispatch();
 	const { profileImage } = useSelector(state => state.profile);
@@ -26,6 +30,7 @@ const ImagePicker = ({
 	const [imageSelected, setImageSelected] = useState({
 		...initialState,
 		fileUri: urlImage,
+		images: imagesArray,
 	});
 
 	const chooseOnePicture = () => {
@@ -53,12 +58,20 @@ const ImagePicker = ({
 		MultiplePicker.openPicker({
 			multiple: true,
 			mediaType: 'photo',
-		}).then(images => {
-			console.log(images);
-			setImageSelected({
-				images: [...imageSelected.images, ...images],
+			includeBase64: true,
+		})
+			.then(images => {
+				
+				const filterImages = images.map(image => ({data: image.data, path: image.path}));
+				console.log(filterImages);
+				setImageSelected({
+					images: [...imageSelected.images, ...filterImages],
+				});
+				setImagesArray(filterImages);
+			})
+			.catch(error => {
+				showToast('error', '¡Oh no!', error.message);
 			});
-		});
 	};
 
 	return (

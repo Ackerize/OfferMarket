@@ -17,8 +17,8 @@ import { finishLoading, startLoading } from '../actions/ui';
 import Popup from '../components/Modals/Popup';
 
 const ProfileForm = ({ navigation, route }) => {
-	const { profile } = route.params;
-	const [profileInfo, setProfileInfo] = useState(profile);
+	const profile = route?.params?.profile;
+	const [profileInfo, setProfileInfo] = useState({});
 
 	const dispatch = useDispatch();
 	const {
@@ -32,16 +32,17 @@ const ProfileForm = ({ navigation, route }) => {
 	useEffect(() => {
 		if (profile) {
 			dispatch(selectLocation({ ...profile.location }));
+			setProfileInfo(profile);
 		}
 	}, []);
 
 	const initialValues = profile
 		? {
-				name: profileInfo.name,
-				user: profileInfo.user,
-				phone: profileInfo.phone,
-				photo: profileInfo.photo,
-				location: profileInfo.location,
+				name: profile.name,
+				user: profile.user,
+				phone: profile.phone,
+				photo: profile.photo,
+				location: profile.location,
 		  }
 		: {
 				name,
