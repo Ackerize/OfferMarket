@@ -42,7 +42,9 @@ const SearchLocation = () => {
 				query={{
 					key: GOOGLE_PLACES_API_KEY,
 					language: 'en',
+					components: 'country:sv',
 				}}
+				
 				fetchDetails={true}
 				GooglePlacesDetailsQuery={{ fields: 'geometry' }}
 				onPress={(data, details = null) => {

@@ -84,6 +84,7 @@ const Login = ({ navigation }) => {
 						style={styles.input}
 						placeholder="Contraseña"
 						placeholderTextColor="#B7C6D9"
+						secureTextEntry={true}
 					/>
 				</View>
 				<TouchableOpacity onPress={handleNormalLogin} style={styles.btn}>

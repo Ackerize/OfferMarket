@@ -23,13 +23,17 @@ import ProductList from '../components/Products/ProductList';
 import ContactInfo from '../components/ContactInfo';
 import Reviews from '../components/Reviews/Reviews';
 import { startLogout } from '../actions/auth';
-import { getProfile } from '../api/profiles';
 import Popup from '../components/Modals/Popup';
 import Spinner from '../components/Spinner';
+import axios from 'axios';
+import { API_HOST } from '../utils/constants';
+import { useIsFocused } from '@react-navigation/native';
+
 
 const heightScreen = Dimensions.get('window').height;
 
 const Profile = ({ navigation }) => {
+	const isFocused = useIsFocused();
 	const [activeTab, setActiveTab] = useState('products');
 	const [visible, setVisible] = useState(false);
 	const [profile, setProfile] = useState(null);
@@ -47,22 +51,37 @@ const Profile = ({ navigation }) => {
 	};
 
 	useEffect(() => {
-		getProfile(uid).then(data => {
-			const { error, message, data: profileInfo } = data;
-
-			if (error) {
-				Popup.show({
-					type: 'Danger',
-					title: '¡Oh no!',
-					textBody: message,
-					buttontext: 'Aceptar',
-					callback: () => Popup.hide(),
-				});
-			} else {
-				setProfile(profileInfo);
-			}
-		});
-	}, []);
+		if(isFocused) {
+			axios
+			.get(`${API_HOST}/profiles/${uid}`)
+			.then(({ data }) => {
+				const { error, message, data: profileInfo } = data;
+				if (error) {
+					Popup.show({
+						type: 'Danger',
+						title: '¡Oh no!',
+						textBody: message,
+						buttontext: 'Aceptar',
+						callback: () => Popup.hide(),
+					});
+				} else {
+					setProfile(profileInfo);
+				}
+			})
+			.catch(({ response: { data } }) => {
+				const { error, message } = data;
+				if (error) {
+					Popup.show({
+						type: 'Danger',
+						title: '¡Oh no!',
+						textBody: message,
+						buttontext: 'Aceptar',
+						callback: () => Popup.hide(),
+					});
+				}
+			});
+		}
+	}, [isFocused]);
 
 	if (!profile) return <Spinner />;
 
@@ -109,12 +128,12 @@ const Profile = ({ navigation }) => {
 					<Button
 						mode="contained"
 						style={styles.btnSecundary}
-						onPress={() =>
+						onPress={() => {
 							navigation.navigate('ProfileForm', {
 								name: 'Editar perfil',
-								uid: profile?.uid,
-							})
-						}>
+								profile
+							});
+						}}>
 						<Text style={[styles.btnText, styles.btnSecundaryText]}>
 							Editar perfil
 						</Text>

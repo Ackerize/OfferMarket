@@ -65,7 +65,7 @@ export default function StackNavigation() {
 							<Stack.Screen
 								name="Home"
 								component={AppNavigation}
-								options={{ headerTransparent: true, title: '' }}
+								options={{ headerTransparent: true, title: '', headerLeft: false }}
 							/>
 							<Stack.Screen
 								name="ProfileForm"
@@ -99,7 +99,7 @@ export default function StackNavigation() {
 							<Stack.Screen
 								name="Home"
 								component={AppNavigation}
-								options={{ headerTransparent: true, title: '' }}
+								options={{ headerTransparent: true, title: '', headerLeft: false }}
 							/>
 						</>
 					)}
