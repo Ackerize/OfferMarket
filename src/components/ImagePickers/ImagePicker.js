@@ -63,7 +63,6 @@ const ImagePicker = ({
 			.then(images => {
 				
 				const filterImages = images.map(image => ({data: image.data, path: image.path}));
-				console.log(filterImages);
 				setImageSelected({
 					images: [...imageSelected.images, ...filterImages],
 				});

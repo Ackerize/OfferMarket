@@ -25,7 +25,6 @@ const Login = ({ navigation }) => {
 	const dispatch = useDispatch();
 
 	const ui = useSelector(state => state.ui);
-	console.log(ui);
 
 	const { loading } = ui;
 
@@ -40,7 +39,6 @@ const Login = ({ navigation }) => {
 
 	const handleNormalLogin = e => {
 		e.preventDefault();
-		console.log('hola');
 		dispatch(startLoginEmailPassword(email, password));
 	};
 

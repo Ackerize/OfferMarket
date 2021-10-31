@@ -20,6 +20,9 @@ const ProductForm = ({ navigation }) => {
 		id: category.id,
 		value: category.name,
 	}));
+
+	categoriesData.shift();
+
 	const dispatch = useDispatch();
 	const {
 		auth: { uid },
@@ -41,8 +44,6 @@ const ProductForm = ({ navigation }) => {
 		condition: null,
 		seller: uid,
 	};
-
-	console.log(loading);
 
 	const onSubmit = async values => {
 		if (!loading) {
@@ -137,7 +138,11 @@ const ProductForm = ({ navigation }) => {
 								onChange={setConditionSelected}
 								value={conditionSelected}
 							/>
-							<SaveButton text="Guardar" onPress={handleSubmit} loading={loading} />
+							<SaveButton
+								text="Guardar"
+								onPress={handleSubmit}
+								loading={loading}
+							/>
 						</View>
 					</ScrollView>
 				)}

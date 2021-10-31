@@ -28,7 +28,7 @@ import Spinner from '../components/Spinner';
 import axios from 'axios';
 import { API_HOST } from '../utils/constants';
 import { useIsFocused } from '@react-navigation/native';
-
+import { showToast } from '../components/Modals/CustomToast';
 
 const heightScreen = Dimensions.get('window').height;
 
@@ -37,6 +37,7 @@ const Profile = ({ navigation }) => {
 	const [activeTab, setActiveTab] = useState('products');
 	const [visible, setVisible] = useState(false);
 	const [profile, setProfile] = useState(null);
+	const [productData, setProductData] = useState(null);
 
 	const dispatch = useDispatch();
 	const { typeLogin, uid } = useSelector(state => state.auth);
@@ -51,37 +52,55 @@ const Profile = ({ navigation }) => {
 	};
 
 	useEffect(() => {
-		if(isFocused) {
+		if (isFocused) {
 			axios
-			.get(`${API_HOST}/profiles/${uid}`)
-			.then(({ data }) => {
-				const { error, message, data: profileInfo } = data;
-				if (error) {
-					Popup.show({
-						type: 'Danger',
-						title: '¡Oh no!',
-						textBody: message,
-						buttontext: 'Aceptar',
-						callback: () => Popup.hide(),
-					});
-				} else {
-					setProfile(profileInfo);
-				}
-			})
-			.catch(({ response: { data } }) => {
-				const { error, message } = data;
-				if (error) {
-					Popup.show({
-						type: 'Danger',
-						title: '¡Oh no!',
-						textBody: message,
-						buttontext: 'Aceptar',
-						callback: () => Popup.hide(),
-					});
-				}
-			});
+				.get(`${API_HOST}/profiles/${uid}`)
+				.then(({ data }) => {
+					const { error, message, data: profileInfo } = data;
+					if (error) {
+						Popup.show({
+							type: 'Danger',
+							title: '¡Oh no!',
+							textBody: message,
+							buttontext: 'Aceptar',
+							callback: () => Popup.hide(),
+						});
+					} else {
+						setProfile(profileInfo);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message } = data;
+					if (error) {
+						Popup.show({
+							type: 'Danger',
+							title: '¡Oh no!',
+							textBody: message,
+							buttontext: 'Aceptar',
+							callback: () => Popup.hide(),
+						});
+					}
+				});
+
+			axios
+				.get(`${API_HOST}/products/user/${uid}`)
+				.then(({ data }) => {
+					const { error, message, products } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setProductData(products);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					}
+				});
 		}
 	}, [isFocused]);
+
 
 	if (!profile) return <Spinner />;
 
@@ -131,7 +150,7 @@ const Profile = ({ navigation }) => {
 						onPress={() => {
 							navigation.navigate('ProfileForm', {
 								name: 'Editar perfil',
-								profile
+								profile,
 							});
 						}}>
 						<Text style={[styles.btnText, styles.btnSecundaryText]}>
@@ -162,7 +181,7 @@ const Profile = ({ navigation }) => {
 				<ScrollView
 					style={styles.scrollView}
 					showsVerticalScrollIndicator={true}>
-					{activeTab == 'products' && <ProductList />}
+					{activeTab == 'products' && <ProductList data={productData} />}
 					{activeTab == 'contact' && (
 						<ContactInfo
 							info={{

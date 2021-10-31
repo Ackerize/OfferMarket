@@ -1,35 +1,34 @@
-import React from 'react'
-import { StyleSheet, Text, View, Image, Dimensions } from 'react-native'
-import { TouchableRipple } from 'react-native-paper'
-import Icon from 'react-native-vector-icons/MaterialIcons'
-import Laptop from '../../assets/img/laptop.png'
+import React from 'react';
+import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
+import { TouchableRipple } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const width = Dimensions.get('window').width
-const targetWidth = width / 2 - 25
+const width = Dimensions.get('window').width;
+const targetWidth = width / 2 - 25;
 
-const ProductCard = ({ navigation }) => {
-
+const ProductCard = ({ navigation, product }) => {
+	const { images, brand, name, price } = product;
 	return (
 		<View style={styles.container}>
-			<Image source={Laptop} style={styles.image} />
+			<Image source={{ uri: images[0] }} style={styles.image} />
 			<View style={styles.infoContainer}>
 				<Text numberOfLines={1} style={styles.title}>
-					Zenbook Duo
+					{name}
 				</Text>
-				<Text>Asus</Text>
-				<Text style={styles.title}>$720.00</Text>
+				{brand ? <Text>Asus</Text> : <View style={{ height: 18 }} />}
+				<Text style={styles.title}>$ {price.toFixed(2)}</Text>
 				<TouchableRipple
-					onPress={() => navigation.navigate("Detail")}
+					onPress={() => navigation.navigate('Detail')}
 					style={styles.btn}
 					borderless>
 					<Icon name="chevron-right" size={30} color="#060948" />
 				</TouchableRipple>
 			</View>
 		</View>
-	)
-}
+	);
+};
 
-export default ProductCard
+export default ProductCard;
 
 const styles = StyleSheet.create({
 	container: {
@@ -80,4 +79,4 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 18,
 		paddingBottom: 100,
 	},
-})
+});

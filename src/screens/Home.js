@@ -1,5 +1,5 @@
 import { map } from 'lodash'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { StyleSheet, SafeAreaView, View, Dimensions } from 'react-native'
 import { Text } from 'react-native-elements'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -11,17 +11,48 @@ import ProductList from '../components/Products/ProductList'
 import Tag from '../components/Tag'
 import { categories } from '../utils/category'
 const heightSize = Dimensions.get('window').height
+import { useIsFocused } from '@react-navigation/native';
+import { showToast } from '../components/Modals/CustomToast';
+import axios from 'axios'
+import { API_HOST } from '../utils/constants'
 
 const Home = ({ navigation }) => {
-
+	const isFocused = useIsFocused();
 	const state = useSelector(state => state);
-	console.log(state)
 
 	const [categorySelected, setCategorySelected] = useState(1)
+	const [productData, setProductData] = useState(null);
 
 	const onChangeCategory = category => {
 		setCategorySelected(category)
 	}
+
+	useEffect(() => {
+		if(isFocused) {
+			const catSelected = categories.find(c => c.id === categorySelected)
+			console.log(catSelected)
+			const URL = catSelected.name !== 'Reciente' ? `${API_HOST}/products?category=${catSelected.name}` : `${API_HOST}/products`;
+			axios
+				.get(URL)
+				.then(({ data }) => {
+					const { error, message, products } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setProductData(products);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					}
+				});
+
+		}
+	}, [isFocused, categorySelected]);
+
+	
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -68,7 +99,7 @@ const Home = ({ navigation }) => {
 				<ScrollView
 					showsVerticalScrollIndicator={false}
 					style={styles.ScrollView}>
-					<ProductList navigation={navigation}/>
+					<ProductList data={productData} navigation={navigation}/>
 				</ScrollView>
 			</View>
 		</SafeAreaView>

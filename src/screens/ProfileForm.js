@@ -53,8 +53,6 @@ const ProfileForm = ({ navigation, route }) => {
 				location,
 		  };
 
-	console.log(initialValues);
-
 	const onSubmit = async values => {
 		if (!loading) {
 			values = { ...values, photo: profileImage, location: location };

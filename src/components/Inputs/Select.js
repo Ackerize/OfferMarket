@@ -16,7 +16,6 @@ const Select = ({ label, data, placeholder, onChange, value }) => {
 				menuBarContainerHeight={51.5 * data.length}
 				placeholder={placeholder}
 				onSelect={selectedItem => {
-					console.log('SelectedItem: ', selectedItem);
 					onChange(selectedItem);
 				}}
 				initialValue={value}
