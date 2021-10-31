@@ -7,7 +7,7 @@ const width = Dimensions.get('window').width;
 const targetWidth = width / 2 - 25;
 
 const ProductCard = ({ navigation, product }) => {
-	const { images, brand, name, price } = product;
+	const { _id, images, brand, name, price } = product;
 	return (
 		<View style={styles.container}>
 			<Image source={{ uri: images[0] }} style={styles.image} />
@@ -18,7 +18,7 @@ const ProductCard = ({ navigation, product }) => {
 				{brand ? <Text>Asus</Text> : <View style={{ height: 18 }} />}
 				<Text style={styles.title}>$ {price.toFixed(2)}</Text>
 				<TouchableRipple
-					onPress={() => navigation.navigate('Detail')}
+					onPress={() => navigation.navigate('Detail', { id: _id })}
 					style={styles.btn}
 					borderless>
 					<Icon name="chevron-right" size={30} color="#060948" />

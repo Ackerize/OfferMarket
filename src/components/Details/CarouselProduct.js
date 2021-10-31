@@ -35,7 +35,7 @@ const RenderItem = props => {
 	return (
 		<TouchableWithoutFeedback>
 			<View>
-				<Image style={styles.image} source={url} />
+				<Image style={styles.image} source={{ uri: url }} />
 			</View>
 		</TouchableWithoutFeedback>
 	)

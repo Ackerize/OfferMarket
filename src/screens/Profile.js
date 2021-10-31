@@ -180,7 +180,7 @@ const Profile = ({ navigation }) => {
 				</View>
 				<ScrollView
 					style={styles.scrollView}
-					showsVerticalScrollIndicator={true}>
+					showsVerticalScrollIndicator={false}>
 					{activeTab == 'products' && <ProductList data={productData} />}
 					{activeTab == 'contact' && (
 						<ContactInfo

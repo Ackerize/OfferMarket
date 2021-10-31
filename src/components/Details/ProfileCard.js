@@ -1,31 +1,34 @@
-import React from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
-import Icon from 'react-native-vector-icons/MaterialIcons'
-const ProfileCard = ({ navigation, displayName, image }) => {
+import React from 'react';
+import { StyleSheet, Text, View, Image } from 'react-native';
+import { TouchableRipple } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+const ProfileCard = ({ navigation, seller }) => {
+	const { name, uid, photo } = seller;
 	return (
 		<View style={styles.containerPerfil}>
 			<View style={styles.imgplusname}>
 				<View>
-					<Image style={styles.image} source={image} />
+					<Image style={styles.image} source={{ uri: photo }} />
 				</View>
-				<View>
-					<Text style={styles.displayName}>{displayName}</Text>
-					<Text>Ver perfil</Text>
+				<View style={styles.contactInfo}>
+					<Text numberOfLines={1} style={styles.displayName}>{name}</Text>
+					<Text style={styles.label}>Ver perfil</Text>
 				</View>
 				<View />
 			</View>
-			<TouchableOpacity style={styles.icon}>
-				<Icon  name="chevron-right" size={30} color="#060948" />
-			</TouchableOpacity>
+			<TouchableRipple style={styles.icon} borderless onPress={() => {}}>
+				<Icon name="chevron-right" size={30} color="#060948" />
+			</TouchableRipple>
 		</View>
-	)
-}
+	);
+};
 
-export default ProfileCard
+export default ProfileCard;
 
 const styles = StyleSheet.create({
 	containerPerfil: {
-    borderRadius: 10,
+		borderRadius: 10,
 		marginTop: 60,
 		backgroundColor: '#EDEFF1',
 		display: 'flex',
@@ -33,11 +36,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		width: '95%',
-		height: 60,
+		height: 63,
 	},
 	image: {
-		width: 50,
-		height: 50,
+		width: 45,
+		height: 45,
 		marginLeft: 10,
 		marginRight: 10,
 		borderRadius: 10,
@@ -49,11 +52,25 @@ const styles = StyleSheet.create({
 	},
 	icon: {
 		backgroundColor: '#fff',
-		marginRight: 10,
-    borderRadius: 10,
+		marginRight: 15,
+		borderRadius: 10,
+		height: 34,
+		width: 36,
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
-  displayName:{
-    color: '#060948',
-    fontWeight: 'bold',
-  }
-})
+	displayName: {
+		color: '#060948',
+		fontWeight: 'bold',
+		fontSize: 15,
+	},
+	label: {
+		color: '#A6A7B2',
+		fontWeight: 'bold',
+		fontSize: 14,
+	},
+	contactInfo: {
+		marginLeft: 8,
+		maxWidth: '75%',
+	}
+});
