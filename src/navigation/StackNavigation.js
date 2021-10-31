@@ -178,6 +178,11 @@ export default function StackNavigation() {
 							headerTransparent: true,
 							title: '',
 							headerBackImage: () => buttonLeft(),
+							headerLeftContainerStyle: {
+								paddingTop: 30,
+								height: 70,
+							},
+							headerRight: null,
 						}}
 					/>
 					<Stack.Screen

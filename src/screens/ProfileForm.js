@@ -93,10 +93,12 @@ const ProfileForm = ({ navigation, route }) => {
 				} else {
 					fileUrl = profileInfo.photo;
 				}
+
 				const { error, message } = await updateProfile(
 					{
 						...values,
 						photo: fileUrl,
+						location,
 					},
 					uid,
 				);

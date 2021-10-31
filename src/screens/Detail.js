@@ -4,15 +4,12 @@ import {
 	Text,
 	View,
 	SafeAreaView,
-	TouchableOpacity,
 	ScrollView,
 	Dimensions,
+	TouchableOpacity,
 } from 'react-native';
 import ProfileCard from '../components/Details/ProfileCard';
-import laptop from '../assets/img/laptop.png';
-import sofa from '../assets/img/sofa.png';
 import CarouselProduct from '../components/Details/CarouselProduct';
-import person from '../assets/img/person.jpg';
 import ConditionAndLocation from '../components/Details/ConditionAndLocation';
 import { Icon } from 'react-native-elements/dist/icons/Icon';
 import { Button } from 'react-native-paper';
@@ -21,6 +18,7 @@ import { API_HOST } from '../utils/constants';
 import { showToast } from '../components/Modals/CustomToast';
 import Spinner from '../components/Spinner';
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import { useSelector } from 'react-redux';
 
 const heightScreen = Dimensions.get('window').height;
 
@@ -28,9 +26,10 @@ const Detail = ({ navigation, route }) => {
 	const [selected, setSelected] = useState(true);
 	const idProduct = route?.params?.id;
 
-	console.log({ idProduct });
+	const { uid } = useSelector(state => state.auth);
 
 	const [productData, setProductData] = useState(null);
+	const [isFavoriteProduct, setIsFavoriteProduct] = useState(null);
 
 	useEffect(() => {
 		if (idProduct) {
@@ -52,10 +51,28 @@ const Detail = ({ navigation, route }) => {
 						console.log({ errorMessage });
 					}
 				});
+
+			axios
+				.get(`${API_HOST}/favorites/${uid}/${idProduct}`)
+				.then(({ data }) => {
+					const { error, message, isFavorite } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setIsFavoriteProduct(isFavorite);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message, errorMessage } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+						console.log({ errorMessage });
+					}
+				});
 		}
 	}, []);
 
-	if (!productData) return <Spinner />;
+	if (!productData || isFavoriteProduct === null) return <Spinner />;
 
 	const {
 		name,
@@ -68,16 +85,76 @@ const Detail = ({ navigation, route }) => {
 		condition,
 	} = productData;
 
-	const imageData = images.map((image) => ({ url: image }));
+	const imageData = images.map(image => ({ url: image }));
+
+	const iconFavorite = isFavoriteProduct ? 'favorite' : 'favorite-border';
+	const colorFavorite = isFavoriteProduct ? '#B71C1C' : '#000';
+
+	const handleFavorite = () => {
+		if (!isFavoriteProduct) {
+			const postData = {
+				user: uid,
+				product: idProduct,
+			}
+			axios.post(`${API_HOST}/favorites`, postData)
+			.then(({ data }) => {
+				const { error, message } = data;
+				if (error) {
+					showToast('error', '¡Oh no!', message);
+				} else {
+					showToast('success', 'Agregado a favoritos', message);
+					setIsFavoriteProduct(true);
+				}
+			})
+			.catch(({ response: { data } }) => {
+				const { error, message, errorMessage } = data;
+				if (error) {
+					showToast('error', '¡Oh no!', message);
+					console.log({ errorMessage });
+				}
+			});
+		}else{
+			axios.delete(`${API_HOST}/favorites/${uid}/${idProduct}`)
+			.then(({ data }) => {
+				const { error, message } = data;
+				if (error) {
+					showToast('error', '¡Oh no!', message);
+				} else {
+					showToast('success', 'Eliminado de favoritos', message);
+					setIsFavoriteProduct(false);
+				}
+			})
+			.catch(({ response: { data } }) => {
+				const { error, message, errorMessage } = data;
+				if (error) {
+					showToast('error', '¡Oh no!', message);
+					console.log({ errorMessage });
+				}
+			});
+		}
+	}
+
 	return (
 		<SafeAreaView style={styles.principalContainer}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<Button
-				icon={() => <Icon name="favorite-border" size={20} />}
-				onPress={() => console.log('Pressed')}
 				mode="contained"
-				style={styles.btnTop}>
-				<Text style={styles.btnContent}>Favorito</Text>
+				icon={() => (
+					<Icon name={iconFavorite} size={20} color={colorFavorite} />
+				)}
+				onPress={handleFavorite}
+				style={[
+					styles.btnTop,
+					isFavoriteProduct ? styles.btnFavorite : styles.btnNotFavorite,
+				]}>
+				<Text
+					style={
+						isFavoriteProduct
+							? styles.btnFavoriteContent
+							: styles.btnNotFavoriteContent
+					}>
+					{isFavoriteProduct ? 'Quitar' : 'Agregar'}
+				</Text>
 			</Button>
 			<ScrollView
 				style={[styles.titleContainer, styles.scrollView]}
@@ -93,10 +170,7 @@ const Detail = ({ navigation, route }) => {
 				<View style={{ marginTop: 25 }}>
 					<CarouselProduct images={imageData} />
 				</View>
-				<ProfileCard
-					seller={seller}
-					navigation={navigation}
-				/>
+				<ProfileCard seller={seller} navigation={navigation} />
 				<View style={styles.titles}>
 					<TouchableOpacity onPress={() => setSelected(true)}>
 						<Text style={selected ? styles.colorBlue : styles.colorGrey}>
@@ -110,11 +184,13 @@ const Detail = ({ navigation, route }) => {
 					</TouchableOpacity>
 				</View>
 				{selected ? (
-					<Text style={styles.description}>
-						{ description }
-					</Text>
+					<Text style={styles.description}>{description}</Text>
 				) : (
-					<ConditionAndLocation condition={condition} location={location} name={name} />
+					<ConditionAndLocation
+						condition={condition}
+						location={location}
+						name={name}
+					/>
 				)}
 			</ScrollView>
 			<View style={styles.bottomContainer}>
@@ -138,17 +214,26 @@ const Detail = ({ navigation, route }) => {
 export default Detail;
 
 const styles = StyleSheet.create({
-	btnContent: {
+	btnNotFavoriteContent: {
 		color: '#1F224D',
+	},
+	btnFavoriteContent: {
+		color: '#B71C1C',
+	},
+	btnFavorite: {
+		backgroundColor: '#FFCDD2',
 	},
 	btnTop: {
 		position: 'absolute',
-		right: 20,
-		top: 10,
+		right: 25,
+		top: 30,
 		display: 'flex',
 		flexDirection: 'row',
-		backgroundColor: '#F1F3F4',
+
 		borderRadius: 10,
+	},
+	btnNotFavorite: {
+		backgroundColor: '#F1F3F4',
 	},
 	principalContainer: {
 		backgroundColor: '#fff',
@@ -158,7 +243,7 @@ const styles = StyleSheet.create({
 	titleContainer: {
 		display: 'flex',
 		flexDirection: 'column',
-		marginTop: 65,
+		marginTop: 90,
 		marginLeft: 25,
 	},
 	title: {
@@ -221,5 +306,6 @@ const styles = StyleSheet.create({
 	},
 	scrollView: {
 		maxHeight: heightScreen - 160,
+		marginBottom: 80,
 	},
 });
