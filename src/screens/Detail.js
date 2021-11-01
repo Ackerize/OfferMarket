@@ -41,7 +41,6 @@ const Detail = ({ navigation, route }) => {
 						showToast('error', '¡Oh no!', message);
 					} else {
 						setProductData(product);
-						console.log({ product });
 					}
 				})
 				.catch(({ response: { data } }) => {
@@ -85,6 +84,8 @@ const Detail = ({ navigation, route }) => {
 		condition,
 	} = productData;
 
+	const { uid: idSeller } = seller;
+	
 	const imageData = images.map(image => ({ url: image }));
 
 	const iconFavorite = isFavoriteProduct ? 'favorite' : 'favorite-border';
@@ -167,7 +168,7 @@ const Detail = ({ navigation, route }) => {
 				) : (
 					<View style={{ height: 20 }} />
 				)}
-				<View style={{ marginTop: 25 }}>
+				<View style={{ marginTop: 20 }}>
 					<CarouselProduct images={imageData} />
 				</View>
 				<ProfileCard seller={seller} navigation={navigation} />

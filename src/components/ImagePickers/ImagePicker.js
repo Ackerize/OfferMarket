@@ -61,12 +61,11 @@ const ImagePicker = ({
 			includeBase64: true,
 		})
 			.then(images => {
-				
 				const filterImages = images.map(image => ({data: image.data, path: image.path}));
 				setImageSelected({
 					images: [...imageSelected.images, ...filterImages],
 				});
-				setImagesArray(filterImages);
+				setImagesArray((prevState) => [...prevState, ...filterImages]);
 			})
 			.catch(error => {
 				showToast('error', '¡Oh no!', error.message);

@@ -29,18 +29,25 @@ import axios from 'axios';
 import { API_HOST } from '../utils/constants';
 import { useIsFocused } from '@react-navigation/native';
 import { showToast } from '../components/Modals/CustomToast';
+import PrimaryButton from '../components/Buttons/PrimaryButton';
+import SecundaryButton from '../components/Buttons/SecundaryButton';
 
 const heightScreen = Dimensions.get('window').height;
 
-const Profile = ({ navigation }) => {
+const Profile = ({ navigation, route }) => {
+	const sellerAux = route?.params?.idProfile;
+
 	const isFocused = useIsFocused();
 	const [activeTab, setActiveTab] = useState('products');
 	const [visible, setVisible] = useState(false);
 	const [profile, setProfile] = useState(null);
 	const [productData, setProductData] = useState(null);
+	const [isSubscribed, setIsSubscribed] = useState(null);
 
 	const dispatch = useDispatch();
 	const { typeLogin, uid } = useSelector(state => state.auth);
+
+	const seller = sellerAux !== uid ? sellerAux : null;
 
 	const openMenu = () => setVisible(true);
 
@@ -53,8 +60,9 @@ const Profile = ({ navigation }) => {
 
 	useEffect(() => {
 		if (isFocused) {
+			const user = seller ? seller : uid;
 			axios
-				.get(`${API_HOST}/profiles/${uid}`)
+				.get(`${API_HOST}/profiles/${user}`)
 				.then(({ data }) => {
 					const { error, message, data: profileInfo } = data;
 					if (error) {
@@ -83,7 +91,7 @@ const Profile = ({ navigation }) => {
 				});
 
 			axios
-				.get(`${API_HOST}/products/user/${uid}`)
+				.get(`${API_HOST}/products/user/${user}`)
 				.then(({ data }) => {
 					const { error, message, products } = data;
 					if (error) {
@@ -98,11 +106,98 @@ const Profile = ({ navigation }) => {
 						showToast('error', '¡Oh no!', message);
 					}
 				});
+
+			if (seller) {
+				axios
+					.get(`${API_HOST}/notifications/${uid}/${seller}`)
+					.then(({ data }) => {
+						const { error, message, isNotification } = data;
+						if (error) {
+							showToast('error', '¡Oh no!', message);
+						} else {
+							setIsSubscribed(isNotification);
+						}
+					})
+					.catch(({ response: { data } }) => {
+						const { error, message } = data;
+						if (error) {
+							showToast('error', '¡Oh no!', message);
+						}
+					});
+			}
 		}
 	}, [isFocused]);
 
+	const handleNewProduct = () => {
+		navigation.navigate('ProductForm', { name: 'Nuevo producto' });
+	};
 
-	if (!profile) return <Spinner />;
+	const handleMessage = () => {};
+
+	const handleEditProfile = () => {
+		navigation.navigate('ProfileForm', {
+			name: 'Editar perfil',
+			profile,
+		});
+	};
+
+	const handleNotification = () => {
+		if (!isSubscribed) {
+			const postData = {
+				user: uid,
+				seller,
+			};
+			axios
+				.post(`${API_HOST}/notifications`, postData)
+				.then(({ data }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setIsSubscribed(true);
+						showToast('success', 'Notificación activada', message);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					}
+				});
+		} else {
+			axios
+				.delete(`${API_HOST}/notifications/${uid}/${seller}`)
+				.then(({ data }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setIsSubscribed(false);
+						showToast('success', 'Notificación desactivada', message);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					}
+				});
+		}
+	};
+
+	const iconPrimaryButton = seller ? (
+		<Icon
+			name={isSubscribed ? 'notifications-off' : 'notifications'}
+			size={20}
+			color="#FFF"
+		/>
+	) : null;
+
+	const iconSecondaryButton = seller ? (
+		<Icon name="chat-bubble-outline" size={20} color="#070B59" />
+	) : null;
+
+	if (!profile || (seller && isSubscribed === null)) return <Spinner />;
 
 	const { photo, name, rating, ...contactInfo } = profile;
 	return (
@@ -110,14 +205,16 @@ const Profile = ({ navigation }) => {
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.headerTitle}>
 				<Title style={styles.title}>Perfil</Title>
-				<TouchableRipple onPress={openMenu} style={styles.touchable}>
-					<Menu
-						visible={visible}
-						onDismiss={closeMenu}
-						anchor={<Icon name="more-vert" color="#060948" size={30} />}>
-						<Menu.Item onPress={handleLogOut} title="Cerrar sesión" />
-					</Menu>
-				</TouchableRipple>
+				{!seller && (
+					<TouchableRipple onPress={openMenu} style={styles.touchable}>
+						<Menu
+							visible={visible}
+							onDismiss={closeMenu}
+							anchor={<Icon name="more-vert" color="#060948" size={30} />}>
+							<Menu.Item onPress={handleLogOut} title="Cerrar sesión" />
+						</Menu>
+					</TouchableRipple>
+				)}
 			</View>
 			<View style={styles.header}>
 				<Avatar.Image size={75} source={{ uri: photo }} />
@@ -134,29 +231,21 @@ const Profile = ({ navigation }) => {
 					/>
 				</View>
 				<View style={styles.btnContainer}>
-					<Button
-						mode="contained"
-						style={styles.btnPrimary}
-						onPress={() =>
-							navigation.navigate('ProductForm', { name: 'Nuevo producto' })
-						}>
-						<Text style={[styles.btnText, styles.btnPrimaryText]}>
-							Nuevo producto
-						</Text>
-					</Button>
-					<Button
-						mode="contained"
-						style={styles.btnSecundary}
-						onPress={() => {
-							navigation.navigate('ProfileForm', {
-								name: 'Editar perfil',
-								profile,
-							});
-						}}>
-						<Text style={[styles.btnText, styles.btnSecundaryText]}>
-							Editar perfil
-						</Text>
-					</Button>
+					<PrimaryButton
+						icon={iconPrimaryButton}
+						onPress={seller ? handleNotification : handleNewProduct}>
+						{!seller
+							? 'Nuevo producto'
+							: seller && isSubscribed
+							? 'Desactivar'
+							: 'Activar'}
+					</PrimaryButton>
+
+					<SecundaryButton
+						icon={iconSecondaryButton}
+						onPress={seller ? handleMessage : handleEditProfile}>
+						{seller ? 'Mensaje' : 'Editar perfil'}
+					</SecundaryButton>
 				</View>
 				<View style={styles.customTabs}>
 					<TouchableWithoutFeedback onPress={() => setActiveTab('products')}>
@@ -179,7 +268,10 @@ const Profile = ({ navigation }) => {
 					</TouchableWithoutFeedback>
 				</View>
 				<ScrollView
-					style={styles.scrollView}
+					style={[
+						styles.scrollView,
+						activeTab == 'products' && { width: '100%' },
+					]}
 					showsVerticalScrollIndicator={false}>
 					{activeTab == 'products' && <ProductList data={productData} />}
 					{activeTab == 'contact' && (
@@ -249,7 +341,7 @@ const styles = StyleSheet.create({
 	},
 	btnContainer: {
 		flexDirection: 'row',
-		justifyContent: 'space-around',
+		justifyContent: 'space-evenly',
 		marginTop: 20,
 		width: '80%',
 	},

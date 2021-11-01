@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import {
 	StyleSheet,
 	Text,
@@ -6,14 +6,15 @@ import {
 	Dimensions,
 	TouchableWithoutFeedback,
 	Image,
-} from 'react-native'
-import Carousel from 'react-native-snap-carousel'
+} from 'react-native';
+import Carousel from 'react-native-snap-carousel';
+import ImageModal from 'react-native-image-modal';
 
-const { width } = Dimensions.get('window')
-const ITEM_WIDTH = Math.round(width * 2)
+const { width } = Dimensions.get('window');
+const ITEM_WIDTH = Math.round(width * 2);
 
 const CarouselProduct = props => {
-	const { images } = props
+	const { images } = props;
 	return (
 		<Carousel
 			layout={'default'}
@@ -24,29 +25,35 @@ const CarouselProduct = props => {
 			firstItem={0}
 			inactiveSlideOpacity={1}
 			inactiveSlideScale={1}
-      pagingEnabled
+			pagingEnabled
 		/>
-	)
-}
+	);
+};
 
 const RenderItem = props => {
-	const { data } = props
-	const { url } = data.item
+	const { data } = props;
+	const { url } = data.item;
 	return (
 		<TouchableWithoutFeedback>
 			<View>
-				<Image style={styles.image} source={{ uri: url }} />
+				<ImageModal
+					resizeMode="contain"
+					modalImageResizeMode="contain"
+					imageBackgroundColor="#fff"
+					style={styles.image}
+					source={{ uri: url }}
+				/>
 			</View>
 		</TouchableWithoutFeedback>
-	)
-}
+	);
+};
 
-export default CarouselProduct
+export default CarouselProduct;
 
 const styles = StyleSheet.create({
 	image: {
 		width: 350,
-		height: 200,
+		height: 220,
 		borderRadius: 20,
 	},
-})
+});

@@ -4,7 +4,7 @@ import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
 import ImagePicker from '../components/ImagePickers/ImagePicker';
 import Input from '../components/Inputs/Input';
 import Select from '../components/Inputs/Select';
-import SaveButton from '../components/SaveButton';
+import SaveButton from '../components/Buttons/SaveButton';
 import { categories } from '../utils/category';
 import { Formik } from 'formik';
 import { useSelector, useDispatch } from 'react-redux';

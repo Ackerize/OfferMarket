@@ -1,18 +1,28 @@
-import React from 'react'
+import React from 'react';
 import {
 	StyleSheet,
 	View,
 	SafeAreaView,
 	TouchableWithoutFeedback,
-} from 'react-native'
-import { Title, Avatar, Text } from 'react-native-paper'
+	Image,
+} from 'react-native';
+import { Title, Avatar, Text } from 'react-native-paper';
 
-const Person = ({ title, subtitle, avatar, date, notifications, action = () => console.log('click') }) => {
+const Person = ({
+	title,
+	subtitle,
+	avatar,
+	date,
+	notifications,
+	action = () => console.log('click'),
+}) => {
 	return (
-		<TouchableWithoutFeedback
-			onPress={action}>
+		<TouchableWithoutFeedback onPress={action}>
 			<View style={styles.messageContainer}>
-				<Avatar.Image size={60} source={avatar} />
+				<Avatar.Image
+					size={60}
+					source={{ uri: avatar }}
+				/>
 				<View style={styles.informationContainer}>
 					<Text style={styles.date}>{date}</Text>
 					<Text style={styles.person}>{title}</Text>
@@ -22,10 +32,10 @@ const Person = ({ title, subtitle, avatar, date, notifications, action = () => c
 				</View>
 			</View>
 		</TouchableWithoutFeedback>
-	)
-}
+	);
+};
 
-export default Person
+export default Person;
 
 const styles = StyleSheet.create({
 	messageContainer: {
@@ -78,4 +88,4 @@ const styles = StyleSheet.create({
 		marginTop: 5,
 		marginBottom: 5,
 	},
-})
+});

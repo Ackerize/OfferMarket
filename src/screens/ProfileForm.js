@@ -5,7 +5,7 @@ import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
 import ImagePicker from '../components/ImagePickers/ImagePicker';
 import Input from '../components/Inputs/Input';
 import LocationInput from '../components/Inputs/LocationInput';
-import SaveButton from '../components/SaveButton';
+import SaveButton from '../components/Buttons/SaveButton';
 import { Formik } from 'formik';
 import { validateProfileForm } from '../utils/utils';
 import { fileUpload } from '../utils/fileUpload';

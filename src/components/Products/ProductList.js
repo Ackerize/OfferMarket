@@ -16,9 +16,9 @@ const ProductList = ({ navigation, data }) => {
 
 	return (
 		<View style={styles.itemsContainer}>
-			{data.map(product => (
+			{data.map((product, index) => (
 				<ProductCard
-					key={product._id}
+					key={index}
 					product={product}
 					navigation={navigation}
 				/>
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		flexWrap: 'wrap',
 		justifyContent: 'space-between',
-		paddingHorizontal: 18,
+		paddingHorizontal: 15,
 		paddingBottom: 100,
 	},
 });

@@ -7,6 +7,7 @@ const width = Dimensions.get('window').width;
 const targetWidth = width / 2 - 25;
 
 const ProductCard = ({ navigation, product }) => {
+	console.log(product)
 	const { _id, images, brand, name, price } = product;
 	return (
 		<View style={styles.container}>
@@ -15,7 +16,13 @@ const ProductCard = ({ navigation, product }) => {
 				<Text numberOfLines={1} style={styles.title}>
 					{name}
 				</Text>
-				{brand ? <Text>Asus</Text> : <View style={{ height: 18 }} />}
+				{brand ? (
+					<Text numberOfLines={1} style={styles.brand}>
+						{brand}
+					</Text>
+				) : (
+					<View style={{ height: 18, marginBottom: 2, }} />
+				)}
 				<Text style={styles.title}>$ {price.toFixed(2)}</Text>
 				<TouchableRipple
 					onPress={() => navigation.navigate('Detail', { id: _id })}
@@ -62,7 +69,11 @@ const styles = StyleSheet.create({
 		color: '#060948',
 		fontSize: 14,
 		fontWeight: 'bold',
-		marginBottom: 5,
+		marginBottom: 3,
+	},
+	brand: {
+		maxWidth: '70%',
+		marginBottom: 2,
 	},
 	btn: {
 		position: 'absolute',

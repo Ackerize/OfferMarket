@@ -12,12 +12,21 @@ const ProfileCard = ({ navigation, seller }) => {
 					<Image style={styles.image} source={{ uri: photo }} />
 				</View>
 				<View style={styles.contactInfo}>
-					<Text numberOfLines={1} style={styles.displayName}>{name}</Text>
+					<Text numberOfLines={1} style={styles.displayName}>
+						{name}
+					</Text>
 					<Text style={styles.label}>Ver perfil</Text>
 				</View>
 				<View />
 			</View>
-			<TouchableRipple style={styles.icon} borderless onPress={() => {}}>
+			<TouchableRipple
+				style={styles.icon}
+				borderless
+				onPress={() =>
+					navigation.navigate('Profile', {
+						idProfile: uid,
+					})
+				}>
 				<Icon name="chevron-right" size={30} color="#060948" />
 			</TouchableRipple>
 		</View>
@@ -29,7 +38,7 @@ export default ProfileCard;
 const styles = StyleSheet.create({
 	containerPerfil: {
 		borderRadius: 10,
-		marginTop: 60,
+		marginTop: 30,
 		backgroundColor: '#EDEFF1',
 		display: 'flex',
 		flexDirection: 'row',
@@ -72,5 +81,5 @@ const styles = StyleSheet.create({
 	contactInfo: {
 		marginLeft: 8,
 		maxWidth: '75%',
-	}
+	},
 });

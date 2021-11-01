@@ -8,7 +8,7 @@ import { useForm } from '../hooks/useForm'
 import { categories } from '../utils/category'
 import { ScrollView } from 'react-native-gesture-handler'
 import LocationInput from '../components/Inputs/LocationInput'
-import SaveButton from '../components/SaveButton'
+import SaveButton from '../components/Buttons/SaveButton'
 
 const Filter = ({ navigation }) => {
 	const [values, handleInputChange] = useForm({
