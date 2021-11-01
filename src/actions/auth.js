@@ -47,7 +47,6 @@ export const startGoogleLogin = () => {
 					const {
 						user: { hasProfile },
 					} = await createNewUser({ uid: user.uid, email: user.email });
-					console.log({hasProfile});
 					dispatch(
 						login(user.uid, user.displayName, user.email, 'google', hasProfile),
 					);

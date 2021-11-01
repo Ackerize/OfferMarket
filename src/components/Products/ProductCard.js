@@ -7,7 +7,6 @@ const width = Dimensions.get('window').width;
 const targetWidth = width / 2 - 25;
 
 const ProductCard = ({ navigation, product }) => {
-	console.log(product)
 	const { _id, images, brand, name, price } = product;
 	return (
 		<View style={styles.container}>

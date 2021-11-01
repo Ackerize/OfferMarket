@@ -11,11 +11,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { validateProductForm } from '../utils/utils';
 import { finishLoading, startLoading } from '../actions/ui';
 import { fileUpload } from '../utils/fileUpload';
-import { createNewProduct } from '../api/products';
+import { createNewProduct, updateProduct } from '../api/products';
 import Popup from '../components/Modals/Popup';
 import { showToast } from '../components/Modals/CustomToast';
 
-const ProductForm = ({ navigation }) => {
+const ProductForm = ({ navigation, route }) => {
+	const product = route?.params?.product;
 	const categoriesData = categories.map(category => ({
 		id: category.id,
 		value: category.name,
@@ -24,26 +25,49 @@ const ProductForm = ({ navigation }) => {
 	categoriesData.shift();
 
 	const dispatch = useDispatch();
+
 	const {
 		auth: { uid },
 		ui: { loading },
 	} = useSelector(state => state);
+
 	const conditionData = [{ id: 1, value: 'Nuevo' }, { id: 2, value: 'Usado' }];
 
-	const [categorySelected, setCategorySelected] = useState(categoriesData[0]);
-	const [conditionSelected, setConditionSelected] = useState(conditionData[0]);
-	const [images, setImages] = useState([]);
+	const cat = product
+		? categoriesData.find(cate => cate.value === product.category)
+		: null;
+	const cond = product
+		? conditionData.find(condi => condi.value === product.condition)
+		: null;
 
-	const initialValues = {
-		name: '',
-		images: null,
-		brand: '',
-		price: 0,
-		description: '',
-		category: null,
-		condition: null,
-		seller: uid,
-	};
+	const [categorySelected, setCategorySelected] = useState(
+		cat ? cat : categoriesData[0],
+	);
+	const [conditionSelected, setConditionSelected] = useState(
+		cond ? cond : conditionData[0],
+	);
+	const [images, setImages] = useState(product ? product.images : []);
+
+	const initialValues = product
+		? {
+				name: product.name,
+				price: product.price,
+				description: product.description,
+				brand: product.brand,
+				images: product.images,
+				category: product.category,
+				condition: product.condition,
+		  }
+		: {
+				name: '',
+				images: null,
+				brand: '',
+				price: 0,
+				description: '',
+				category: null,
+				condition: null,
+				seller: uid,
+		  };
 
 	const onSubmit = async values => {
 		if (!loading) {
@@ -91,14 +115,73 @@ const ProductForm = ({ navigation }) => {
 		}
 	};
 
+	const onUpdate = async values => {
+		if (!loading) {
+			values = {
+				...values,
+				category: categorySelected.value,
+				condition: conditionSelected.value,
+				images,
+			};
+
+			const isValid = validateProductForm(values);
+
+			if (isValid) {
+				dispatch(startLoading());
+				const urls = images.map(async image => {
+					if (image?.data) {
+						const source = 'data:image/jpg;base64,' + image.data;
+						const fileUrl = await fileUpload(source);
+						return fileUrl;
+					}
+					if (image?.path) return image.path;
+					return image;
+				});
+				const imageUploads = await Promise.all(urls);
+
+				values.images = [...new Set(imageUploads)];
+				const { error, message } = await updateProduct(
+					{
+						...values,
+						price: Number(values.price),
+						brand: values.brand.length > 0 ? values.brand : null,
+					},
+					product._id,
+				);
+
+				if (!error) {
+					showToast('success', 'Producto actualizado', message);
+					navigation.goBack();
+				} else {
+					showToast('error', '¡Oh no!', message);
+				}
+				dispatch(finishLoading());
+			} else {
+				Popup.show({
+					type: 'Danger',
+					title: '¡Oh no!',
+					textBody: 'Debe de llenar todos los campos obligatorios',
+					buttontext: 'Aceptar',
+					callback: () => Popup.hide(),
+				});
+			}
+		}
+	};
+
 	return (
 		<SafeAreaView style={styles.mainContainer}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
-			<Formik initialValues={initialValues} onSubmit={onSubmit}>
+			<Formik
+				initialValues={initialValues}
+				onSubmit={product ? onUpdate : onSubmit}>
 				{({ handleChange, handleBlur, handleSubmit, values }) => (
 					<ScrollView style={styles.formContainer}>
 						<View style={{ paddingBottom: 50 }}>
-							<ImagePicker multiple={true} setImagesArray={setImages} />
+							<ImagePicker
+								multiple={true}
+								setImagesArray={setImages}
+								imagesArray={images}
+							/>
 							<Input
 								label="Nombre: (*)"
 								value={values.name}

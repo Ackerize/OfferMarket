@@ -7,22 +7,26 @@ import {
 	ScrollView,
 	Dimensions,
 	TouchableOpacity,
+	TouchableWithoutFeedback,
 } from 'react-native';
 import ProfileCard from '../components/Details/ProfileCard';
 import CarouselProduct from '../components/Details/CarouselProduct';
 import ConditionAndLocation from '../components/Details/ConditionAndLocation';
 import { Icon } from 'react-native-elements/dist/icons/Icon';
-import { Button } from 'react-native-paper';
 import axios from 'axios';
 import { API_HOST } from '../utils/constants';
 import { showToast } from '../components/Modals/CustomToast';
 import Spinner from '../components/Spinner';
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
 import { useSelector } from 'react-redux';
+import FavoriteButton from '../components/Buttons/FavoriteButton';
+import DeleteButton from '../components/Buttons/DeleteButton';
+import { useIsFocused } from '@react-navigation/native';
 
 const heightScreen = Dimensions.get('window').height;
 
 const Detail = ({ navigation, route }) => {
+	const isFocused = useIsFocused();
 	const [selected, setSelected] = useState(true);
 	const idProduct = route?.params?.id;
 
@@ -32,7 +36,7 @@ const Detail = ({ navigation, route }) => {
 	const [isFavoriteProduct, setIsFavoriteProduct] = useState(null);
 
 	useEffect(() => {
-		if (idProduct) {
+		if (isFocused) {
 			axios
 				.get(`${API_HOST}/products/${idProduct}`)
 				.then(({ data }) => {
@@ -69,7 +73,7 @@ const Detail = ({ navigation, route }) => {
 					}
 				});
 		}
-	}, []);
+	}, [isFocused]);
 
 	if (!productData || isFavoriteProduct === null) return <Spinner />;
 
@@ -85,78 +89,95 @@ const Detail = ({ navigation, route }) => {
 	} = productData;
 
 	const { uid: idSeller } = seller;
-	
-	const imageData = images.map(image => ({ url: image }));
 
-	const iconFavorite = isFavoriteProduct ? 'favorite' : 'favorite-border';
-	const colorFavorite = isFavoriteProduct ? '#B71C1C' : '#000';
+	const imageData = images.map(image => ({ url: image }));
 
 	const handleFavorite = () => {
 		if (!isFavoriteProduct) {
 			const postData = {
 				user: uid,
 				product: idProduct,
-			}
-			axios.post(`${API_HOST}/favorites`, postData)
-			.then(({ data }) => {
-				const { error, message } = data;
-				if (error) {
-					showToast('error', '¡Oh no!', message);
-				} else {
-					showToast('success', 'Agregado a favoritos', message);
-					setIsFavoriteProduct(true);
-				}
-			})
-			.catch(({ response: { data } }) => {
-				const { error, message, errorMessage } = data;
-				if (error) {
-					showToast('error', '¡Oh no!', message);
-					console.log({ errorMessage });
-				}
-			});
-		}else{
-			axios.delete(`${API_HOST}/favorites/${uid}/${idProduct}`)
-			.then(({ data }) => {
-				const { error, message } = data;
-				if (error) {
-					showToast('error', '¡Oh no!', message);
-				} else {
-					showToast('success', 'Eliminado de favoritos', message);
-					setIsFavoriteProduct(false);
-				}
-			})
-			.catch(({ response: { data } }) => {
-				const { error, message, errorMessage } = data;
-				if (error) {
-					showToast('error', '¡Oh no!', message);
-					console.log({ errorMessage });
-				}
-			});
+			};
+			axios
+				.post(`${API_HOST}/favorites`, postData)
+				.then(({ data }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						showToast('success', 'Agregado a favoritos', message);
+						setIsFavoriteProduct(true);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message, errorMessage } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+						console.log({ errorMessage });
+					}
+				});
+		} else {
+			axios
+				.delete(`${API_HOST}/favorites/${uid}/${idProduct}`)
+				.then(({ data }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						showToast('success', 'Eliminado de favoritos', message);
+						setIsFavoriteProduct(false);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message, errorMessage } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+						console.log({ errorMessage });
+					}
+				});
 		}
-	}
+	};
+
+	const handleDelete = () => {
+		axios
+			.delete(`${API_HOST}/products/${idProduct}`)
+			.then(({ data }) => {
+				const { error, message } = data;
+				if (error) {
+					showToast('error', '¡Oh no!', message);
+				} else {
+					showToast('success', 'Producto eliminado', message);
+					navigation.goBack();
+				}
+			})
+			.catch(({ response: { data } }) => {
+				const { error, message, errorMessage } = data;
+				if (error) {
+					showToast('error', '¡Oh no!', message);
+					console.log({ errorMessage });
+				}
+			});
+	};
+
+	const handleEdit = () => {
+		navigation.navigate('ProductForm', { product: productData });
+	};
+
+	const handleMessage = () => {
+		console.log('message');
+	};
 
 	return (
 		<SafeAreaView style={styles.principalContainer}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
-			<Button
-				mode="contained"
-				icon={() => (
-					<Icon name={iconFavorite} size={20} color={colorFavorite} />
-				)}
-				onPress={handleFavorite}
-				style={[
-					styles.btnTop,
-					isFavoriteProduct ? styles.btnFavorite : styles.btnNotFavorite,
-				]}>
-				<Text
-					style={
-						isFavoriteProduct
-							? styles.btnFavoriteContent
-							: styles.btnNotFavoriteContent
-					}>
-					{isFavoriteProduct ? 'Quitar' : 'Agregar'}
-				</Text>
-			</Button>
+			{idSeller === uid ? (
+				<DeleteButton onPress={handleDelete} />
+			) : (
+				<FavoriteButton
+					onPress={handleFavorite}
+					isFavoriteProduct={isFavoriteProduct}
+				/>
+			)}
 			<ScrollView
 				style={[styles.titleContainer, styles.scrollView]}
 				showsVerticalScrollIndicator={true}>
@@ -171,9 +192,9 @@ const Detail = ({ navigation, route }) => {
 				<View style={{ marginTop: 20 }}>
 					<CarouselProduct images={imageData} />
 				</View>
-				{
-					idSeller !== uid && (<ProfileCard seller={seller} navigation={navigation} />)
-				}
+				{idSeller !== uid && (
+					<ProfileCard seller={seller} navigation={navigation} />
+				)}
 				<View style={styles.titles}>
 					<TouchableOpacity onPress={() => setSelected(true)}>
 						<Text style={selected ? styles.colorBlue : styles.colorGrey}>
@@ -202,12 +223,16 @@ const Detail = ({ navigation, route }) => {
 						<Text style={{ color: '#A6A7B2', fontWeight: 'bold' }}>Precio</Text>
 						<Text style={styles.price}>${price.toFixed(2)}</Text>
 					</View>
-					<TouchableOpacity style={[styles.btn]}>
-						<Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
-							Enviar Mensaje
-						</Text>
-						<Icon name="send" size={30} color="#fff" />
-					</TouchableOpacity>
+					<TouchableWithoutFeedback
+						onPress={idSeller === uid ? handleEdit : handleMessage}>
+						<View style={[styles.btn]}>
+							{idSeller === uid && <Icon name="edit" size={30} color="#fff" />}
+							<Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
+								{idSeller === uid ? 'Editar producto' : 'Enviar mensaje'}
+							</Text>
+							{idSeller !== uid && <Icon name="send" size={30} color="#fff" />}
+						</View>
+					</TouchableWithoutFeedback>
 				</View>
 			</View>
 		</SafeAreaView>
@@ -217,27 +242,6 @@ const Detail = ({ navigation, route }) => {
 export default Detail;
 
 const styles = StyleSheet.create({
-	btnNotFavoriteContent: {
-		color: '#1F224D',
-	},
-	btnFavoriteContent: {
-		color: '#B71C1C',
-	},
-	btnFavorite: {
-		backgroundColor: '#FFCDD2',
-	},
-	btnTop: {
-		position: 'absolute',
-		right: 25,
-		top: 30,
-		display: 'flex',
-		flexDirection: 'row',
-
-		borderRadius: 10,
-	},
-	btnNotFavorite: {
-		backgroundColor: '#F1F3F4',
-	},
 	principalContainer: {
 		backgroundColor: '#fff',
 		width: '100%',
@@ -282,13 +286,13 @@ const styles = StyleSheet.create({
 	},
 	btn: {
 		backgroundColor: '#070B59',
-		width: 200,
+		width: 190,
 		height: 50,
 		borderRadius: 10,
 		display: 'flex',
 		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'space-around',
+		justifyContent: 'space-evenly',
 		marginLeft: 25,
 	},
 	bottomContainer: {

@@ -27,10 +27,12 @@ const ImagePicker = ({
 		images: [],
 	};
 
+	const img = imagesArray.map(image => ({ path: image }));
+
 	const [imageSelected, setImageSelected] = useState({
 		...initialState,
 		fileUri: urlImage,
-		images: imagesArray,
+		images: img,
 	});
 
 	const chooseOnePicture = () => {
@@ -61,11 +63,14 @@ const ImagePicker = ({
 			includeBase64: true,
 		})
 			.then(images => {
-				const filterImages = images.map(image => ({data: image.data, path: image.path}));
+				const filterImages = images.map(image => ({
+					data: image.data,
+					path: image.path,
+				}));
 				setImageSelected({
 					images: [...imageSelected.images, ...filterImages],
 				});
-				setImagesArray((prevState) => [...prevState, ...filterImages]);
+				setImagesArray([...imageSelected.images, ...filterImages]);
 			})
 			.catch(error => {
 				showToast('error', '¡Oh no!', error.message);
@@ -101,14 +106,14 @@ const ImagePicker = ({
 								key={index}
 								multiple={true}
 								source={{ uri: image.path }}
-								onPress={() =>
+								onPress={() => {
+									const newImages = imageSelected.images.filter((img, i) => i !== index);
 									setImageSelected({
 										...imageSelected,
-										images: imageSelected.images.filter(
-											(img, i) => i !== index,
-										),
-									})
-								}
+										images: newImages,
+									});			
+									setImagesArray([...newImages]);
+								}}
 							/>
 						))}
 						<ImageInput
@@ -144,4 +149,7 @@ const styles = StyleSheet.create({
 ImagePicker.propTypes = {
 	multiple: PropTypes.bool,
 	urlImage: PropTypes.string,
+	onUpdate: PropTypes.func,
+	imagesArray: PropTypes.array,
+	setImagesArray: PropTypes.func,
 };

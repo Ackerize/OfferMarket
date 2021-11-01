@@ -39,8 +39,6 @@ const Favorites = ({ navigation }) => {
 		}
 	}, [isFocused]);
 
-	console.log('Favorites products: ', favoritesProducts);
-
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
