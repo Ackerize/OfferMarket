@@ -10,12 +10,14 @@ import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
 import ProductList from '../components/Products/ProductList';
 import Tag from '../components/Tag';
 import { categories } from '../utils/category';
-const heightSize = Dimensions.get('window').height;
 import { useIsFocused } from '@react-navigation/native';
 import { showToast } from '../components/Modals/CustomToast';
 import axios from 'axios';
 import { API_HOST } from '../utils/constants';
 import { firebase } from '../utils/firebase-config';
+
+
+const heightSize = Dimensions.get('window').height;
 
 const Home = ({ navigation }) => {
 	const isFocused = useIsFocused();
@@ -25,7 +27,7 @@ const Home = ({ navigation }) => {
 	const [productData, setProductData] = useState(null);
 
 	const [totalNotification, setTotalNotification] = useState(0);
-	const [notifications, setNotifications] = useState([]);
+	const [notifications, setNotifications] = useState(null);
 
 	const onChangeCategory = category => {
 		setCategorySelected(category);
@@ -34,7 +36,6 @@ const Home = ({ navigation }) => {
 	useEffect(() => {
 		if (isFocused) {
 			const catSelected = categories.find(c => c.id === categorySelected);
-			console.log(catSelected);
 			const URL =
 				catSelected.name !== 'Reciente'
 					? `${API_HOST}/products?category=${catSelected.name}`
@@ -63,7 +64,7 @@ const Home = ({ navigation }) => {
 		notifications.on('value', snapshot => {
 			const data = snapshot.val();
 			if (data) {
-				const dataArray = Object.entries(data).map(array => array[1]);
+				const dataArray = Object.entries(data).map(array => ({...array[1], id: array[0]}));
 				const unreadNotifications = dataArray.filter(
 					item => item.read === false,
 				);

@@ -171,7 +171,9 @@ const Detail = ({ navigation, route }) => {
 				<View style={{ marginTop: 20 }}>
 					<CarouselProduct images={imageData} />
 				</View>
-				<ProfileCard seller={seller} navigation={navigation} />
+				{
+					idSeller !== uid && (<ProfileCard seller={seller} navigation={navigation} />)
+				}
 				<View style={styles.titles}>
 					<TouchableOpacity onPress={() => setSelected(true)}>
 						<Text style={selected ? styles.colorBlue : styles.colorGrey}>

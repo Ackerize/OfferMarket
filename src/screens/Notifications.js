@@ -1,18 +1,73 @@
-import React from 'react';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { useState } from 'react';
+import { StyleSheet, SafeAreaView } from 'react-native';
+import {
+	ScrollView,
+	TouchableWithoutFeedback,
+} from 'react-native-gesture-handler';
 import { Title } from 'react-native-paper';
 import Person from '../components/Person';
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import { firebase } from '../utils/firebase-config';
+import { useSelector } from 'react-redux';
+import Spinner from '../components/Spinner';
+import Alert from '../components/Alert';
 
 const Notifications = ({ navigation, route }) => {
 	const notis = route?.params?.notifications;
+
+	const [notifications, setNotifications] = useState(notis);
+
+	const { uid } = useSelector(state => state.auth);
+
+	const handleOnPress = (idNotification, idProduct) => {
+		const notif = notifications.filter(
+			noti => noti.idNotification === idNotification,
+		);
+		if (!notif.read) {
+			firebase
+				.database()
+				.ref(`notifications/${uid}/${idNotification}`)
+				.update({
+					read: true,
+				});
+			setNotifications(
+				notifications.map(noti =>
+					noti.id === idNotification ? { ...noti, read: true } : noti,
+				),
+			);
+		}
+		navigation.navigate('Detail', { id: idProduct });
+	};
+
+	if (!notifications)
+		return (
+			<SafeAreaView style={styles.container}>
+				<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
+				<Title style={[styles.title]}>Notificaciones</Title>
+				<Spinner />
+			</SafeAreaView>
+		);
+
+	if (notifications.length === 0)
+		return (
+			<>
+				<SafeAreaView style={styles.container}>
+					<FocusAwareStatusBar
+						barStyle="dark-content"
+						backgroundColor="white"
+					/>
+					<Title style={[styles.title]}>Notificaciones</Title>
+					<Alert>No hay notificaciones</Alert>
+				</SafeAreaView>
+			</>
+		);
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<Title style={styles.title}>Notificaciones</Title>
 			<ScrollView>
-				{notis.map((noti, index) => (
+				{notifications.map((noti, index) => (
 					<>
 						{noti.read ? (
 							<Person
@@ -22,9 +77,12 @@ const Notifications = ({ navigation, route }) => {
 								date="Hace 2 días"
 								notifications={0}
 								key={index}
+								action={() => handleOnPress(noti.id, noti.product)}
 							/>
 						) : (
-							<View style={styles.newNotiContainer}>
+							<TouchableWithoutFeedback
+								style={styles.newNotiContainer}
+								onPress={() => handleOnPress(noti.id, noti.product)}>
 								<Person
 									avatar={noti.seller.photo}
 									title={noti.seller.name}
@@ -33,7 +91,7 @@ const Notifications = ({ navigation, route }) => {
 									notifications={0}
 									key={index}
 								/>
-							</View>
+							</TouchableWithoutFeedback>
 						)}
 					</>
 				))}
