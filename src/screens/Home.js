@@ -16,7 +16,6 @@ import axios from 'axios';
 import { API_HOST } from '../utils/constants';
 import { firebase } from '../utils/firebase-config';
 
-
 const heightSize = Dimensions.get('window').height;
 
 const Home = ({ navigation }) => {
@@ -64,12 +63,17 @@ const Home = ({ navigation }) => {
 		notifications.on('value', snapshot => {
 			const data = snapshot.val();
 			if (data) {
-				const dataArray = Object.entries(data).map(array => ({...array[1], id: array[0]}));
+				const dataArray = Object.entries(data).map(array => ({
+					...array[1],
+					id: array[0],
+				}));
 				const unreadNotifications = dataArray.filter(
 					item => item.read === false,
 				);
 				setNotifications(dataArray);
 				setTotalNotification(unreadNotifications.length);
+			} else {
+				setNotifications([]);
 			}
 		});
 	}, []);
@@ -92,7 +96,9 @@ const Home = ({ navigation }) => {
 							icon="bell"
 							color="#003C95"
 							style={styles.notification}
-							onPress={() => navigation.navigate('Notifications', { notifications })}
+							onPress={() =>
+								navigation.navigate('Notifications', { notifications })
+							}
 						/>
 					</View>
 				</View>

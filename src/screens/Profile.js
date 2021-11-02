@@ -132,7 +132,9 @@ const Profile = ({ navigation, route }) => {
 		navigation.navigate('ProductForm', { name: 'Nuevo producto' });
 	};
 
-	const handleMessage = () => {};
+	const handleMessage = () => {
+		navigation.navigate('PersonalChat', { uid, idSeller: sellerAux });
+	};
 
 	const handleEditProfile = () => {
 		navigation.navigate('ProfileForm', {

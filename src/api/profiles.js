@@ -11,13 +11,7 @@ export async function updateProfile(profile, uid) {
 	return data;
 }
 
-export const getProfile = uid => {
-	axios
-		.get(`${API_HOST}/profiles/${uid}`)
-		.then(({ data }) => {
-			return data;
-		})
-		.catch(({ response: { data } }) => {
-			return data;
-		});
+export const getProfile = async uid => {
+	const { data } = await axios.get(`${API_HOST}/profiles/${uid}`);
+	return data.data;
 };

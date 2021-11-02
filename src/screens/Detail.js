@@ -164,7 +164,7 @@ const Detail = ({ navigation, route }) => {
 	};
 
 	const handleMessage = () => {
-		console.log('message');
+		navigation.navigate('PersonalChat', { uid, idSeller });
 	};
 
 	return (
