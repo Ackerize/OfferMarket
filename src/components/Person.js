@@ -24,7 +24,7 @@ const Person = ({
 				<View style={styles.informationContainer}>
 					<Text style={styles.date}>{date}</Text>
 					<Text style={styles.person}>{title}</Text>
-					<Text style={styles.message}>{subtitle}</Text>
+					<Text numberOfLines={1} style={styles.message}>{subtitle}</Text>
 					{notifications > 0 && <Text style={styles.notificationText}>{ notifications }</Text>}
 					<View style={styles.line} />
 				</View>
@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
 		fontSize: 17,
 		color: '#9D9D9D',
 		lineHeight: 20,
+		width: '80%',
 	},
 	line: {
 		height: 1,

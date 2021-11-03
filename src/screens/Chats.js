@@ -11,6 +11,7 @@ import { getProfile } from '../api/profiles';
 import Spinner from '../components/Spinner';
 import Alert from '../components/Alert';
 import { countUnreadMessages } from '../utils/utils';
+import moment from 'moment';
 
 const heightSize = Dimensions.get('window').height;
 
@@ -31,19 +32,23 @@ const Chats = ({ navigation }) => {
 					const example = Object.entries(data);
 					example.forEach(item => {
 						const idUser = item[0];
+						dataUsers = [ ...dataUsers, idUser ];
 						const dataUser = item[1];
-						const dataMessages = Object.entries(dataUser).map(message => ({
-							idMessage: message[0],
-							...message[1],
-						}));
+						const dataMessages = Object.keys(dataUser);
+						const lastDate = dataMessages[dataMessages.length - 1];
+						const lastMessage = dataUser[lastDate];
 
-						dataUsers = [...dataUsers, idUser];
+						const lastest = Object.entries(lastMessage).map(item => ({
+							date: lastDate,
+							idMessage: item[0],
+							message: item[1],
+						}));
 
 						setMessages({
 							...messages,
-							[idUser]: dataMessages.reverse(),
+							[idUser]: lastest.reverse(),
 						});
-					})
+					});
 
 					const profiles = dataUsers.map(async item => {
 						const { photo, name, user } = await getProfile(item);
@@ -53,11 +58,21 @@ const Chats = ({ navigation }) => {
 					Promise.all(profiles).then(values => {
 						setChats(values);
 					});
+
 				} else {
 					setChats([]);
 				}
 			});
+
+		return () => {
+			firebase
+				.database()
+				.ref(`/chats/${uid}`)
+				.off();
+		};
 	}, []);
+
+	console.log({ messages })
 
 	const action = idSeller =>
 		navigation.navigate('PersonalChat', {
@@ -89,17 +104,21 @@ const Chats = ({ navigation }) => {
 			<Title style={styles.title}>Mensajes</Title>
 			<ScrollView style={styles.scrollView}>
 				{chats.length > 0 &&
-					chats.map(item => (
-						<Person
-							key={item.user}
-							avatar={item.photo}
-							title={item.name}
-							subtitle={messages[item.user][0].text}
-							date="Hace 20 min"
-							notifications={countUnreadMessages(messages[item.user], uid)}
-							action={() => action(item.user)}
-						/>
-					))}
+					chats.map(item => {
+						const today = moment().format('DD/MM/YYYY');
+						const itemDate = messages[item.user][0].date.replace(/-/g, '/');
+						return (
+							<Person
+								key={item.user}
+								avatar={item.photo}
+								title={item.name}
+								subtitle={messages[item.user][0].message.text}
+								date={itemDate === today ? messages[item.user][0].message.time  : itemDate}
+								notifications={countUnreadMessages(messages[item.user], uid)}
+								action={() => action(item.user)}
+							/>
+						)
+					})}
 			</ScrollView>
 		</SafeAreaView>
 	);

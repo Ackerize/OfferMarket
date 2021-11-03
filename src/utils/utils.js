@@ -22,8 +22,8 @@ export const validateProductForm = formData => {
 
 export const countUnreadMessages = (messages, idUser) => {
 	let count = 0;
-	messages.forEach(message => {
-		if (message.author != idUser && !message.read) count++;
+	messages.forEach(item => {
+		if (item.message.author != idUser && !item.message.read) count++;
 	});
 	return count;
 }

@@ -1,5 +1,6 @@
 import axios from 'axios';
-import React, { useState, useRef, useEffect } from 'react';
+import moment from 'moment';
+import React, { useState, useRef, useEffect, Fragment } from 'react';
 import {
 	StyleSheet,
 	SafeAreaView,
@@ -29,6 +30,7 @@ const PersonalChat = ({ navigation, route }) => {
 	const [sellerProfile, setSellerProfile] = useState(null);
 	const [inputMessage, setInputMessage] = useState('');
 	const [messages, setMessages] = useState(null);
+	const [dates, setDates] = useState([]);
 
 	const chatScrollRef = useRef();
 
@@ -45,28 +47,42 @@ const PersonalChat = ({ navigation, route }) => {
 		chatBuyer.on('value', snapshot => {
 			const data = snapshot.val();
 			if (data) {
-				const dataArray = Object.entries(data).map(array => ({
-					...array[1],
-					idMessage: array[0],
-				}));
+				let messagesArray = {};
+				Object.entries(data).forEach(array => {
+					const [key, value] = array;
+					const arrayMessage = Object.entries(value).map(message => {
+						const [idMessage, valueMessage] = message;
+						const { read } = valueMessage;
+						if (read === false) {
+							firebase
+								.database()
+								.ref(`/chats/${idBuyer}/${idSeller}/${key}/${idMessage}`)
+								.update({
+									read: true,
+								});
+						}
+						return {
+							...message[1],
+							idMessage: message[0],
+						};
+					});
 
-				dataArray.forEach(message => {
-					const { idMessage, read } = message;
-					if (read === false) {
-						firebase
-							.database()
-							.ref(`/chats/${idBuyer}/${idSeller}/${idMessage}`)
-							.update({
-								read: true,
-							});
-					}
+					messagesArray = {
+						...messagesArray,
+						[key]: arrayMessage,
+					};
 				});
 
-				setMessages(dataArray);
+				setDates(Object.keys(messagesArray));
+				setMessages(messagesArray);
 			} else {
 				setMessages([]);
 			}
 		});
+
+		return () => {
+			chatBuyer.off();
+		};
 	}, []);
 
 	useEffect(() => {
@@ -76,20 +92,21 @@ const PersonalChat = ({ navigation, route }) => {
 	}, []);
 
 	const onSendMessage = () => {
+		const date = moment().format('DD-MM-YYYY');
 		const message = {
 			author: idBuyer,
 			text: inputMessage,
-			date: Date.now(),
+			time: moment().format('HH:mm'),
 			read: false,
 		};
 		setInputMessage('');
 		firebase
 			.database()
-			.ref(`/chats/${idBuyer}/${idSeller}`)
+			.ref(`/chats/${idBuyer}/${idSeller}/${date}`)
 			.push(message);
 		firebase
 			.database()
-			.ref(`/chats/${idSeller}/${idBuyer}`)
+			.ref(`/chats/${idSeller}/${idBuyer}/${date}`)
 			.push(message);
 	};
 
@@ -147,24 +164,34 @@ const PersonalChat = ({ navigation, route }) => {
 			<ScrollView style={styles.chat} ref={chatScrollRef}>
 				{messages && (
 					<>
-						<View style={styles.dateContainer}>
-							<Text style={styles.date}>Hoy</Text>
-						</View>
-						{messages.map(message =>
-							message.author === idBuyer ? (
-								<MessageSent
-									key={message.idMessage}
-									message={message.text}
-									time="11:00"
-								/>
-							) : (
-								<MessageReceive
-									key={message.idMessage}
-									message={message.text}
-									time="11:02"
-								/>
-							),
-						)}
+						{dates.map(date => {
+							const formatDay = date.replace(/-/g, '/');
+							const today = moment().format('DD/MM/YYYY');
+							return (
+								<>
+									<View style={styles.dateContainer} key={date}>
+										<Text style={styles.date}>
+											{formatDay === today ? 'Hoy' : formatDay}
+										</Text>
+									</View>
+									{messages[date].map(message =>
+										message.author === idBuyer ? (
+											<MessageSent
+												key={message.idMessage}
+												message={message.text}
+												time={message.time}
+											/>
+										) : (
+											<MessageReceive
+												key={message.idMessage}
+												message={message.text}
+												time={message.time}
+											/>
+										),
+									)}
+								</>
+							);
+						})}
 					</>
 				)}
 			</ScrollView>
@@ -233,11 +260,13 @@ const styles = StyleSheet.create({
 	date: {
 		fontSize: 16,
 		borderRadius: 10,
-		backgroundColor: '#FFF',
-		width: 70,
+		backgroundColor: '#7A98C5',
 		height: 30,
 		textAlignVertical: 'center',
 		textAlign: 'center',
+		paddingHorizontal: 10,
+		fontWeight: 'bold',
+		color: '#fff',
 	},
 	infoContainer: {
 		display: 'flex',
