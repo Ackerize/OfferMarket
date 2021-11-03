@@ -2,11 +2,9 @@ import React from 'react';
 import {
 	StyleSheet,
 	View,
-	SafeAreaView,
 	TouchableWithoutFeedback,
-	Image,
 } from 'react-native';
-import { Title, Avatar, Text } from 'react-native-paper';
+import {  Avatar, Text } from 'react-native-paper';
 
 const Person = ({
 	title,
@@ -27,7 +25,7 @@ const Person = ({
 					<Text style={styles.date}>{date}</Text>
 					<Text style={styles.person}>{title}</Text>
 					<Text style={styles.message}>{subtitle}</Text>
-					{notifications > 0 && <Text style={styles.notificationText}>10</Text>}
+					{notifications > 0 && <Text style={styles.notificationText}>{ notifications }</Text>}
 					<View style={styles.line} />
 				</View>
 			</View>

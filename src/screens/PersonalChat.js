@@ -8,12 +8,7 @@ import {
 	ScrollView,
 	Dimensions,
 } from 'react-native';
-import {
-	Avatar,
-	Text,
-	Menu,
-	TouchableRipple,
-} from 'react-native-paper';
+import { Avatar, Text, Menu, TouchableRipple } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
 import MessageReceive from '../components/Messages/MessageReceive';
@@ -54,6 +49,19 @@ const PersonalChat = ({ navigation, route }) => {
 					...array[1],
 					idMessage: array[0],
 				}));
+
+				dataArray.forEach(message => {
+					const { idMessage, read } = message;
+					if (read === false) {
+						firebase
+							.database()
+							.ref(`/chats/${idBuyer}/${idSeller}/${idMessage}`)
+							.update({
+								read: true,
+							});
+					}
+				});
+
 				setMessages(dataArray);
 			} else {
 				setMessages([]);
@@ -93,7 +101,7 @@ const PersonalChat = ({ navigation, route }) => {
 			.remove()
 			.then(() => {
 				showToast('success', 'Chat eliminado', 'Se eliminó el chat con éxito');
-				navigation.navigate('Home')
+				navigation.navigate('Home');
 			})
 			.catch(() =>
 				showToast('error', '¡Oh no!', 'Ocurrió un error. Inténtalo de nuevo'),

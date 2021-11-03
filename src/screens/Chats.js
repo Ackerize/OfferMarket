@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { getProfile } from '../api/profiles';
 import Spinner from '../components/Spinner';
 import Alert from '../components/Alert';
+import { countUnreadMessages } from '../utils/utils';
 
 const heightSize = Dimensions.get('window').height;
 
@@ -17,6 +18,7 @@ const Chats = ({ navigation }) => {
 	const { uid } = useSelector(state => state.auth);
 
 	const [chats, setChats] = useState(null);
+	const [messages, setMessages] = useState({});
 
 	useEffect(() => {
 		firebase
@@ -25,13 +27,26 @@ const Chats = ({ navigation }) => {
 			.on('value', snapshot => {
 				const data = snapshot.val();
 				if (data) {
-					const dataArray = Object.entries(data).map(array => ({
-						...array[1],
-						idUser: array[0],
-					}));
+					let dataUsers = [];
+					const example = Object.entries(data);
+					example.forEach(item => {
+						const idUser = item[0];
+						const dataUser = item[1];
+						const dataMessages = Object.entries(dataUser).map(message => ({
+							idMessage: message[0],
+							...message[1],
+						}));
 
-					const profiles = dataArray.map(async item => {
-						const { photo, name, user } = await getProfile(item.idUser);
+						dataUsers = [...dataUsers, idUser];
+
+						setMessages({
+							...messages,
+							[idUser]: dataMessages.reverse(),
+						});
+					})
+
+					const profiles = dataUsers.map(async item => {
+						const { photo, name, user } = await getProfile(item);
 						return { photo, name, user };
 					});
 
@@ -44,10 +59,11 @@ const Chats = ({ navigation }) => {
 			});
 	}, []);
 
-	const action = (idSeller) => navigation.navigate('PersonalChat', {
-		uid,
-		idSeller
-	});
+	const action = idSeller =>
+		navigation.navigate('PersonalChat', {
+			uid,
+			idSeller,
+		});
 
 	if (!chats) {
 		return (
@@ -72,80 +88,18 @@ const Chats = ({ navigation }) => {
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<Title style={styles.title}>Mensajes</Title>
 			<ScrollView style={styles.scrollView}>
-				{chats.map(item => (
-					<Person
-						avatar={item.photo}
-						title={item.name}
-						subtitle="Ok, nos vemos a esa hora."
-						date="Hace 20 min"
-						notifications={0}
-						action={() => action(item.user)}
-					/>
-				))}
-				{/* <Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 20 min"
-					notifications={0}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 2 días"
-					notifications={0}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 20 min"
-					notifications={10}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 2 días"
-					notifications={2}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 20 min"
-					notifications={1}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 2 días"
-					notifications={0}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 20 min"
-					notifications={1}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 2 días"
-					notifications={0}
-					action={action}
-				/> */}
+				{chats.length > 0 &&
+					chats.map(item => (
+						<Person
+							key={item.user}
+							avatar={item.photo}
+							title={item.name}
+							subtitle={messages[item.user][0].text}
+							date="Hace 20 min"
+							notifications={countUnreadMessages(messages[item.user], uid)}
+							action={() => action(item.user)}
+						/>
+					))}
 			</ScrollView>
 		</SafeAreaView>
 	);
