@@ -275,7 +275,7 @@ const Profile = ({ navigation, route }) => {
 						activeTab == 'products' && { width: '100%' },
 					]}
 					showsVerticalScrollIndicator={false}>
-					{activeTab == 'products' && <ProductList data={productData} />}
+					{activeTab == 'products' && <ProductList navigation={navigation} data={productData} />}
 					{activeTab == 'contact' && (
 						<ContactInfo
 							info={{
@@ -284,7 +284,7 @@ const Profile = ({ navigation, route }) => {
 							}}
 						/>
 					)}
-					{activeTab == 'reviews' && <Reviews />}
+					{activeTab == 'reviews' && <Reviews profile={profile} />}
 				</ScrollView>
 			</View>
 		</SafeAreaView>

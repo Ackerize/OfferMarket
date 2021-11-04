@@ -145,7 +145,9 @@ const PersonalChat = ({ navigation, route }) => {
 						<Menu.Item
 							onPress={() => {
 								closeMenu();
-								navigation.navigate('Profile');
+								navigation.navigate('Profile', {
+									idProfile: idSeller,
+								});
 							}}
 							title="Ver perfil"
 						/>
@@ -160,7 +162,7 @@ const PersonalChat = ({ navigation, route }) => {
 					</Menu>
 				</TouchableRipple>
 			</View>
-			<ModalRating visible={showModal} setVisible={setShowModal} />
+			<ModalRating visible={showModal} setVisible={setShowModal} seller={idSeller} />
 			<ScrollView style={styles.chat} ref={chatScrollRef}>
 				{messages && (
 					<>

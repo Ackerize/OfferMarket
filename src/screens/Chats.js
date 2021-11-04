@@ -72,8 +72,6 @@ const Chats = ({ navigation }) => {
 		};
 	}, []);
 
-	console.log({ messages })
-
 	const action = idSeller =>
 		navigation.navigate('PersonalChat', {
 			uid,
