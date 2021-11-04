@@ -34,7 +34,6 @@ const Reviews = ({ profile }) => {
 				};
 
 				dataReviews.forEach(element => {
-					console.log(element.rating);
 					aux[element.rating] += 1;
 				});
 

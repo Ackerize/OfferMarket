@@ -1,7 +1,6 @@
 import React from 'react'
 import { StyleSheet, Text, View, Dimensions } from 'react-native'
 import { Avatar } from 'react-native-paper'
-import avatarImg from '../../assets/img/person.jpg'
 import { AirbnbRating } from 'react-native-elements'
 import PropTypes from 'prop-types';
 import moment from 'moment'
@@ -9,12 +8,12 @@ import moment from 'moment'
 const width = Dimensions.get('window').width
 
 const ReviewItem = ({ review }) => {
-	const {author, comment, rating, createdAt } = review;
+	const {author, photo, comment, rating, createdAt } = review;
 	const date = moment(createdAt).format('DD/MM/YYYY')
 	return (
 		<View style={styles.container}>
 			<View style={styles.infoContainer}>
-				<Avatar.Image size={40} source={avatarImg} />
+				<Avatar.Image size={40} source={{ uri: photo }} />
 				<View style={styles.info}>
 					<Text style={styles.name}>{ author }</Text>
 					<View style={styles.ratingDate}>
