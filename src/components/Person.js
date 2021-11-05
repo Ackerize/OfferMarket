@@ -1,31 +1,39 @@
-import React from 'react'
+import React from 'react';
 import {
 	StyleSheet,
 	View,
-	SafeAreaView,
 	TouchableWithoutFeedback,
-} from 'react-native'
-import { Title, Avatar, Text } from 'react-native-paper'
+} from 'react-native';
+import {  Avatar, Text } from 'react-native-paper';
 
-const Person = ({ title, subtitle, avatar, date, notifications, action = () => console.log('click') }) => {
+const Person = ({
+	title,
+	subtitle,
+	avatar,
+	date,
+	notifications,
+	action = () => console.log('click'),
+}) => {
 	return (
-		<TouchableWithoutFeedback
-			onPress={action}>
+		<TouchableWithoutFeedback onPress={action}>
 			<View style={styles.messageContainer}>
-				<Avatar.Image size={60} source={avatar} />
+				<Avatar.Image
+					size={60}
+					source={{ uri: avatar }}
+				/>
 				<View style={styles.informationContainer}>
 					<Text style={styles.date}>{date}</Text>
 					<Text style={styles.person}>{title}</Text>
-					<Text style={styles.message}>{subtitle}</Text>
-					{notifications > 0 && <Text style={styles.notificationText}>10</Text>}
+					<Text numberOfLines={1} style={styles.message}>{subtitle}</Text>
+					{notifications > 0 && <Text style={styles.notificationText}>{ notifications }</Text>}
 					<View style={styles.line} />
 				</View>
 			</View>
 		</TouchableWithoutFeedback>
-	)
-}
+	);
+};
 
-export default Person
+export default Person;
 
 const styles = StyleSheet.create({
 	messageContainer: {
@@ -70,6 +78,7 @@ const styles = StyleSheet.create({
 		fontSize: 17,
 		color: '#9D9D9D',
 		lineHeight: 20,
+		width: '80%',
 	},
 	line: {
 		height: 1,
@@ -78,4 +87,4 @@ const styles = StyleSheet.create({
 		marginTop: 5,
 		marginBottom: 5,
 	},
-})
+});

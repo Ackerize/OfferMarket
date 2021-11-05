@@ -1,9 +1,9 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import PropTypes from 'prop-types'
-import RNSingleSelect from '@freakycoder/react-native-single-select'
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import PropTypes from 'prop-types';
+import RNSingleSelect from '@freakycoder/react-native-single-select';
 
-const Select = ({ label, data, placeholder }) => {
+const Select = ({ label, data, placeholder, onChange, value }) => {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.label}>{label} </Text>
@@ -15,13 +15,16 @@ const Select = ({ label, data, placeholder }) => {
 				menuBarContainerWidth={'100%'}
 				menuBarContainerHeight={51.5 * data.length}
 				placeholder={placeholder}
-				onSelect={selectedItem => console.log('SelectedItem: ', selectedItem)}
+				onSelect={selectedItem => {
+					onChange(selectedItem);
+				}}
+				initialValue={value}
 			/>
 		</View>
-	)
-}
+	);
+};
 
-export default Select
+export default Select;
 
 const styles = StyleSheet.create({
 	container: {
@@ -41,10 +44,11 @@ const styles = StyleSheet.create({
 		color: '#000000',
 		marginBottom: 10,
 	},
-})
+});
 
 Select.propTypes = {
 	label: PropTypes.string.isRequired,
 	data: PropTypes.array.isRequired,
 	placeholder: PropTypes.string.isRequired,
-}
+	onChange: PropTypes.func.isRequired,
+};

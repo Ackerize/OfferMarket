@@ -1,90 +1,128 @@
-import React from 'react'
-import { StyleSheet, SafeAreaView, Dimensions } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler'
-import { Title, } from 'react-native-paper'
-import avatarImg from '../assets/img/person.jpg'
-import Person from '../components/Person'
-import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, SafeAreaView, Dimensions } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Title } from 'react-native-paper';
+import Person from '../components/Person';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import { API_HOST } from '../utils/constants';
+import { firebase } from '../utils/firebase-config';
+import { useSelector } from 'react-redux';
+import { getProfile } from '../api/profiles';
+import Spinner from '../components/Spinner';
+import Alert from '../components/Alert';
+import { countUnreadMessages } from '../utils/utils';
+import moment from 'moment';
 
-const heightSize = Dimensions.get('window').height
+const heightSize = Dimensions.get('window').height;
 
 const Chats = ({ navigation }) => {
-	const action = () => navigation.navigate('PersonalChat')
+	const { uid } = useSelector(state => state.auth);
+
+	const [chats, setChats] = useState(null);
+	const [messages, setMessages] = useState({});
+
+	useEffect(() => {
+		firebase
+			.database()
+			.ref(`/chats/${uid}`)
+			.on('value', snapshot => {
+				const data = snapshot.val();
+				if (data) {
+					let dataUsers = [];
+					const example = Object.entries(data);
+					example.forEach(item => {
+						const idUser = item[0];
+						dataUsers = [ ...dataUsers, idUser ];
+						const dataUser = item[1];
+						const dataMessages = Object.keys(dataUser);
+						const lastDate = dataMessages[dataMessages.length - 1];
+						const lastMessage = dataUser[lastDate];
+
+						const lastest = Object.entries(lastMessage).map(item => ({
+							date: lastDate,
+							idMessage: item[0],
+							message: item[1],
+						}));
+
+						setMessages({
+							...messages,
+							[idUser]: lastest.reverse(),
+						});
+					});
+
+					const profiles = dataUsers.map(async item => {
+						const { photo, name, user } = await getProfile(item);
+						return { photo, name, user };
+					});
+
+					Promise.all(profiles).then(values => {
+						setChats(values);
+					});
+
+				} else {
+					setChats([]);
+				}
+			});
+
+		return () => {
+			firebase
+				.database()
+				.ref(`/chats/${uid}`)
+				.off();
+		};
+	}, []);
+
+	const action = idSeller =>
+		navigation.navigate('PersonalChat', {
+			uid,
+			idSeller,
+		});
+
+	if (!chats) {
+		return (
+			<SafeAreaView style={styles.container}>
+				<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
+				<Title style={styles.title}>Mensajes</Title>
+				<Spinner />
+			</SafeAreaView>
+		);
+	}
+	if (chats.length === 0) {
+		return (
+			<SafeAreaView style={styles.container}>
+				<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
+				<Title style={styles.title}>Mensajes</Title>
+				<Alert>No hay mensajes</Alert>
+			</SafeAreaView>
+		);
+	}
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<Title style={styles.title}>Mensajes</Title>
 			<ScrollView style={styles.scrollView}>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 20 min"
-					notifications={0}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 2 días"
-					notifications={0}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 20 min"
-					notifications={10}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 2 días"
-					notifications={2}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 20 min"
-					notifications={1}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 2 días"
-					notifications={0}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 20 min"
-					notifications={1}
-					action={action}
-				/>
-				<Person
-					avatar={avatarImg}
-					title="Juan Gómez"
-					subtitle="Ok, nos vemos a esa hora."
-					date="Hace 2 días"
-					notifications={0}
-					action={action}
-				/>
+				{chats.length > 0 &&
+					chats.map(item => {
+						const today = moment().format('DD/MM/YYYY');
+						const itemDate = messages[item.user][0].date.replace(/-/g, '/');
+						return (
+							<Person
+								key={item.user}
+								avatar={item.photo}
+								title={item.name}
+								subtitle={messages[item.user][0].message.text}
+								date={itemDate === today ? messages[item.user][0].message.time  : itemDate}
+								notifications={countUnreadMessages(messages[item.user], uid)}
+								action={() => action(item.user)}
+							/>
+						)
+					})}
 			</ScrollView>
 		</SafeAreaView>
-	)
-}
+	);
+};
 
-export default Chats
+export default Chats;
 
 const styles = StyleSheet.create({
 	container: {
@@ -101,4 +139,4 @@ const styles = StyleSheet.create({
 	scrollView: {
 		maxHeight: heightSize - 150,
 	},
-})
+});

@@ -1,37 +1,200 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
 	StyleSheet,
 	Text,
 	View,
 	SafeAreaView,
+	ScrollView,
+	Dimensions,
 	TouchableOpacity,
-} from 'react-native'
-import ProfileCard from '../components/Details/ProfileCard'
-import laptop from '../assets/img/laptop.png'
-import sofa from '../assets/img/sofa.png'
-import CarouselProduct from '../components/Details/CarouselProduct'
-import person from '../assets/img/person.jpg'
-import ConditionAndLocation from '../components/Details/ConditionAndLocation'
-import { Icon } from 'react-native-elements/dist/icons/Icon'
+	TouchableWithoutFeedback,
+} from 'react-native';
+import ProfileCard from '../components/Details/ProfileCard';
+import CarouselProduct from '../components/Details/CarouselProduct';
+import ConditionAndLocation from '../components/Details/ConditionAndLocation';
+import { Icon } from 'react-native-elements/dist/icons/Icon';
+import axios from 'axios';
+import { API_HOST } from '../utils/constants';
+import { showToast } from '../components/Modals/CustomToast';
+import Spinner from '../components/Spinner';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import { useSelector } from 'react-redux';
+import FavoriteButton from '../components/Buttons/FavoriteButton';
+import DeleteButton from '../components/Buttons/DeleteButton';
+import { useIsFocused } from '@react-navigation/native';
 
-const Detail = ({ navigation }) => {
-	const [selected, setSelected] = useState(true)
+const heightScreen = Dimensions.get('window').height;
 
-	const data = [{ url: laptop }, { url: laptop }, { url: sofa }, { url: sofa }]
-	console.log(selected)
+const Detail = ({ navigation, route }) => {
+	const isFocused = useIsFocused();
+	const [selected, setSelected] = useState(true);
+	const idProduct = route?.params?.id;
+
+	const { uid } = useSelector(state => state.auth);
+
+	const [productData, setProductData] = useState(null);
+	const [isFavoriteProduct, setIsFavoriteProduct] = useState(null);
+
+	useEffect(() => {
+		if (isFocused) {
+			axios
+				.get(`${API_HOST}/products/${idProduct}`)
+				.then(({ data }) => {
+					const { error, message, product } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setProductData(product);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message, errorMessage } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+						console.log({ errorMessage });
+					}
+				});
+
+			axios
+				.get(`${API_HOST}/favorites/${uid}/${idProduct}`)
+				.then(({ data }) => {
+					const { error, message, isFavorite } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setIsFavoriteProduct(isFavorite);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message, errorMessage } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+						console.log({ errorMessage });
+					}
+				});
+		}
+	}, [isFocused]);
+
+	if (!productData || isFavoriteProduct === null) return <Spinner />;
+
+	const {
+		name,
+		brand,
+		description,
+		images,
+		location,
+		price,
+		seller,
+		condition,
+	} = productData;
+
+	const { uid: idSeller } = seller;
+
+	const imageData = images.map(image => ({ url: image }));
+
+	const handleFavorite = () => {
+		if (!isFavoriteProduct) {
+			const postData = {
+				user: uid,
+				product: idProduct,
+			};
+			axios
+				.post(`${API_HOST}/favorites`, postData)
+				.then(({ data }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						showToast('success', 'Agregado a favoritos', message);
+						setIsFavoriteProduct(true);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message, errorMessage } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+						console.log({ errorMessage });
+					}
+				});
+		} else {
+			axios
+				.delete(`${API_HOST}/favorites/${uid}/${idProduct}`)
+				.then(({ data }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						showToast('success', 'Eliminado de favoritos', message);
+						setIsFavoriteProduct(false);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message, errorMessage } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+						console.log({ errorMessage });
+					}
+				});
+		}
+	};
+
+	const handleDelete = () => {
+		axios
+			.delete(`${API_HOST}/products/${idProduct}`)
+			.then(({ data }) => {
+				const { error, message } = data;
+				if (error) {
+					showToast('error', '¡Oh no!', message);
+				} else {
+					showToast('success', 'Producto eliminado', message);
+					navigation.goBack();
+				}
+			})
+			.catch(({ response: { data } }) => {
+				const { error, message, errorMessage } = data;
+				if (error) {
+					showToast('error', '¡Oh no!', message);
+					console.log({ errorMessage });
+				}
+			});
+	};
+
+	const handleEdit = () => {
+		navigation.navigate('ProductForm', { product: productData });
+	};
+
+	const handleMessage = () => {
+		navigation.navigate('PersonalChat', { uid, idSeller });
+	};
+
 	return (
 		<SafeAreaView style={styles.principalContainer}>
-			<View style={styles.titleContainer}>
-				<Text style={styles.title}>Zenbook Duo</Text>
-				<Text style={{ color: '#A9A9B7' }}>Marca: Asus</Text>
-				<View style={{ marginTop: 25 }}>
-					<CarouselProduct images={data} />
-				</View>
-				<ProfileCard
-					displayName={'Pedro Palacios'}
-					navigation={navigation}
-					image={person}
+			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
+			{idSeller === uid ? (
+				<DeleteButton onPress={handleDelete} />
+			) : (
+				<FavoriteButton
+					onPress={handleFavorite}
+					isFavoriteProduct={isFavoriteProduct}
 				/>
+			)}
+			<ScrollView
+				style={[styles.titleContainer, styles.scrollView]}
+				showsVerticalScrollIndicator={true}>
+				<Text numberOfLines={1} style={styles.title}>
+					{name}
+				</Text>
+				{brand ? (
+					<Text style={{ color: '#A9A9B7' }}>Marca: {brand}</Text>
+				) : (
+					<View style={{ height: 20 }} />
+				)}
+				<View style={{ marginTop: 20 }}>
+					<CarouselProduct images={imageData} />
+				</View>
+				{idSeller !== uid && (
+					<ProfileCard seller={seller} navigation={navigation} />
+				)}
 				<View style={styles.titles}>
 					<TouchableOpacity onPress={() => setSelected(true)}>
 						<Text style={selected ? styles.colorBlue : styles.colorGrey}>
@@ -45,32 +208,38 @@ const Detail = ({ navigation }) => {
 					</TouchableOpacity>
 				</View>
 				{selected ? (
-					<Text style={styles.description}>
-						Este portátil tiene una pantalla de 15.6’’ OLED 4K 16:9 táctil.
-						Cuenta con un Intel Core i9-9980HK. La conectividad inalámbrica está
-						bien cubierta con Bluetooth 5.0 y WiFi 6. El tacto del touchpad ...
-					</Text>
+					<Text style={styles.description}>{description}</Text>
 				) : (
-					<ConditionAndLocation condition={'Usado'} />
+					<ConditionAndLocation
+						condition={condition}
+						location={location}
+						name={name}
+					/>
 				)}
-			</View>
+			</ScrollView>
 			<View style={styles.bottomContainer}>
 				<View style={styles.bottomContainerDirection}>
-					<View style={{marginRight: 35}}>
-						<Text style={{color: '#A6A7B2', fontWeight: 'bold'}}>Precio</Text>
-						<Text style={styles.price}>$1,500</Text>
+					<View style={{ marginRight: 35 }}>
+						<Text style={{ color: '#A6A7B2', fontWeight: 'bold' }}>Precio</Text>
+						<Text style={styles.price}>${price.toFixed(2)}</Text>
 					</View>
-					<TouchableOpacity style={styles.btn}>
-						<Text style={{ color: '#fff' }}>Enviar Mensaje</Text>
-						<Icon name="send" size={30} color="#fff" />
-					</TouchableOpacity>
+					<TouchableWithoutFeedback
+						onPress={idSeller === uid ? handleEdit : handleMessage}>
+						<View style={[styles.btn]}>
+							{idSeller === uid && <Icon name="edit" size={30} color="#fff" />}
+							<Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>
+								{idSeller === uid ? 'Editar producto' : 'Enviar mensaje'}
+							</Text>
+							{idSeller !== uid && <Icon name="send" size={30} color="#fff" />}
+						</View>
+					</TouchableWithoutFeedback>
 				</View>
 			</View>
 		</SafeAreaView>
-	)
-}
+	);
+};
 
-export default Detail
+export default Detail;
 
 const styles = StyleSheet.create({
 	principalContainer: {
@@ -81,59 +250,69 @@ const styles = StyleSheet.create({
 	titleContainer: {
 		display: 'flex',
 		flexDirection: 'column',
-		marginTop: 65,
+		marginTop: 90,
 		marginLeft: 25,
 	},
 	title: {
 		fontSize: 22,
 		fontWeight: 'bold',
 		color: '#060948',
+		maxWidth: '90%',
 	},
 	description: {
-		marginTop: 30,
+		marginVertical: 15,
 		color: '#A6A7B2',
+		paddingHorizontal: 15,
+		fontSize: 16,
 	},
 	colorBlue: {
 		color: '#060948',
 		fontWeight: 'bold',
 		borderBottomColor: '#060948',
 		borderBottomWidth: 2,
+		marginHorizontal: 10,
 	},
 	colorGrey: {
 		color: '#A6A7B2',
 		fontWeight: 'bold',
+		marginHorizontal: 10,
 	},
 	titles: {
 		display: 'flex',
 		flexDirection: 'row',
 		width: '100%',
-		justifyContent: 'space-evenly',
+		justifyContent: 'center',
 		marginTop: 25,
 	},
 	btn: {
 		backgroundColor: '#070B59',
-    width: 200,
-    height: 50,
-    borderRadius: 10,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
+		width: 190,
+		height: 50,
+		borderRadius: 10,
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-evenly',
+		marginLeft: 25,
 	},
 	bottomContainer: {
 		position: 'absolute',
 		left: 0,
 		right: 0,
-    alignItems: 'center',
-		bottom: 30,
+		alignItems: 'center',
+		bottom: 25,
 	},
-  bottomContainerDirection:{
-    display: 'flex',
-    flexDirection: 'row',
-  },
-  price:{
-    color: '#060948',
-    fontSize: 22,
-    fontWeight: 'bold',
-  }
-})
+	bottomContainerDirection: {
+		display: 'flex',
+		flexDirection: 'row',
+	},
+	price: {
+		color: '#060948',
+		fontSize: 22,
+		fontWeight: 'bold',
+	},
+	scrollView: {
+		maxHeight: heightScreen - 160,
+		marginBottom: 80,
+	},
+});

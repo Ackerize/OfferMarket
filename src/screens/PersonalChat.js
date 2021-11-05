@@ -1,47 +1,141 @@
-import React, { useState, useRef, useEffect } from 'react'
+import axios from 'axios';
+import moment from 'moment';
+import React, { useState, useRef, useEffect, Fragment } from 'react';
 import {
 	StyleSheet,
 	SafeAreaView,
 	View,
-	Image,
 	TextInput,
 	ScrollView,
 	Dimensions,
-} from 'react-native'
-import {
-	Avatar,
-	Text,
-	Menu,
-	TouchableRipple,
-} from 'react-native-paper'
-import Icon from 'react-native-vector-icons/MaterialIcons'
-import avatarImg from '../assets/img/person.jpg'
-import sofaImg from '../assets/img/sofa.png'
-import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import ModalRating from '../components/Modals/ModalRating'
+} from 'react-native';
+import { Avatar, Text, Menu, TouchableRipple } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import MessageReceive from '../components/Messages/MessageReceive';
+import MessageSent from '../components/Messages/MessageSent';
+import { showToast } from '../components/Modals/CustomToast';
+import ModalRating from '../components/Modals/ModalRating';
+import Spinner from '../components/Spinner';
+import { API_HOST } from '../utils/constants';
+import { firebase } from '../utils/firebase-config';
 
-const windowHeight = Dimensions.get('window').height
+const windowHeight = Dimensions.get('window').height;
 
-const PersonalChat = ({ navigation }) => {
-	const [visible, setVisible] = useState(false)
-	const [showModal, setShowModal] = useState(false)
-	const chatScrollRef = useRef()
+const PersonalChat = ({ navigation, route }) => {
+	const idSeller = route?.params?.idSeller;
+	const idBuyer = route?.params?.uid;
+	const [visible, setVisible] = useState(false);
+	const [showModal, setShowModal] = useState(false);
+	const [sellerProfile, setSellerProfile] = useState(null);
+	const [inputMessage, setInputMessage] = useState('');
+	const [messages, setMessages] = useState(null);
+	const [dates, setDates] = useState([]);
 
-	const openMenu = () => setVisible(true)
+	const chatScrollRef = useRef();
 
-	const closeMenu = () => setVisible(false)
+	const openMenu = () => setVisible(true);
+
+	const closeMenu = () => setVisible(false);
+
+	// useEffect(() => {
+	// 	chatScrollRef.current.scrollTo({ y: windowHeight });
+	// }, []);
 
 	useEffect(() => {
-		chatScrollRef.current.scrollTo({ y: windowHeight })
-	}, [])
+		const chatBuyer = firebase.database().ref(`/chats/${idBuyer}/${idSeller}`);
+		chatBuyer.on('value', snapshot => {
+			const data = snapshot.val();
+			if (data) {
+				let messagesArray = {};
+				Object.entries(data).forEach(array => {
+					const [key, value] = array;
+					const arrayMessage = Object.entries(value).map(message => {
+						const [idMessage, valueMessage] = message;
+						const { read } = valueMessage;
+						if (read === false) {
+							firebase
+								.database()
+								.ref(`/chats/${idBuyer}/${idSeller}/${key}/${idMessage}`)
+								.update({
+									read: true,
+								});
+						}
+						return {
+							...message[1],
+							idMessage: message[0],
+						};
+					});
+
+					messagesArray = {
+						...messagesArray,
+						[key]: arrayMessage,
+					};
+				});
+
+				setDates(Object.keys(messagesArray));
+				setMessages(messagesArray);
+			} else {
+				setMessages([]);
+			}
+		});
+
+		return () => {
+			chatBuyer.off();
+		};
+	}, []);
+
+	useEffect(() => {
+		axios.get(`${API_HOST}/profiles/${idSeller}`).then(({ data }) => {
+			setSellerProfile(data.data);
+		});
+	}, []);
+
+	const onSendMessage = () => {
+		const date = moment().format('DD-MM-YYYY');
+		const message = {
+			author: idBuyer,
+			text: inputMessage,
+			time: moment().format('HH:mm'),
+			read: false,
+		};
+		setInputMessage('');
+		firebase
+			.database()
+			.ref(`/chats/${idBuyer}/${idSeller}/${date}`)
+			.push(message);
+		firebase
+			.database()
+			.ref(`/chats/${idSeller}/${idBuyer}/${date}`)
+			.push(message);
+	};
+
+	const onDeleteChat = () => {
+		closeMenu();
+		firebase
+			.database()
+			.ref(`/chats/${idBuyer}/${idSeller}`)
+			.remove()
+			.then(() => {
+				showToast('success', 'Chat eliminado', 'Se eliminó el chat con éxito');
+				navigation.navigate('Home');
+			})
+			.catch(() =>
+				showToast('error', '¡Oh no!', 'Ocurrió un error. Inténtalo de nuevo'),
+			);
+	};
+
+	if (!messages || !sellerProfile) return <Spinner />;
+
+	const { photo, name } = sellerProfile;
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.header}>
 				<View style={styles.contactInformation}>
-					<Avatar.Image size={55} source={avatarImg} />
-					<Text style={styles.name}>Juan Gallardo</Text>
+					<Avatar.Image size={55} source={{ uri: photo }} />
+					<Text style={styles.name}>{name}</Text>
 				</View>
 				<TouchableRipple onPress={openMenu} style={styles.touchable}>
 					<Menu
@@ -50,145 +144,58 @@ const PersonalChat = ({ navigation }) => {
 						anchor={<Icon name="more-vert" color="#060948" size={30} />}>
 						<Menu.Item
 							onPress={() => {
-								closeMenu()
-								navigation.navigate('Profile')
+								closeMenu();
+								navigation.navigate('Profile', {
+									idProfile: idSeller,
+								});
 							}}
 							title="Ver perfil"
 						/>
 						<Menu.Item
 							onPress={() => {
-								setShowModal(true)
-								closeMenu()
+								setShowModal(true);
+								closeMenu();
 							}}
 							title="Calificar usuario"
 						/>
-						<Menu.Item onPress={() => {}} title="Borrar chat" />
+						<Menu.Item onPress={onDeleteChat} title="Borrar chat" />
 					</Menu>
 				</TouchableRipple>
 			</View>
-			<ModalRating visible={showModal} setVisible={setShowModal} />
+			<ModalRating visible={showModal} setVisible={setShowModal} seller={idSeller} />
 			<ScrollView style={styles.chat} ref={chatScrollRef}>
-				<View style={styles.dateContainer}>
-					<Text style={styles.date}>Hoy</Text>
-				</View>
-				<View style={styles.product}>
-					<View style={styles.infoContainer}>
-						<Image style={styles.imgProduct} source={sofaImg} />
-						<View style={styles.productInfo}>
-							<Text style={styles.productName}>Sofá para dos personas</Text>
-							<Text style={styles.productCategory}>Categoría: Hogar</Text>
-						</View>
-					</View>
-					<Text style={styles.price}>$60</Text>
-				</View>
-				<View style={[styles.messageSendContainer, styles.messageFirst]}>
-					<View style={styles.messageSend}>
-						<Text style={styles.messageSendContent}>
-							Hola, estoy interesado en este producto. Sigue disponible?
-						</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.sendTime}>11:00</Text>
-						</View>
-					</View>
-				</View>
-				<View style={styles.messageReceiveContainer}>
-					<View style={styles.messageReceive}>
-						<Text style={styles.messageReceiveContent}>Ok.</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.receiveTime}>11:02</Text>
-						</View>
-					</View>
-				</View>
-				<View style={styles.messageSendContainer}>
-					<View style={styles.messageSend}>
-						<Text style={styles.messageSendContent}>
-							Entendido, llegaré ahora por la tarde por él.
-						</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.sendTime}>11:05</Text>
-						</View>
-					</View>
-				</View>
-				<View style={styles.messageReceiveContainer}>
-					<View style={styles.messageReceive}>
-						<Text style={styles.messageReceiveContent}>Ok, entendido.</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.receiveTime}>11:08</Text>
-						</View>
-					</View>
-				</View>
-				<View style={[styles.messageSendContainer, styles.messageFirst]}>
-					<View style={styles.messageSend}>
-						<Text style={styles.messageSendContent}>
-							Hola, estoy interesado en este producto. Sigue disponible?
-						</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.sendTime}>11:00</Text>
-						</View>
-					</View>
-				</View>
-				<View style={styles.messageReceiveContainer}>
-					<View style={styles.messageReceive}>
-						<Text style={styles.messageReceiveContent}>Ok.</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.receiveTime}>11:02</Text>
-						</View>
-					</View>
-				</View>
-				<View style={styles.messageSendContainer}>
-					<View style={styles.messageSend}>
-						<Text style={styles.messageSendContent}>
-							Entendido, llegaré ahora por la tarde por él.
-						</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.sendTime}>11:05</Text>
-						</View>
-					</View>
-				</View>
-				<View style={styles.messageReceiveContainer}>
-					<View style={styles.messageReceive}>
-						<Text style={styles.messageReceiveContent}>Ok, entendido.</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.receiveTime}>11:08</Text>
-						</View>
-					</View>
-				</View>
-				<View style={[styles.messageSendContainer, styles.messageFirst]}>
-					<View style={styles.messageSend}>
-						<Text style={styles.messageSendContent}>
-							Hola, estoy interesado en este producto. Sigue disponible?
-						</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.sendTime}>11:00</Text>
-						</View>
-					</View>
-				</View>
-				<View style={styles.messageReceiveContainer}>
-					<View style={styles.messageReceive}>
-						<Text style={styles.messageReceiveContent}>Ok.</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.receiveTime}>11:02</Text>
-						</View>
-					</View>
-				</View>
-				<View style={styles.messageSendContainer}>
-					<View style={styles.messageSend}>
-						<Text style={styles.messageSendContent}>
-							Entendido, llegaré ahora por la tarde por él.
-						</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.sendTime}>11:05</Text>
-						</View>
-					</View>
-				</View>
-				<View style={styles.messageReceiveContainer}>
-					<View style={styles.messageReceive}>
-						<Text style={styles.messageReceiveContent}>Ok, entendido.</Text>
-						<View style={styles.viewTime}>
-							<Text style={styles.receiveTime}>11:08</Text>
-						</View>
-					</View>
-				</View>
+				{messages && (
+					<>
+						{dates.map(date => {
+							const formatDay = date.replace(/-/g, '/');
+							const today = moment().format('DD/MM/YYYY');
+							return (
+								<>
+									<View style={styles.dateContainer} key={date}>
+										<Text style={styles.date}>
+											{formatDay === today ? 'Hoy' : formatDay}
+										</Text>
+									</View>
+									{messages[date].map(message =>
+										message.author === idBuyer ? (
+											<MessageSent
+												key={message.idMessage}
+												message={message.text}
+												time={message.time}
+											/>
+										) : (
+											<MessageReceive
+												key={message.idMessage}
+												message={message.text}
+												time={message.time}
+											/>
+										),
+									)}
+								</>
+							);
+						})}
+					</>
+				)}
 			</ScrollView>
 			<View style={styles.input}>
 				<TextInput
@@ -196,16 +203,21 @@ const PersonalChat = ({ navigation }) => {
 					underlineColor="transparent"
 					placeholder="Escribe un mensaje..."
 					selectionColor="#060948"
+					onChangeText={text => setInputMessage(text)}
+					value={inputMessage}
 				/>
-				<View style={styles.sendButton}>
+				<TouchableRipple
+					style={styles.sendButton}
+					onPress={onSendMessage}
+					borderless>
 					<Icon name="send" size={30} color="#fff" />
-				</View>
+				</TouchableRipple>
 			</View>
 		</SafeAreaView>
-	)
-}
+	);
+};
 
-export default PersonalChat
+export default PersonalChat;
 
 const styles = StyleSheet.create({
 	container: {
@@ -250,11 +262,13 @@ const styles = StyleSheet.create({
 	date: {
 		fontSize: 16,
 		borderRadius: 10,
-		backgroundColor: '#FFF',
-		width: 70,
+		backgroundColor: '#7A98C5',
 		height: 30,
 		textAlignVertical: 'center',
 		textAlign: 'center',
+		paddingHorizontal: 10,
+		fontWeight: 'bold',
+		color: '#fff',
 	},
 	infoContainer: {
 		display: 'flex',
@@ -263,114 +277,6 @@ const styles = StyleSheet.create({
 	chat: {
 		maxHeight: windowHeight - 152,
 		marginBottom: 85,
-	},
-	product: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		width: '90%',
-		alignSelf: 'center',
-		backgroundColor: '#fff',
-		height: 70,
-		borderRadius: 10,
-		paddingVertical: 10,
-		paddingHorizontal: 20,
-	},
-	imgProduct: {
-		width: 50,
-		height: 50,
-	},
-	productInfo: {
-		display: 'flex',
-		flexDirection: 'column',
-		marginLeft: 20,
-	},
-	productName: {
-		fontSize: 16,
-		fontWeight: 'bold',
-	},
-	productCategory: {
-		fontSize: 16,
-		color: '#B1B4C3',
-		fontWeight: 'bold',
-	},
-	price: {
-		fontSize: 16,
-		fontWeight: 'bold',
-	},
-	messageFirst: {
-		marginTop: 20,
-	},
-	messageSendContainer: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'flex-end',
-		marginHorizontal: 15,
-		marginVertical: 5,
-	},
-	messageSend: {
-		backgroundColor: '#003C95',
-		display: 'flex',
-		flexDirection: 'row',
-		padding: 10,
-		paddingHorizontal: 15,
-		borderRadius: 15,
-		borderTopRightRadius: 0,
-		justifyContent: 'space-between',
-		flexWrap: 'wrap',
-		alignItems: 'center',
-		minWidth: '30%',
-		maxWidth: '85%',
-	},
-	messageSendContent: {
-		color: '#fff',
-		fontSize: 16,
-		maxWidth: '80%',
-	},
-	sendTime: {
-		fontSize: 13,
-		color: '#F2F8FD',
-		textAlign: 'right',
-		paddingLeft: 20,
-		fontWeight: 'bold',
-	},
-	messageReceiveContainer: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'flex-start',
-		marginHorizontal: 15,
-		marginVertical: 5,
-	},
-	messageReceive: {
-		backgroundColor: '#FFF',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		flexWrap: 'wrap',
-		alignItems: 'center',
-		minWidth: '30%',
-		maxWidth: '85%',
-		padding: 10,
-		paddingHorizontal: 15,
-		borderRadius: 15,
-		borderTopLeftRadius: 0,
-	},
-	messageReceiveContent: {
-		color: '#000',
-		fontSize: 16,
-	},
-	receiveTime: {
-		fontSize: 13,
-		paddingLeft: 10,
-		color: '#B1B4C3',
-		fontWeight: 'bold',
-	},
-	viewTime: {
-		display: 'flex',
-		flexDirection: 'row',
-		alignItems: 'flex-end',
-		justifyContent: 'flex-end',
-		height: '100%',
 	},
 	input: {
 		position: 'absolute',
@@ -407,4 +313,4 @@ const styles = StyleSheet.create({
 		paddingRight: 15,
 		paddingLeft: 5,
 	},
-})
+});

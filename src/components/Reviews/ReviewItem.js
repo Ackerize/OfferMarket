@@ -1,32 +1,35 @@
 import React from 'react'
 import { StyleSheet, Text, View, Dimensions } from 'react-native'
 import { Avatar } from 'react-native-paper'
-import avatarImg from '../../assets/img/person.jpg'
 import { AirbnbRating } from 'react-native-elements'
+import PropTypes from 'prop-types';
+import moment from 'moment'
 
 const width = Dimensions.get('window').width
 
-const ReviewItem = () => {
+const ReviewItem = ({ review }) => {
+	const {author, photo, comment, rating, createdAt } = review;
+	const date = moment(createdAt).format('DD/MM/YYYY')
 	return (
 		<View style={styles.container}>
 			<View style={styles.infoContainer}>
-				<Avatar.Image size={40} source={avatarImg} />
+				<Avatar.Image size={40} source={{ uri: photo }} />
 				<View style={styles.info}>
-					<Text style={styles.name}>Pedro Gomez</Text>
+					<Text style={styles.name}>{ author }</Text>
 					<View style={styles.ratingDate}>
 						<AirbnbRating
 							showRating={false}
-							defaultRating={4}
+							defaultRating={rating}
 							onFinishRating={console.log}
 							isDisabled={true}
 							starStyle={styles.star}
 						/>
-						<Text style={styles.date}>19/09/2021</Text>
+						<Text style={styles.date}>{ date }</Text>
 					</View>
 				</View>
 			</View>
 			<Text style={styles.comment}>
-				Muy buen servicio. Recomendado.
+				{ comment }
 			</Text>
 			<View style={styles.line} />
 		</View>
@@ -82,3 +85,7 @@ const styles = StyleSheet.create({
         textAlign: 'justify',
 	},
 })
+
+ReviewItem.propTypes = {
+	review: PropTypes.object.isRequired,
+}

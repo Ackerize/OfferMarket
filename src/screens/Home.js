@@ -1,27 +1,82 @@
-import { map } from 'lodash'
-import React, { useState } from 'react'
-import { StyleSheet, SafeAreaView, View, Dimensions } from 'react-native'
-import { Text } from 'react-native-elements'
-import { ScrollView } from 'react-native-gesture-handler'
-import { IconButton } from 'react-native-paper'
-import { useSelector } from 'react-redux'
-import Logo from '../assets/img/logo.svg'
-import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import ProductList from '../components/Products/ProductList'
-import Tag from '../components/Tag'
-import { categories } from '../utils/category'
-const heightSize = Dimensions.get('window').height
+import { map } from 'lodash';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, SafeAreaView, View, Dimensions } from 'react-native';
+import { Text } from 'react-native-elements';
+import { ScrollView } from 'react-native-gesture-handler';
+import { IconButton } from 'react-native-paper';
+import { useSelector } from 'react-redux';
+import Logo from '../assets/img/logo.svg';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import ProductList from '../components/Products/ProductList';
+import Tag from '../components/Tag';
+import { categories } from '../utils/category';
+import { useIsFocused } from '@react-navigation/native';
+import { showToast } from '../components/Modals/CustomToast';
+import axios from 'axios';
+import { API_HOST } from '../utils/constants';
+import { firebase } from '../utils/firebase-config';
+
+const heightSize = Dimensions.get('window').height;
 
 const Home = ({ navigation }) => {
+	const isFocused = useIsFocused();
+	const { uid } = useSelector(state => state.auth);
 
-	const state = useSelector(state => state);
-	console.log(state)
+	const [categorySelected, setCategorySelected] = useState(1);
+	const [productData, setProductData] = useState(null);
 
-	const [categorySelected, setCategorySelected] = useState(1)
+	const [totalNotification, setTotalNotification] = useState(0);
+	const [notifications, setNotifications] = useState(null);
 
 	const onChangeCategory = category => {
-		setCategorySelected(category)
-	}
+		setCategorySelected(category);
+	};
+
+	useEffect(() => {
+		if (isFocused) {
+			const catSelected = categories.find(c => c.id === categorySelected);
+			const URL =
+				catSelected.name !== 'Reciente'
+					? `${API_HOST}/products?category=${catSelected.name}`
+					: `${API_HOST}/products`;
+			axios
+				.get(URL)
+				.then(({ data }) => {
+					const { error, message, products } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setProductData(products);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					}
+				});
+		}
+	}, [isFocused, categorySelected]);
+
+	useEffect(() => {
+		const notifications = firebase.database().ref(`/notifications/${uid}`);
+		notifications.on('value', snapshot => {
+			const data = snapshot.val();
+			if (data) {
+				const dataArray = Object.entries(data).map(array => ({
+					...array[1],
+					id: array[0],
+				}));
+				const unreadNotifications = dataArray.filter(
+					item => item.read === false,
+				);
+				setNotifications(dataArray);
+				setTotalNotification(unreadNotifications.length);
+			} else {
+				setNotifications([]);
+			}
+		});
+	}, []);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -33,13 +88,17 @@ const Home = ({ navigation }) => {
 
 				<View>
 					<View style={styles.notificationContainer}>
-						<Text style={styles.notificationText}>1</Text>
+						{totalNotification > 0 && (
+							<Text style={styles.notificationText}>{totalNotification}</Text>
+						)}
 						<IconButton
 							raised
 							icon="bell"
 							color="#003C95"
 							style={styles.notification}
-							onPress={() => navigation.navigate('Notifications')}
+							onPress={() =>
+								navigation.navigate('Notifications', { notifications })
+							}
 						/>
 					</View>
 				</View>
@@ -68,14 +127,14 @@ const Home = ({ navigation }) => {
 				<ScrollView
 					showsVerticalScrollIndicator={false}
 					style={styles.ScrollView}>
-					<ProductList navigation={navigation}/>
+					<ProductList data={productData} navigation={navigation} />
 				</ScrollView>
 			</View>
 		</SafeAreaView>
-	)
-}
+	);
+};
 
-export default Home
+export default Home;
 
 const styles = StyleSheet.create({
 	container: {
@@ -182,4 +241,4 @@ const styles = StyleSheet.create({
 	ScrollView: {
 		maxHeight: heightSize - 230,
 	},
-})
+});

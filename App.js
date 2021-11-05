@@ -11,6 +11,7 @@ import { Provider } from 'react-redux'
 import reduxStore from './src/store/store'
 import { PersistGate } from 'redux-persist/integration/react'
 
+LogBox.ignoreLogs(['Setting a timer for a long period of time']); // ignore specific logs
 LogBox.ignoreAllLogs(true)
 
 const App = () => {

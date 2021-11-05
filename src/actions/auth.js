@@ -8,8 +8,7 @@ import { finishLoading, startLoading } from './ui';
 
 export const startLoginEmailPassword = (email, password) => {
 	return dispatch => {
-		firebase
-			.auth()
+		auth()
 			.signInWithEmailAndPassword(email, password)
 			.then(async ({ user }) => {
 				try {
@@ -48,7 +47,6 @@ export const startGoogleLogin = () => {
 					const {
 						user: { hasProfile },
 					} = await createNewUser({ uid: user.uid, email: user.email });
-					console.log({hasProfile});
 					dispatch(
 						login(user.uid, user.displayName, user.email, 'google', hasProfile),
 					);
@@ -126,19 +124,19 @@ export const startRegisterWithEmailAndPassword = (
 	displayName,
 ) => {
 	return dispatch => {
-		firebase
-			.auth()
+		auth()
 			.createUserWithEmailAndPassword(email, password)
 			.then(async ({ user }) => {
 				try {
 					dispatch(startLoading());
 					await user.updateProfile({ displayName: displayName });
+					const actualUser = auth().currentUser;
 					const {
 						user: { hasProfile },
 					} = await createNewUser({ uid: user.uid, email: user.email });
 
 					dispatch(
-						login(user.uid, user.displayName, user.email, 'email', hasProfile),
+						login(user.uid, actualUser.displayName, user.email, 'email', hasProfile),
 					);
 					dispatch(finishLoading());
 				} catch (e) {

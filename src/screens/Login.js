@@ -25,7 +25,6 @@ const Login = ({ navigation }) => {
 	const dispatch = useDispatch();
 
 	const ui = useSelector(state => state.ui);
-	console.log(ui);
 
 	const { loading } = ui;
 
@@ -40,7 +39,6 @@ const Login = ({ navigation }) => {
 
 	const handleNormalLogin = e => {
 		e.preventDefault();
-		console.log('hola');
 		dispatch(startLoginEmailPassword(email, password));
 	};
 
@@ -84,6 +82,7 @@ const Login = ({ navigation }) => {
 						style={styles.input}
 						placeholder="Contraseña"
 						placeholderTextColor="#B7C6D9"
+						secureTextEntry={true}
 					/>
 				</View>
 				<TouchableOpacity onPress={handleNormalLogin} style={styles.btn}>
