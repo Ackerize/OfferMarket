@@ -1,25 +1,39 @@
-import React, { useState } from 'react'
-import { StyleSheet, View } from 'react-native'
-import { launchImageLibrary } from 'react-native-image-picker'
-import MultiplePicker from 'react-native-image-crop-picker'
-import ImageInput from '../Inputs/ImageInput'
-import ImageCard from './ImageCard'
-import { ScrollView } from 'react-native-gesture-handler'
-import PropTypes from 'prop-types'
-import { useSelector, useDispatch } from 'react-redux'
-import { selectPhoto } from '../../actions/profile'
+import React, { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import MultiplePicker from 'react-native-image-crop-picker';
+import ImageInput from '../Inputs/ImageInput';
+import ImageCard from './ImageCard';
+import { ScrollView } from 'react-native-gesture-handler';
+import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectPhoto } from '../../actions/profile';
+import Popup from '../Modals/Popup';
+import { showToast } from '../Modals/CustomToast';
 
-const ImagePicker = ({ multiple = false }) => {
-	const dispatch = useDispatch()
-	const { profileImage } = useSelector(state => state.profile)
+const ImagePicker = ({
+	multiple = false,
+	urlImage = null,
+	onUpdate = () => {},
+	imagesArray = [],
+	setImagesArray = () => {},
+}) => {
+	const dispatch = useDispatch();
+	const { profileImage } = useSelector(state => state.profile);
 
 	const initialState = {
 		filePath: profileImage,
 		fileUri: null,
 		images: [],
-	}
+	};
 
-	const [imageSelected, setImageSelected] = useState(initialState)
+	const img = imagesArray.map(image => ({ path: image }));
+
+	const [imageSelected, setImageSelected] = useState({
+		...initialState,
+		fileUri: urlImage,
+		images: img,
+	});
 
 	const chooseOnePicture = () => {
 		let options = {
@@ -29,30 +43,39 @@ const ImagePicker = ({ multiple = false }) => {
 			},
 			includeBase64: true,
 			mediaType: 'photo',
-		}
+		};
 		launchImageLibrary(options, response => {
 			if (!response.didCancel && !response.error && !response.customButton) {
 				setImageSelected({
 					filePath: response.assets[0],
 					fileUri: response.assets[0].uri,
 					images: [],
-				})
-				dispatch(selectPhoto(response.assets[0].base64))
+				});
+				dispatch(selectPhoto(response.assets[0].base64));
 			}
-		})
-	}
+		});
+	};
 
 	const chooseMultiplePictures = () => {
 		MultiplePicker.openPicker({
 			multiple: true,
 			mediaType: 'photo',
-		}).then(images => {
-			console.log(images)
-			setImageSelected({
-				images: [...imageSelected.images, ...images],
-			})
+			includeBase64: true,
 		})
-	}
+			.then(images => {
+				const filterImages = images.map(image => ({
+					data: image.data,
+					path: image.path,
+				}));
+				setImageSelected({
+					images: [...imageSelected.images, ...filterImages],
+				});
+				setImagesArray([...imageSelected.images, ...filterImages]);
+			})
+			.catch(error => {
+				showToast('error', '¡Oh no!', error.message);
+			});
+	};
 
 	return (
 		<>
@@ -61,8 +84,9 @@ const ImagePicker = ({ multiple = false }) => {
 					<ImageCard
 						source={{ uri: imageSelected.fileUri }}
 						onPress={() => {
-							setImageSelected(initialState)
-							dispatch(selectPhoto(null))
+							setImageSelected(initialState);
+							dispatch(selectPhoto(null));
+							onUpdate(prevState => ({ ...prevState, photo: null }));
 						}}
 					/>
 					<ImageInput
@@ -82,14 +106,14 @@ const ImagePicker = ({ multiple = false }) => {
 								key={index}
 								multiple={true}
 								source={{ uri: image.path }}
-								onPress={() =>
+								onPress={() => {
+									const newImages = imageSelected.images.filter((img, i) => i !== index);
 									setImageSelected({
 										...imageSelected,
-										images: imageSelected.images.filter(
-											(img, i) => i !== index,
-										),
-									})
-								}
+										images: newImages,
+									});			
+									setImagesArray([...newImages]);
+								}}
 							/>
 						))}
 						<ImageInput
@@ -106,10 +130,10 @@ const ImagePicker = ({ multiple = false }) => {
 				/>
 			)}
 		</>
-	)
-}
+	);
+};
 
-export default ImagePicker
+export default ImagePicker;
 
 const styles = StyleSheet.create({
 	imageContainer: {
@@ -120,8 +144,12 @@ const styles = StyleSheet.create({
 	scrollImage: {
 		height: 180,
 	},
-})
+});
 
 ImagePicker.propTypes = {
 	multiple: PropTypes.bool,
-}
+	urlImage: PropTypes.string,
+	onUpdate: PropTypes.func,
+	imagesArray: PropTypes.array,
+	setImagesArray: PropTypes.func,
+};

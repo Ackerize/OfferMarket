@@ -1,28 +1,50 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text, View, TextInput } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { map } from 'lodash'
-import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import Tag from '../components/Tag'
-import { useForm } from '../hooks/useForm'
-import { categories } from '../utils/category'
-import { ScrollView } from 'react-native-gesture-handler'
-import LocationInput from '../components/Inputs/LocationInput'
-import SaveButton from '../components/SaveButton'
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { map } from 'lodash';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import Tag from '../components/Tag';
+import { useForm } from '../hooks/useForm';
+import { categories } from '../utils/category';
+import { ScrollView } from 'react-native-gesture-handler';
+import LocationInput from '../components/Inputs/LocationInput';
+import SaveButton from '../components/Buttons/SaveButton';
+import { useSelector, useDispatch } from 'react-redux';
+import {  setFilter } from '../actions/filter';
 
 const Filter = ({ navigation }) => {
+	const dispatch = useDispatch();
+
+	const { category, condition, location, maxPrice, minPrice } = useSelector(
+		state => state.filters,
+	);
+
+	const [categoriesArray ] = useState(categories.slice(1))
+
 	const [values, handleInputChange] = useForm({
-		minPrice: '',
-		maxPrice: '',
-	})
+		minPrice: minPrice || '',
+		maxPrice: maxPrice || '',
+	});
 
-	const [statusSelected, setStatusSelected] = useState('Nuevo')
+	const [statusSelected, setStatusSelected] = useState(condition);
 
-	const [categorySelected, setCategorySelected] = useState(1)
+	const [categorySelected, setCategorySelected] = useState(categories.find(cat => cat.name === category));
 
-	const onChangeCategory = category => {
-		setCategorySelected(category)
-	}
+	const onChangeCategory = newCategory => {
+		setCategorySelected(newCategory);
+	}; 
+
+	const onSave = () => {
+		const newFilters = {
+			category: categorySelected?.name,
+			condition: statusSelected,
+			maxPrice: values.maxPrice.length > 0 ? values.maxPrice : null,
+			minPrice: values.minPrice.length > 0 ? values.minPrice : null
+		};
+
+		dispatch(setFilter(newFilters));
+		navigation.goBack();
+	};
 
 	return (
 		<SafeAreaView style={styles.mainContainer}>
@@ -62,11 +84,11 @@ const Filter = ({ navigation }) => {
 				<Text style={styles.label}>Categoría:</Text>
 				<View style={styles.optionsContainer}>
 					<ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-						{map(categories, catg => (
+						{map(categoriesArray, catg => (
 							<Tag
 								key={catg.id}
-								selected={categorySelected === catg.id}
-								onPress={() => onChangeCategory(catg.id)}
+								selected={categorySelected?.id === catg.id}
+								onPress={() => onChangeCategory(catg)}
 								name={catg.name}
 							/>
 						))}
@@ -76,16 +98,13 @@ const Filter = ({ navigation }) => {
 				<View style={styles.optionsContainer}>
 					<LocationInput onPress={() => console.log('UBICACIÓN')} />
 				</View>
-				<SaveButton
-					onPress={() => navigation.navigate('Home')}
-					text="Aplicar"
-				/>
+				<SaveButton onPress={onSave} text="Aplicar" />
 			</ScrollView>
 		</SafeAreaView>
-	)
-}
+	);
+};
 
-export default Filter
+export default Filter;
 
 const styles = StyleSheet.create({
 	mainContainer: {
@@ -141,4 +160,4 @@ const styles = StyleSheet.create({
 		color: '#060948',
 		fontSize: 15,
 	},
-})
+});

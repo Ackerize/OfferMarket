@@ -5,11 +5,13 @@ import { authReducer } from '../reducers/authReducer';
 import thunk from 'redux-thunk';
 import { profileReducer } from '../reducers/profileReducer';
 import { uiReducer } from '../reducers/uiReducer';
+import { filterReducer } from '../reducers/filterReducer';
 
 const reducers = combineReducers({
 	auth: authReducer,
 	profile: profileReducer,
 	ui: uiReducer,
+	filters: filterReducer
 });
 
 const persistConfig = {

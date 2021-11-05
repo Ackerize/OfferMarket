@@ -16,7 +16,7 @@ import ProfileForm from '../screens/ProfileForm';
 import ProductForm from '../screens/ProductForm';
 import SearchLocation from '../screens/SearchLocation';
 import { useSelector } from 'react-redux';
-import Detail from '../screens/Detail'
+import Detail from '../screens/Detail';
 
 const Stack = createStackNavigator();
 
@@ -65,7 +65,11 @@ export default function StackNavigation() {
 							<Stack.Screen
 								name="Home"
 								component={AppNavigation}
-								options={{ headerTransparent: true, title: '' }}
+								options={{
+									headerTransparent: true,
+									title: '',
+									headerLeft: false,
+								}}
 							/>
 							<Stack.Screen
 								name="ProfileForm"
@@ -99,7 +103,11 @@ export default function StackNavigation() {
 							<Stack.Screen
 								name="Home"
 								component={AppNavigation}
-								options={{ headerTransparent: true, title: '' }}
+								options={{
+									headerTransparent: true,
+									title: '',
+									headerLeft: false,
+								}}
 							/>
 						</>
 					)}
@@ -178,6 +186,11 @@ export default function StackNavigation() {
 							headerTransparent: true,
 							title: '',
 							headerBackImage: () => buttonLeft(),
+							headerLeftContainerStyle: {
+								paddingTop: 30,
+								height: 70,
+							},
+							headerRight: null,
 						}}
 					/>
 					<Stack.Screen
