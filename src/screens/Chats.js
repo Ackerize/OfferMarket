@@ -28,11 +28,12 @@ const Chats = ({ navigation }) => {
 			.on('value', snapshot => {
 				const data = snapshot.val();
 				if (data) {
+					let aux = {};
 					let dataUsers = [];
 					const example = Object.entries(data);
 					example.forEach(item => {
 						const idUser = item[0];
-						dataUsers = [ ...dataUsers, idUser ];
+						dataUsers = [...dataUsers, idUser];
 						const dataUser = item[1];
 						const dataMessages = Object.keys(dataUser);
 						const lastDate = dataMessages[dataMessages.length - 1];
@@ -44,11 +45,13 @@ const Chats = ({ navigation }) => {
 							message: item[1],
 						}));
 
-						setMessages({
-							...messages,
+						aux = {
+							...aux,
 							[idUser]: lastest.reverse(),
-						});
+						};
 					});
+
+					setMessages(aux);
 
 					const profiles = dataUsers.map(async item => {
 						const { photo, name, user } = await getProfile(item);
@@ -58,7 +61,6 @@ const Chats = ({ navigation }) => {
 					Promise.all(profiles).then(values => {
 						setChats(values);
 					});
-
 				} else {
 					setChats([]);
 				}
@@ -96,6 +98,7 @@ const Chats = ({ navigation }) => {
 			</SafeAreaView>
 		);
 	}
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />

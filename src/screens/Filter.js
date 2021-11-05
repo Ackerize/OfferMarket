@@ -10,7 +10,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import LocationInput from '../components/Inputs/LocationInput';
 import SaveButton from '../components/Buttons/SaveButton';
 import { useSelector, useDispatch } from 'react-redux';
-import {  setFilter } from '../actions/filter';
+import { setFilter } from '../actions/filter';
 
 const Filter = ({ navigation }) => {
 	const dispatch = useDispatch();
@@ -19,7 +19,7 @@ const Filter = ({ navigation }) => {
 		state => state.filters,
 	);
 
-	const [categoriesArray ] = useState(categories.slice(1))
+	const [categoriesArray] = useState(categories.slice(1));
 
 	const [values, handleInputChange] = useForm({
 		minPrice: minPrice || '',
@@ -28,18 +28,20 @@ const Filter = ({ navigation }) => {
 
 	const [statusSelected, setStatusSelected] = useState(condition);
 
-	const [categorySelected, setCategorySelected] = useState(categories.find(cat => cat.name === category));
+	const [categorySelected, setCategorySelected] = useState(
+		categories.find(cat => cat.name === category),
+	);
 
 	const onChangeCategory = newCategory => {
 		setCategorySelected(newCategory);
-	}; 
+	};
 
 	const onSave = () => {
 		const newFilters = {
 			category: categorySelected?.name,
 			condition: statusSelected,
 			maxPrice: values.maxPrice.length > 0 ? values.maxPrice : null,
-			minPrice: values.minPrice.length > 0 ? values.minPrice : null
+			minPrice: values.minPrice.length > 0 ? values.minPrice : null,
 		};
 
 		dispatch(setFilter(newFilters));
