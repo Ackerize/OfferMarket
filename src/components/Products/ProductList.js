@@ -5,12 +5,14 @@ import Spinner from '../Spinner';
 import ProductCard from './ProductCard';
 
 const ProductList = ({ navigation, data }) => {
-	if (!data)
+	if (data === null)
 		return (
 			<View style={styles.spinnerContainer}>
 				<Spinner />
 			</View>
 		);
+	
+	if (data === false) return null;
 
 	if (data.length === 0) return <Alert>No se encontraron productos</Alert>;
 

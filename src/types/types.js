@@ -7,4 +7,6 @@ export const types = {
 	clear: '[PROFILE] CLEAR',
 	startLoading: '[UI] START LOADING',
 	finishLoading: '[UI] FINISH LOADING',
+	clearFilter: '[FILTER] CLEAR',
+	setFilter: '[FILTER] SET',
 };
