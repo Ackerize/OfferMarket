@@ -1,28 +1,50 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text, View, TextInput } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { map } from 'lodash'
-import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import Tag from '../components/Tag'
-import { useForm } from '../hooks/useForm'
-import { categories } from '../utils/category'
-import { ScrollView } from 'react-native-gesture-handler'
-import { TouchableRipple, Button } from 'react-native-paper'
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { map } from 'lodash';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import Tag from '../components/Tag';
+import { useForm } from '../hooks/useForm';
+import { categories } from '../utils/category';
+import { ScrollView } from 'react-native-gesture-handler';
+import LocationInput from '../components/Inputs/LocationInput';
+import SaveButton from '../components/Buttons/SaveButton';
+import { useSelector, useDispatch } from 'react-redux';
+import {  setFilter } from '../actions/filter';
 
 const Filter = ({ navigation }) => {
+	const dispatch = useDispatch();
+
+	const { category, condition, location, maxPrice, minPrice } = useSelector(
+		state => state.filters,
+	);
+
+	const [categoriesArray ] = useState(categories.slice(1))
+
 	const [values, handleInputChange] = useForm({
-		minPrice: '',
-		maxPrice: '',
-	})
+		minPrice: minPrice || '',
+		maxPrice: maxPrice || '',
+	});
 
-	const [statusSelected, setStatusSelected] = useState('Nuevo')
+	const [statusSelected, setStatusSelected] = useState(condition);
 
-	const [categorySelected, setCategorySelected] = useState(1)
+	const [categorySelected, setCategorySelected] = useState(categories.find(cat => cat.name === category));
 
-	const onChangeCategory = category => {
-		setCategorySelected(category)
-	}
+	const onChangeCategory = newCategory => {
+		setCategorySelected(newCategory);
+	}; 
+
+	const onSave = () => {
+		const newFilters = {
+			category: categorySelected?.name,
+			condition: statusSelected,
+			maxPrice: values.maxPrice.length > 0 ? values.maxPrice : null,
+			minPrice: values.minPrice.length > 0 ? values.minPrice : null
+		};
+
+		dispatch(setFilter(newFilters));
+		navigation.goBack();
+	};
 
 	return (
 		<SafeAreaView style={styles.mainContainer}>
@@ -62,36 +84,27 @@ const Filter = ({ navigation }) => {
 				<Text style={styles.label}>Categoría:</Text>
 				<View style={styles.optionsContainer}>
 					<ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-						{map(categories, catg => (
+						{map(categoriesArray, catg => (
 							<Tag
 								key={catg.id}
-								selected={categorySelected === catg.id}
-								onPress={() => onChangeCategory(catg.id)}
+								selected={categorySelected?.id === catg.id}
+								onPress={() => onChangeCategory(catg)}
 								name={catg.name}
 							/>
 						))}
 					</ScrollView>
 				</View>
-				<Text style={styles.label}>Ubicación (radio de 5km):</Text>
+				<Text style={styles.label}>Ubicación (radio de 5km): </Text>
 				<View style={styles.optionsContainer}>
-					<View style={styles.locationInput}>
-						<Icon name="location-on" size={30} color="black" />
-						<Text style={styles.locationLabeL}>Elige una ubicación</Text>
-						<TouchableRipple
-							onPress={() => console.log('HEREEEEE')}
-							style={styles.btn}
-							borderless>
-							<Icon name="chevron-right" size={30} color="#060948" />
-						</TouchableRipple>
-					</View>
+					<LocationInput onPress={() => console.log('UBICACIÓN')} />
 				</View>
-                <Button mode="contained" style={styles.saveBtn} onPress={() => navigation.navigate("Home")}>Aplicar</Button>
+				<SaveButton onPress={onSave} text="Aplicar" />
 			</ScrollView>
 		</SafeAreaView>
-	)
-}
+	);
+};
 
-export default Filter
+export default Filter;
 
 const styles = StyleSheet.create({
 	mainContainer: {
@@ -129,30 +142,22 @@ const styles = StyleSheet.create({
 	btn: {
 		backgroundColor: '#FFF',
 		borderRadius: 10,
-        paddingHorizontal: 2,
-        paddingVertical: 2,
+		paddingHorizontal: 2,
+		paddingVertical: 2,
 	},
-    locationInput: {
-        backgroundColor: "#EDEFF1",
-        width: "95%",
-        marginHorizontal: 10,
-        borderRadius: 10,
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        justifyContent: "space-between",
-    },
-    locationLabeL: {
-        color: "#060948",
-        fontSize: 15
-    },
-    saveBtn: {
-        width: "40%",
-        alignSelf: "center",
-        marginTop: 20,
-        paddingVertical: 2,
-        backgroundColor: '#070B59',
+	locationInput: {
+		backgroundColor: '#EDEFF1',
+		width: '95%',
+		marginHorizontal: 10,
 		borderRadius: 10,
-    }
-})
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: 15,
+		paddingVertical: 10,
+		justifyContent: 'space-between',
+	},
+	locationLabeL: {
+		color: '#060948',
+		fontSize: 15,
+	},
+});

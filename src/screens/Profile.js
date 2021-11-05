@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import {
 	StyleSheet,
 	Text,
@@ -6,88 +6,248 @@ import {
 	View,
 	TouchableWithoutFeedback,
 	Dimensions,
-} from 'react-native'
+} from 'react-native';
 import {
 	Title,
 	Avatar,
 	Button,
 	TouchableRipple,
 	Menu,
-} from 'react-native-paper'
-import { useSelector, useDispatch } from 'react-redux'
-import { AirbnbRating } from 'react-native-elements'
-import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import avatarImg from '../assets/img/person.jpg'
-import { ScrollView } from 'react-native-gesture-handler'
-import Icon from 'react-native-vector-icons/MaterialIcons'
-import ProductList from '../components/Products/ProductList'
-import ContactInfo from '../components/ContactInfo'
-import Reviews from '../components/Reviews/Reviews'
-import { startLogout } from '../actions/auth'
+} from 'react-native-paper';
+import { useSelector, useDispatch } from 'react-redux';
+import { AirbnbRating } from 'react-native-elements';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import { ScrollView } from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import ProductList from '../components/Products/ProductList';
+import ContactInfo from '../components/ContactInfo';
+import Reviews from '../components/Reviews/Reviews';
+import { startLogout } from '../actions/auth';
+import Popup from '../components/Modals/Popup';
+import Spinner from '../components/Spinner';
+import axios from 'axios';
+import { API_HOST } from '../utils/constants';
+import { useIsFocused } from '@react-navigation/native';
+import { showToast } from '../components/Modals/CustomToast';
+import PrimaryButton from '../components/Buttons/PrimaryButton';
+import SecundaryButton from '../components/Buttons/SecundaryButton';
 
-const heightScreen = Dimensions.get('window').height
+const heightScreen = Dimensions.get('window').height;
 
-const Profile = () => {
-	const [activeTab, setActiveTab] = useState('products')
-	const [visible, setVisible] = useState(false)
+const Profile = ({ navigation, route }) => {
+	const sellerAux = route?.params?.idProfile;
 
-	const dispatch = useDispatch()
-	const { typeLogin } = useSelector(state => state.auth)
+	const isFocused = useIsFocused();
+	const [activeTab, setActiveTab] = useState('products');
+	const [visible, setVisible] = useState(false);
+	const [profile, setProfile] = useState(null);
+	const [productData, setProductData] = useState(null);
+	const [isSubscribed, setIsSubscribed] = useState(null);
 
-	const openMenu = () => setVisible(true)
+	const dispatch = useDispatch();
+	const { typeLogin, uid } = useSelector(state => state.auth);
 
-	const closeMenu = () => setVisible(false)
+	const seller = sellerAux !== uid ? sellerAux : null;
+
+	const openMenu = () => setVisible(true);
+
+	const closeMenu = () => setVisible(false);
 
 	const handleLogOut = () => {
-		closeMenu()
-		dispatch(startLogout(typeLogin))
-	}
+		closeMenu();
+		dispatch(startLogout(typeLogin));
+	};
 
+	useEffect(() => {
+		if (isFocused) {
+			const user = seller ? seller : uid;
+			axios
+				.get(`${API_HOST}/profiles/${user}`)
+				.then(({ data }) => {
+					const { error, message, data: profileInfo } = data;
+					if (error) {
+						Popup.show({
+							type: 'Danger',
+							title: '¡Oh no!',
+							textBody: message,
+							buttontext: 'Aceptar',
+							callback: () => Popup.hide(),
+						});
+					} else {
+						setProfile(profileInfo);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message } = data;
+					if (error) {
+						Popup.show({
+							type: 'Danger',
+							title: '¡Oh no!',
+							textBody: message,
+							buttontext: 'Aceptar',
+							callback: () => Popup.hide(),
+						});
+					}
+				});
+
+			axios
+				.get(`${API_HOST}/products/user/${user}`)
+				.then(({ data }) => {
+					const { error, message, products } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setProductData(products);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					}
+				});
+
+			if (seller) {
+				axios
+					.get(`${API_HOST}/notifications/${uid}/${seller}`)
+					.then(({ data }) => {
+						const { error, message, isNotification } = data;
+						if (error) {
+							showToast('error', '¡Oh no!', message);
+						} else {
+							setIsSubscribed(isNotification);
+						}
+					})
+					.catch(({ response: { data } }) => {
+						const { error, message } = data;
+						if (error) {
+							showToast('error', '¡Oh no!', message);
+						}
+					});
+			}
+		}
+	}, [isFocused]);
+
+	const handleNewProduct = () => {
+		navigation.navigate('ProductForm', { name: 'Nuevo producto' });
+	};
+
+	const handleMessage = () => {
+		navigation.navigate('PersonalChat', { uid, idSeller: sellerAux });
+	};
+
+	const handleEditProfile = () => {
+		navigation.navigate('ProfileForm', {
+			name: 'Editar perfil',
+			profile,
+		});
+	};
+
+	const handleNotification = () => {
+		if (!isSubscribed) {
+			const postData = {
+				user: uid,
+				seller,
+			};
+			axios
+				.post(`${API_HOST}/notifications`, postData)
+				.then(({ data }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setIsSubscribed(true);
+						showToast('success', 'Notificación activada', message);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					}
+				});
+		} else {
+			axios
+				.delete(`${API_HOST}/notifications/${uid}/${seller}`)
+				.then(({ data }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						setIsSubscribed(false);
+						showToast('success', 'Notificación desactivada', message);
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					}
+				});
+		}
+	};
+
+	const iconPrimaryButton = seller ? (
+		<Icon
+			name={isSubscribed ? 'notifications-off' : 'notifications'}
+			size={20}
+			color="#FFF"
+		/>
+	) : null;
+
+	const iconSecondaryButton = seller ? (
+		<Icon name="chat-bubble-outline" size={20} color="#070B59" />
+	) : null;
+
+	if (!profile || (seller && isSubscribed === null)) return <Spinner />;
+
+	const { photo, name, rating, ...contactInfo } = profile;
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<View style={styles.headerTitle}>
 				<Title style={styles.title}>Perfil</Title>
-				<TouchableRipple onPress={openMenu} style={styles.touchable}>
-					<Menu
-						visible={visible}
-						onDismiss={closeMenu}
-						anchor={<Icon name="more-vert" color="#060948" size={30} />}>
-						<Menu.Item onPress={handleLogOut} title="Cerrar sesión" />
-					</Menu>
-				</TouchableRipple>
+				{!seller && (
+					<TouchableRipple onPress={openMenu} style={styles.touchable}>
+						<Menu
+							visible={visible}
+							onDismiss={closeMenu}
+							anchor={<Icon name="more-vert" color="#060948" size={30} />}>
+							<Menu.Item onPress={handleLogOut} title="Cerrar sesión" />
+						</Menu>
+					</TouchableRipple>
+				)}
 			</View>
 			<View style={styles.header}>
-				<Avatar.Image size={75} source={avatarImg} />
-				<Text style={styles.name}>Juan Hernández</Text>
+				<Avatar.Image size={75} source={{ uri: photo }} />
+
+				<Text style={styles.name}>{name}</Text>
 				<View style={styles.ratingContainer}>
-					<Text style={styles.countStar}>4.0</Text>
+					<Text style={styles.countStar}>{rating.toFixed(1)}</Text>
 					<AirbnbRating
 						showRating={false}
-						defaultRating={4}
-						onFinishRating={console.log}
+						defaultRating={rating}
 						starContainerStyle={styles.rating}
 						isDisabled={true}
 						starStyle={styles.star}
 					/>
 				</View>
 				<View style={styles.btnContainer}>
-					<Button
-						mode="contained"
-						style={styles.btnPrimary}
-						onPress={() => console.log('Click')}>
-						<Text style={[styles.btnText, styles.btnPrimaryText]}>
-							Nuevo producto
-						</Text>
-					</Button>
-					<Button
-						mode="contained"
-						style={styles.btnSecundary}
-						onPress={() => console.log('Click')}>
-						<Text style={[styles.btnText, styles.btnSecundaryText]}>
-							Editar perfil
-						</Text>
-					</Button>
+					<PrimaryButton
+						icon={iconPrimaryButton}
+						onPress={seller ? handleNotification : handleNewProduct}>
+						{!seller
+							? 'Nuevo producto'
+							: seller && isSubscribed
+							? 'Desactivar'
+							: 'Activar'}
+					</PrimaryButton>
+
+					<SecundaryButton
+						icon={iconSecondaryButton}
+						onPress={seller ? handleMessage : handleEditProfile}>
+						{seller ? 'Mensaje' : 'Editar perfil'}
+					</SecundaryButton>
 				</View>
 				<View style={styles.customTabs}>
 					<TouchableWithoutFeedback onPress={() => setActiveTab('products')}>
@@ -110,18 +270,28 @@ const Profile = () => {
 					</TouchableWithoutFeedback>
 				</View>
 				<ScrollView
-					style={styles.scrollView}
+					style={[
+						styles.scrollView,
+						activeTab == 'products' && { width: '100%' },
+					]}
 					showsVerticalScrollIndicator={false}>
-					{activeTab == 'products' && <ProductList />}
-					{activeTab == 'contact' && <ContactInfo />}
-					{activeTab == 'reviews' && <Reviews />}
+					{activeTab == 'products' && <ProductList navigation={navigation} data={productData} />}
+					{activeTab == 'contact' && (
+						<ContactInfo
+							info={{
+								name,
+								...contactInfo,
+							}}
+						/>
+					)}
+					{activeTab == 'reviews' && <Reviews profile={profile} />}
 				</ScrollView>
 			</View>
 		</SafeAreaView>
-	)
-}
+	);
+};
 
-export default Profile
+export default Profile;
 
 const styles = StyleSheet.create({
 	container: {
@@ -173,7 +343,7 @@ const styles = StyleSheet.create({
 	},
 	btnContainer: {
 		flexDirection: 'row',
-		justifyContent: 'space-around',
+		justifyContent: 'space-evenly',
 		marginTop: 20,
 		width: '80%',
 	},
@@ -223,4 +393,4 @@ const styles = StyleSheet.create({
 		right: 10,
 		top: 10,
 	},
-})
+});

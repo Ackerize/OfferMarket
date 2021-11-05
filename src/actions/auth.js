@@ -1,43 +1,66 @@
-import { types } from '../types/types'
-import { firebase } from '../utils/firebase-config'
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import auth from '@react-native-firebase/auth'
-import { LoginManager, AccessToken } from 'react-native-fbsdk-next'
+import { types } from '../types/types';
+import { firebase } from '../utils/firebase-config';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
+import { createNewUser } from '../api/users';
+import { finishLoading, startLoading } from './ui';
 
 export const startLoginEmailPassword = (email, password) => {
 	return dispatch => {
-		firebase
-			.auth()
+		auth()
 			.signInWithEmailAndPassword(email, password)
-			.then(({ user }) => {
-				dispatch(login(user.uid, user.displayName, user.email))
+			.then(async ({ user }) => {
+				try {
+					dispatch(startLoading());
+					const {
+						user: { hasProfile },
+					} = await createNewUser({ uid: user.uid, email: user.email });
+					dispatch(
+						login(user.uid, user.displayName, user.email, 'email', hasProfile),
+					);
+					dispatch(finishLoading());
+				} catch (e) {
+					console.log(e);
+				}
 			})
 			.catch(e => {
-				console.log(e)
-			})
-	}
-}
+				console.log(e);
+			});
+	};
+};
 
 export const startGoogleLogin = () => {
-	console.log('clicked')
+	console.log('clicked');
 	return async dispatch => {
-		const { idToken } = await GoogleSignin.signIn()
+		const { idToken } = await GoogleSignin.signIn();
 
 		// Create a Google credential with the token
-		const googleCredential = auth.GoogleAuthProvider.credential(idToken)
+		const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
 		// Sign-in the user with the credential
 		auth()
 			.signInWithCredential(googleCredential)
-			.then(({ user }) => {
-				dispatch(login(user.uid, user.displayName, user.email, 'google'))
+			.then(async ({ user }) => {
+				try {
+					dispatch(startLoading());
+					const {
+						user: { hasProfile },
+					} = await createNewUser({ uid: user.uid, email: user.email });
+					dispatch(
+						login(user.uid, user.displayName, user.email, 'google', hasProfile),
+					);
+					dispatch(finishLoading());
+				} catch (e) {
+					console.log(e);
+				}
 			})
 			.catch(e => {
-				console.log('ERROR')
-				console.log(e)
-			})
-	}
-}
+				console.log('ERROR');
+				console.log(e);
+			});
+	};
+};
 
 export const startFacebookLogin = () => {
 	return async dispatch => {
@@ -48,34 +71,52 @@ export const startFacebookLogin = () => {
 		])
 			.then(result => {
 				if (result.isCancelled) {
-					console.log('Login cancelled')
+					console.log('Login cancelled');
 				} else {
 					AccessToken.getCurrentAccessToken()
 						.then(data => {
 							const facebookCredential = auth.FacebookAuthProvider.credential(
 								data.accessToken,
-							)
+							);
 							auth()
 								.signInWithCredential(facebookCredential)
-								.then(({ user }) => {
-									dispatch(
-										login(user.uid, user.displayName, user.email, 'facebook'),
-									)
+								.then(async ({ user }) => {
+									try {
+										dispatch(startLoading());
+										const {
+											user: { hasProfile },
+										} = await createNewUser({
+											uid: user.uid,
+											email: user.email,
+										});
+										dispatch(
+											login(
+												user.uid,
+												user.displayName,
+												user.email,
+												'facebook',
+												hasProfile,
+											),
+										);
+										dispatch(finishLoading());
+									} catch (e) {
+										console.log(e);
+									}
 								})
 								.catch(e => {
-									console.log(e)
-								})
+									console.log(e);
+								});
 						})
 						.catch(e => {
-							console.log(e)
-						})
+							console.log(e);
+						});
 				}
 			})
 			.catch(e => {
-				console.log(e)
-			})
-	}
-}
+				console.log(e);
+			});
+	};
+};
 
 export const startRegisterWithEmailAndPassword = (
 	email,
@@ -83,40 +124,57 @@ export const startRegisterWithEmailAndPassword = (
 	displayName,
 ) => {
 	return dispatch => {
-		firebase
-			.auth()
+		auth()
 			.createUserWithEmailAndPassword(email, password)
 			.then(async ({ user }) => {
-				await user.updateProfile({ displayName: displayName })
-				dispatch(login(user.uid, user.displayName, user.email, 'email'))
-			})
-	}
-}
+				try {
+					dispatch(startLoading());
+					await user.updateProfile({ displayName: displayName });
+					const actualUser = auth().currentUser;
+					const {
+						user: { hasProfile },
+					} = await createNewUser({ uid: user.uid, email: user.email });
 
-export const login = (uid, displayName, email, typeLogin) => ({
+					dispatch(
+						login(user.uid, actualUser.displayName, user.email, 'email', hasProfile),
+					);
+					dispatch(finishLoading());
+				} catch (e) {
+					console.log(e);
+				}
+			});
+	};
+};
+
+export const login = (uid, displayName, email, typeLogin, hasProfile) => ({
 	type: types.login,
 	payload: {
 		uid,
 		displayName,
 		email,
 		typeLogin,
+		hasProfile,
 	},
-})
+});
+
+export const updateHasProfile = () => ({
+	type: types.updateHasProfile,
+});
 
 export const startLogout = typeLogin => {
 	return async dispatch => {
 		switch (typeLogin) {
 			case 'google':
-				await GoogleSignin.revokeAccess()
+				await GoogleSignin.revokeAccess();
 			default:
 				auth()
 					.signOut()
-					.then(() => dispatch(logout()))
-				break
+					.then(() => dispatch(logout()));
+				break;
 		}
-	}
-}
+	};
+};
 
 export const logout = () => ({
 	type: types.logout,
-})
+});

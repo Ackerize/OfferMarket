@@ -13,9 +13,12 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome'
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
 import { useFormik } from 'formik'
 import { startRegisterWithEmailAndPassword } from '../actions/auth'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import Loading from 'react-native-loading-spinner-overlay';
+import { Button } from 'react-native-paper'
 
 const Register = ({ navigation }) => {
+	const { loading } = useSelector(state => state.ui);
 	const dispatch = useDispatch()
 	const formRegister = useFormik({
 		initialValues: {
@@ -36,6 +39,10 @@ const Register = ({ navigation }) => {
 	return (
 		<SafeAreaView style={styles.mainContainer}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
+			<Loading
+				visible={loading}
+				textContent='Cargando...'
+			/>
 			<ScrollView
 				style={styles.viewContainer}
 				contentContainerStyle={styles.positionView}
@@ -76,6 +83,7 @@ const Register = ({ navigation }) => {
 							style={styles.input}
 							placeholder="Contraseña"
 							placeholderTextColor="#B7C6D9"
+							secureTextEntry={true}
 						/>
 					</View>
 					<View style={styles.inputSection}>
@@ -87,11 +95,12 @@ const Register = ({ navigation }) => {
 							style={styles.input}
 							placeholder="Repetir Contraseña"
 							placeholderTextColor="#B7C6D9"
+							secureTextEntry={true}
 						/>
 					</View>
-					<TouchableOpacity onPress={handleRegister} style={styles.btn}>
+					<Button onPress={handleRegister} style={styles.btn}>
 						<Text style={styles.btnText}>Crear Cuenta</Text>
-					</TouchableOpacity>
+					</Button>
 					<View style={{ marginTop: 10 }}>
 						<Text style={{ textAlign: 'center' }}>
 							<Text>¿Ya tienes cuenta?</Text>

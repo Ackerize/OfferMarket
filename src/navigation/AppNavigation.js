@@ -5,6 +5,7 @@ import Home from '../screens/Home'
 import Chats from '../screens/Chats'
 import Favorites from '../screens/Favorites'
 import Profile from '../screens/Profile'
+import SearchUbication from '../screens/SearchLocation'
 
 const Tabs = AnimatedTabBarNavigator()
 
@@ -86,6 +87,15 @@ export default () => {
 					),
 				}}
 			/>
+			{/* <Tabs.Screen
+				name="Mapa"
+				component={SearchUbication}
+				options={{
+					tabBarIcon: ({ focused, color }) => (
+						<TabBarIcon focused={focused} tintColor={color} name="person" />
+					),
+				}}
+			/> */}
 		</Tabs.Navigator>
 	)
 }
