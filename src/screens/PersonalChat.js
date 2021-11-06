@@ -31,6 +31,8 @@ const PersonalChat = ({ navigation, route }) => {
 	const [inputMessage, setInputMessage] = useState('');
 	const [messages, setMessages] = useState(null);
 	const [dates, setDates] = useState([]);
+	const [idMessageSent, setIdMessageSent] = useState('');
+	const [isLoading, setIsLoading] = useState(true);
 
 	const chatScrollRef = useRef();
 
@@ -52,8 +54,8 @@ const PersonalChat = ({ navigation, route }) => {
 					const [key, value] = array;
 					const arrayMessage = Object.entries(value).map(message => {
 						const [idMessage, valueMessage] = message;
-						const { read } = valueMessage;
-						if (read === false) {
+						const { read, author } = valueMessage;
+						if (author !== idBuyer && read === false) {
 							firebase
 								.database()
 								.ref(`/chats/${idBuyer}/${idSeller}/${key}/${idMessage}`)
@@ -86,28 +88,90 @@ const PersonalChat = ({ navigation, route }) => {
 	}, []);
 
 	useEffect(() => {
+		const chatSeller = firebase.database().ref(`/chats/${idSeller}/${idBuyer}`);
+		chatSeller.on('value', snapshot => {
+			const data = snapshot.val();
+			if (data) {
+				Object.entries(data).forEach(array => {
+					const [key, value] = array;
+					Object.entries(value).forEach(message => {
+						const [idMessage, valueMessage] = message;
+						const { read, author } = valueMessage;
+						if (author !== idBuyer && read === false) {
+							firebase
+								.database()
+								.ref(`/chats/${idSeller}/${idBuyer}/${key}/${idMessage}`)
+								.update({
+									read: true,
+								});
+						}
+					});
+				});
+			}
+		});
+
+		return () => {
+			chatSeller.off();
+		};
+	}, []);
+
+	useEffect(() => {
 		axios.get(`${API_HOST}/profiles/${idSeller}`).then(({ data }) => {
 			setSellerProfile(data.data);
 		});
 	}, []);
 
+	const date = moment().format('DD-MM-YYYY');
+
+	useEffect(() => {
+		if (!isLoading) {
+			firebase
+				.database()
+				.ref(`/chats/${idBuyer}/${idSeller}/${date}/${idMessageSent}`)
+				.update({
+					sent: false,
+				});
+		}
+	}, [isLoading]);
+
 	const onSendMessage = () => {
-		const date = moment().format('DD-MM-YYYY');
 		const message = {
 			author: idBuyer,
 			text: inputMessage,
 			time: moment().format('HH:mm'),
 			read: false,
+			sent: true,
 		};
 		setInputMessage('');
+		setIsLoading(true);
 		firebase
 			.database()
 			.ref(`/chats/${idBuyer}/${idSeller}/${date}`)
-			.push(message);
+			.push(message)
+			.then(url => {
+				const idMessage = String(url)
+					.split('/')
+					.pop();
+
+				setIdMessageSent(idMessage);
+			});
 		firebase
 			.database()
 			.ref(`/chats/${idSeller}/${idBuyer}/${date}`)
-			.push(message);
+			.push(message)
+			.then((url) => {
+				const idMessage = String(url)
+					.split('/')
+					.pop();
+				console.log(idMessage);
+				firebase
+					.database()
+					.ref(`/chats/${idSeller}/${idBuyer}/${date}/${idMessage}`)
+					.update({
+						sent: false,
+					});
+				setIsLoading(false);
+			});
 	};
 
 	const onDeleteChat = () => {
@@ -162,7 +226,11 @@ const PersonalChat = ({ navigation, route }) => {
 					</Menu>
 				</TouchableRipple>
 			</View>
-			<ModalRating visible={showModal} setVisible={setShowModal} seller={idSeller} />
+			<ModalRating
+				visible={showModal}
+				setVisible={setShowModal}
+				seller={idSeller}
+			/>
 			<ScrollView style={styles.chat} ref={chatScrollRef}>
 				{messages && (
 					<>
@@ -182,6 +250,8 @@ const PersonalChat = ({ navigation, route }) => {
 												key={message.idMessage}
 												message={message.text}
 												time={message.time}
+												read={message.read}
+												sent={message.sent}
 											/>
 										) : (
 											<MessageReceive

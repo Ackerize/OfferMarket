@@ -17,7 +17,7 @@ export const validateProductForm = formData => {
 	return (
 		name.length > 0 &&
 		images.length > 0 &&
-		Number(price) > 0 &&
+		Number(price) >= 0 &&
 		description.length > 0
 	);
 };

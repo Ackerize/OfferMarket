@@ -1,16 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import PropTypes from 'prop-types';
+import Read from './Read';
+import Sent from './Sent';
+import Received from './Received';
 
-const MessageSent = ({ message, time }) => {
+const MessageSent = ({ message, time, read, sent }) => {
 	return (
-		<View style={[styles.messageSendContainer, styles.messageFirst]}>
+		<View style={[styles.messageSendContainer]}>
 			<View style={styles.messageSend}>
-				<Text style={styles.messageSendContent}>
-					{ message }
-				</Text>
+				<Text style={styles.messageSendContent}>{message}</Text>
+				<View style={styles.timeContainer} />
 				<View style={styles.viewTime}>
-					<Text style={styles.sendTime}>{ time }</Text>
+					<Text style={styles.sendTime}>{time} </Text>
+					{read ? <Read /> : sent ? <Sent /> : <Received />}
 				</View>
 			</View>
 		</View>
@@ -28,6 +31,7 @@ const styles = StyleSheet.create({
 		marginVertical: 5,
 	},
 	messageSend: {
+		position: 'relative',
 		backgroundColor: '#003C95',
 		display: 'flex',
 		flexDirection: 'row',
@@ -40,11 +44,12 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		minWidth: '30%',
 		maxWidth: '85%',
+		height: '100%',
 	},
 	messageSendContent: {
 		color: '#fff',
 		fontSize: 16,
-		maxWidth: '80%',
+		maxWidth: '100%',
 	},
 	sendTime: {
 		fontSize: 13,
@@ -59,6 +64,17 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 		justifyContent: 'flex-end',
 		height: '100%',
+		position: 'absolute',
+		right: 10,
+		bottom: 7,
+	},
+	timeContainer: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'flex-end',
+		justifyContent: 'flex-end',
+		height: '100%',
+		width: 65,
 	},
 });
 

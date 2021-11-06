@@ -1,10 +1,9 @@
 import React from 'react';
-import {
-	StyleSheet,
-	View,
-	TouchableWithoutFeedback,
-} from 'react-native';
-import {  Avatar, Text } from 'react-native-paper';
+import { StyleSheet, View, TouchableWithoutFeedback } from 'react-native';
+import { Avatar, Text } from 'react-native-paper';
+import Read from './Messages/Read';
+import Received from './Messages/Received';
+import Sent from './Messages/Sent';
 
 const Person = ({
 	title,
@@ -12,20 +11,29 @@ const Person = ({
 	avatar,
 	date,
 	notifications,
+	type = 'person',
+	read = false,
+	sent = false,
 	action = () => console.log('click'),
 }) => {
 	return (
 		<TouchableWithoutFeedback onPress={action}>
 			<View style={styles.messageContainer}>
-				<Avatar.Image
-					size={60}
-					source={{ uri: avatar }}
-				/>
+				<Avatar.Image size={60} source={{ uri: avatar }} />
 				<View style={styles.informationContainer}>
 					<Text style={styles.date}>{date}</Text>
 					<Text style={styles.person}>{title}</Text>
-					<Text numberOfLines={1} style={styles.message}>{subtitle}</Text>
-					{notifications > 0 && <Text style={styles.notificationText}>{ notifications }</Text>}
+					<View style={styles.lastMessage}>
+						{type === 'message' && (
+							read ? <Read /> : sent ? <Sent color='#ABACAE' /> : <Received color='#ABACAE' />
+						)}
+						<Text numberOfLines={1} style={[styles.message, type === "message" && styles.typeMessage]}>
+							{subtitle}
+						</Text>
+					</View>
+					{notifications > 0 && (
+						<Text style={styles.notificationText}>{notifications}</Text>
+					)}
 					<View style={styles.line} />
 				</View>
 			</View>
@@ -80,11 +88,17 @@ const styles = StyleSheet.create({
 		lineHeight: 20,
 		width: '80%',
 	},
+	typeMessage: {
+		marginLeft: 5,
+	},
 	line: {
 		height: 1,
 		width: '95%',
 		backgroundColor: '#DCE5EE',
 		marginTop: 5,
 		marginBottom: 5,
+	},
+	lastMessage: {
+		flexDirection: 'row',
 	},
 });

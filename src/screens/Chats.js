@@ -107,16 +107,21 @@ const Chats = ({ navigation }) => {
 				{chats.length > 0 &&
 					chats.map(item => {
 						const today = moment().format('DD/MM/YYYY');
+						const {author, read, sent, text, time } = messages[item.user][0].message;
 						const itemDate = messages[item.user][0].date.replace(/-/g, '/');
+						
 						return (
 							<Person
 								key={item.user}
 								avatar={item.photo}
 								title={item.name}
-								subtitle={messages[item.user][0].message.text}
-								date={itemDate === today ? messages[item.user][0].message.time  : itemDate}
+								subtitle={text}
+								date={itemDate === today ? time  : itemDate}
 								notifications={countUnreadMessages(messages[item.user], uid)}
 								action={() => action(item.user)}
+								type="message"
+								read={author === uid ? read : false}
+								sent={sent}
 							/>
 						)
 					})}
