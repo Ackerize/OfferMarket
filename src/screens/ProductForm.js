@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
 import ImagePicker from '../components/ImagePickers/ImagePicker';
@@ -14,6 +14,8 @@ import { fileUpload } from '../utils/fileUpload';
 import { createNewProduct, updateProduct } from '../api/products';
 import Popup from '../components/Modals/Popup';
 import { showToast } from '../components/Modals/CustomToast';
+import LocationInput from '../components/Inputs/LocationInput';
+import { selectLocation } from '../actions/profile';
 
 const ProductForm = ({ navigation, route }) => {
 	const product = route?.params?.product;
@@ -29,9 +31,18 @@ const ProductForm = ({ navigation, route }) => {
 	const {
 		auth: { uid },
 		ui: { loading },
+		profile: { location },
 	} = useSelector(state => state);
 
-	const conditionData = [{ id: 1, value: 'Nuevo' }, { id: 2, value: 'Usado' }];
+	const { name: city } = location;
+
+	useEffect(() => {
+		if (product) {
+			dispatch(selectLocation({ ...product.location }));
+		}
+	}, []);
+
+	const conditionData = [{ id: 1, value: 'Nuevo' }, { id: 2, pvalue: 'Usado' }];
 
 	const cat = product
 		? categoriesData.find(cate => cate.value === product.category)
@@ -57,6 +68,7 @@ const ProductForm = ({ navigation, route }) => {
 				images: product.images,
 				category: product.category,
 				condition: product.condition,
+				location: product.location,
 		  }
 		: {
 				name: '',
@@ -67,7 +79,10 @@ const ProductForm = ({ navigation, route }) => {
 				category: null,
 				condition: null,
 				seller: uid,
+				location
 		  };
+
+		  console.log(location);
 
 	const onSubmit = async values => {
 		if (!loading) {
@@ -75,6 +90,7 @@ const ProductForm = ({ navigation, route }) => {
 				...values,
 				category: categorySelected.value,
 				condition: conditionSelected.value,
+				location: location,
 				images,
 			};
 
@@ -121,6 +137,7 @@ const ProductForm = ({ navigation, route }) => {
 				...values,
 				category: categorySelected.value,
 				condition: conditionSelected.value,
+				location: location,
 				images,
 			};
 
@@ -183,44 +200,51 @@ const ProductForm = ({ navigation, route }) => {
 								imagesArray={images}
 							/>
 							<Input
-								label="Nombre: (*)"
+								label="Nombre:"
 								value={values.name}
 								onChangeText={handleChange('name')}
 								onBlur={handleBlur('name')}
 							/>
 							<Input
-								label="Marca: (*)"
+								label="Marca:"
 								value={values.brand}
 								onChangeText={handleChange('brand')}
 								onBlur={handleBlur('brand')}
 							/>
 							<Input
-								label="Descripción: (*)"
+								label="Descripción:"
 								value={values.description}
 								onChangeText={handleChange('description')}
 								onBlur={handleBlur('description')}
 							/>
 							<Input
-								label="Precio: (*)"
+								label="Precio:"
 								type="numeric"
 								value={values.price.toString()}
 								onChangeText={handleChange('price')}
 								onBlur={handleBlur('price')}
 							/>
 							<Select
-								label="Categoría: (*)"
+								label="Categoría:"
 								placeholder="Selecciona una categoría"
 								data={categoriesData}
 								onChange={setCategorySelected}
 								value={categorySelected}
 							/>
 							<Select
-								label="Condición: (*)"
+								label="Condición:"
 								placeholder="Selecciona la condición"
 								data={conditionData}
 								onChange={setConditionSelected}
 								value={conditionSelected}
 							/>
+							<View style={styles.container}>
+								<Text style={styles.label}>Ubicación: </Text>
+								<LocationInput
+									actualLocation={city}
+									onPress={() => navigation.navigate('SearchLocation')}
+								/>
+							</View>
 							<SaveButton
 								text="Guardar"
 								onPress={handleSubmit}
@@ -245,5 +269,13 @@ const styles = StyleSheet.create({
 	formContainer: {
 		paddingHorizontal: 25,
 		marginTop: 30,
+	},
+	container: {
+		marginVertical: 15,
+	},
+	label: {
+		fontSize: 16,
+		color: '#000000',
+		marginBottom: 10,
 	},
 });

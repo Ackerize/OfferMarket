@@ -31,6 +31,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { showToast } from '../components/Modals/CustomToast';
 import PrimaryButton from '../components/Buttons/PrimaryButton';
 import SecundaryButton from '../components/Buttons/SecundaryButton';
+import { clear } from '../actions/profile';
 
 const heightScreen = Dimensions.get('window').height;
 
@@ -57,6 +58,10 @@ const Profile = ({ navigation, route }) => {
 		closeMenu();
 		dispatch(startLogout(typeLogin));
 	};
+
+	useEffect(() => {
+		dispatch(clear());
+	}, []);
 
 	useEffect(() => {
 		if (isFocused) {

@@ -39,6 +39,7 @@ const Search = ({ navigation }) => {
 	useEffect(() => {
 		if (products && products.length > 0) {
 			const filtersArray = Object.entries(filters).filter(([key, value]) => value)
+			console.log(filtersArray);
 			setFilteredProducts(
 				filterArray(products, filtersArray),
 			);

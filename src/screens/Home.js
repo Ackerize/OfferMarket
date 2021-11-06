@@ -4,7 +4,7 @@ import { StyleSheet, SafeAreaView, View, Dimensions } from 'react-native';
 import { Text } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 import { IconButton } from 'react-native-paper';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Logo from '../assets/img/logo.svg';
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
 import ProductList from '../components/Products/ProductList';
@@ -15,12 +15,15 @@ import { showToast } from '../components/Modals/CustomToast';
 import axios from 'axios';
 import { API_HOST } from '../utils/constants';
 import { firebase } from '../utils/firebase-config';
+import { clear } from '../actions/profile';
 
 const heightSize = Dimensions.get('window').height;
 
 const Home = ({ navigation }) => {
 	const isFocused = useIsFocused();
 	const { uid } = useSelector(state => state.auth);
+
+	const dispatch = useDispatch();
 
 	const [categorySelected, setCategorySelected] = useState(1);
 	const [productData, setProductData] = useState(null);
@@ -77,6 +80,10 @@ const Home = ({ navigation }) => {
 			}
 		});
 	}, []);
+
+	useEffect(() => {
+		if (isFocused) dispatch(clear());
+	}, [isFocused]);
 
 	return (
 		<SafeAreaView style={styles.container}>

@@ -1,37 +1,49 @@
-import React, { useState, useEffect } from 'react'
-import { View, StyleSheet } from 'react-native'
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
-import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import MapView, { Marker } from 'react-native-maps'
-import { useSelector, useDispatch } from 'react-redux'
-import { selectLocation } from '../actions/profile'
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import MapView, { Marker, Circle } from 'react-native-maps';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectLocation } from '../actions/profile';
 
-const GOOGLE_PLACES_API_KEY = 'AIzaSyAiatjF-bmk1fr8Dk7QS4wEGjCiHMjAdZg'
+const GOOGLE_PLACES_API_KEY = 'AIzaSyAiatjF-bmk1fr8Dk7QS4wEGjCiHMjAdZg';
 
-const SearchLocation = () => {
-	const dispatch = useDispatch()
+const SearchLocation = ({ route }) => {
+	const type = route?.params?.type;
 
-	const {location: { name: currentLocation, ...rest }} = useSelector(state => state.profile)
+	const dispatch = useDispatch();
+
+	const {
+		location: { name: currentLocation, ...rest },
+	} = useSelector(state => state.profile);
 
 	useEffect(() => {
-		if(!currentLocation) {
-			dispatch(selectLocation({ latitude: 13.672945, longitude: -89.300506, name: 'Santa Tecla' }))
+		if (!currentLocation) {
+			dispatch(
+				selectLocation({
+					latitude: 13.672945,
+					longitude: -89.300506,
+					name: 'Santa Tecla',
+				}),
+			);
 		}
-	}, [])
+	}, []);
 
-	const isMarker = rest.longitude && rest.latitude ? rest : null
+	const isMarker = rest.longitude && rest.latitude ? rest : null;
 
-	const [marker, setMarker] = useState(isMarker)
+	const [marker, setMarker] = useState(isMarker);
 	const [location, setLocation] = useState({
 		lat: rest.latitude || 13.672945,
 		lng: rest.longitude || -89.300506,
-	})
+	});
 
 	const onUpdateLocation = (coords, name) => {
-		setMarker(coords)
-		setLocation(coords)
-		dispatch(selectLocation({ ...coords, name }))
-	}
+		setMarker(coords);
+		setLocation(coords);
+		dispatch(selectLocation({ ...coords, name }));
+	};
+
+	console.log(type);
 
 	return (
 		<View style={styles.container}>
@@ -44,14 +56,13 @@ const SearchLocation = () => {
 					language: 'en',
 					components: 'country:sv',
 				}}
-				
 				fetchDetails={true}
 				GooglePlacesDetailsQuery={{ fields: 'geometry' }}
 				onPress={(data, details = null) => {
-					const coords = details?.geometry?.location
-					const citySplit = data.description.split(', ')
-					const city = citySplit[citySplit.length - 2]
-					onUpdateLocation(coords, city)
+					const coords = details?.geometry?.location;
+					const citySplit = data.description.split(', ');
+					const city = citySplit[citySplit.length - 2];
+					onUpdateLocation(coords, city);
 				}}
 				onFail={error => console.error(error)}
 				styles={{
@@ -71,12 +82,36 @@ const SearchLocation = () => {
 						region={{
 							latitude: location?.lat || location?.latitude,
 							longitude: location?.lng || location?.longitude,
-							latitudeDelta: 0.003757,
-							longitudeDelta: 0.001842,
+							latitudeDelta: 0.01022,
+							longitudeDelta: 0.01421,
 						}}
 						onPress={e => {
-							onUpdateLocation(e.nativeEvent.coordinate, currentLocation)
+							onUpdateLocation(e.nativeEvent.coordinate, currentLocation);
 						}}>
+						{type === 'filter' && (
+							<Circle
+								center={{
+									latitude: rest.latitude || 13.672945,
+									longitude: rest.longitude || -89.300506,
+								}}
+								radius={750}
+								fillColor="rgba(161, 179, 206, 0.4)"
+								strokeColor="rgba(161, 179, 206, 0.4)"
+								zIndex={2}
+								strokeWidth={2}
+							/>
+						)}
+						{
+							type === 'filter' && (
+								<Marker
+								coordinate={{
+									latitude: rest.latitude || 13.672945,
+									longitude: rest.longitude || -89.300506,
+								}}
+								title="Ubicación de búsqueda"
+							/>
+							)
+						}
 						{marker && (
 							<Marker
 								coordinate={{
@@ -90,10 +125,10 @@ const SearchLocation = () => {
 				</View>
 			</View>
 		</View>
-	)
-}
+	);
+};
 
-export default SearchLocation
+export default SearchLocation;
 
 const styles = StyleSheet.create({
 	container: {
@@ -145,6 +180,5 @@ const styles = StyleSheet.create({
 	map: {
 		...StyleSheet.absoluteFillObject,
 		borderRadius: 10,
-		zIndex: -1,
 	},
-})
+});

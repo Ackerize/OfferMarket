@@ -19,12 +19,18 @@ const Filter = ({ navigation }) => {
 		state => state.filters,
 	);
 
+	const { location: profileLocation } = useSelector(state => state.profile);
+
+	const { name: city } = profileLocation;
+
 	const [categoriesArray] = useState(categories.slice(1));
 
 	const [values, handleInputChange] = useForm({
 		minPrice: minPrice || '',
 		maxPrice: maxPrice || '',
 	});
+
+	console.log({ location, profileLocation });
 
 	const [statusSelected, setStatusSelected] = useState(condition);
 
@@ -42,6 +48,12 @@ const Filter = ({ navigation }) => {
 			condition: statusSelected,
 			maxPrice: values.maxPrice.length > 0 ? values.maxPrice : null,
 			minPrice: values.minPrice.length > 0 ? values.minPrice : null,
+			location: profileLocation.latitude
+				? {
+						latitude: profileLocation.latitude,
+						longitude: profileLocation.longitude,
+				  }
+				: location,
 		};
 
 		dispatch(setFilter(newFilters));
@@ -98,7 +110,12 @@ const Filter = ({ navigation }) => {
 				</View>
 				<Text style={styles.label}>Ubicación (radio de 5km): </Text>
 				<View style={styles.optionsContainer}>
-					<LocationInput onPress={() => console.log('UBICACIÓN')} />
+					<LocationInput
+					actualLocation={city}
+						onPress={() => navigation.navigate('SearchLocation', {
+							type: 'filter',
+						})}
+					/>
 				</View>
 				<SaveButton onPress={onSave} text="Aplicar" />
 			</ScrollView>
