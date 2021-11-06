@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { getProfile } from '../api/profiles';
 import Spinner from '../components/Spinner';
 import Alert from '../components/Alert';
-import { countUnreadMessages } from '../utils/utils';
+import { countUnreadMessages, orderArray } from '../utils/utils';
 import moment from 'moment';
 
 const heightSize = Dimensions.get('window').height;
@@ -33,7 +33,7 @@ const Chats = ({ navigation }) => {
 					const example = Object.entries(data);
 					example.forEach(item => {
 						const idUser = item[0];
-						dataUsers = [...dataUsers, idUser];
+
 						const dataUser = item[1];
 						const dataMessages = Object.keys(dataUser);
 						const lastDate = dataMessages[dataMessages.length - 1];
@@ -49,12 +49,22 @@ const Chats = ({ navigation }) => {
 							...aux,
 							[idUser]: lastest.reverse(),
 						};
+
+						dataUsers = [
+							...dataUsers,
+							{
+								id: idUser,
+								...lastest[0],
+							},
+						];
 					});
+
+					dataUsers = orderArray(dataUsers);
 
 					setMessages(aux);
 
 					const profiles = dataUsers.map(async item => {
-						const { photo, name, user } = await getProfile(item);
+						const { photo, name, user } = await getProfile(item.id);
 						return { photo, name, user };
 					});
 
@@ -107,23 +117,25 @@ const Chats = ({ navigation }) => {
 				{chats.length > 0 &&
 					chats.map(item => {
 						const today = moment().format('DD/MM/YYYY');
-						const {author, read, sent, text, time } = messages[item.user][0].message;
+						const { author, read, sent, text, time } = messages[
+							item.user
+						][0].message;
 						const itemDate = messages[item.user][0].date.replace(/-/g, '/');
-						
+
 						return (
 							<Person
 								key={item.user}
 								avatar={item.photo}
 								title={item.name}
 								subtitle={text}
-								date={itemDate === today ? time  : itemDate}
+								date={itemDate === today ? time : itemDate}
 								notifications={countUnreadMessages(messages[item.user], uid)}
 								action={() => action(item.user)}
 								type="message"
 								read={author === uid ? read : false}
 								sent={sent}
 							/>
-						)
+						);
 					})}
 			</ScrollView>
 		</SafeAreaView>

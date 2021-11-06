@@ -1,4 +1,5 @@
 import { isPointWithinRadius } from 'geolib';
+import moment from 'moment';
 
 export const validateProfileForm = formData => {
 	const {
@@ -66,6 +67,15 @@ export const validRegister = (name, username, password, passwordConfirm) => {
 	return true;
 };
 
+export const validMinMaxPrice = (min, max) => {
+	if (min.length === 0 && max.length === 0) return true;
+	if (Number(min) < 0 || Number(max) < 0)
+		throw new Error('El precio debe ser mayor o igual a 0');
+	if (Number(min) > Number(max))
+		throw new Error('El precio mínimo debe ser menor que el máximo');
+	return true;
+};
+
 export const filterArray = (array, filters) => {
 	filters.forEach(([key, value]) => {
 		switch (key) {
@@ -82,7 +92,10 @@ export const filterArray = (array, filters) => {
 							latitude: item.location.latitude,
 							longitude: item.location.longitude,
 						},
-						value,
+						{
+							latitude: value.latitude,
+							longitude: value.longitude,
+						},
 						750,
 					),
 				);
@@ -92,4 +105,15 @@ export const filterArray = (array, filters) => {
 		}
 	});
 	return array;
+};
+
+export const orderArray = array => {
+	let sortedArray = array
+		.sort(
+			(a, b) =>
+				moment(a.message.datetime).valueOf() -
+				moment(b.message.datetime).valueOf(),
+		)
+		.reverse();
+	return sortedArray;
 };

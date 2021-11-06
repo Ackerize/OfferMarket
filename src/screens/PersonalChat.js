@@ -156,6 +156,7 @@ const PersonalChat = ({ navigation, route }) => {
 			time: moment().format('HH:mm'),
 			read: false,
 			sent: true,
+			datetime: Date.now(),
 		};
 		setInputMessage('');
 		setIsLoading(true);

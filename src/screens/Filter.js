@@ -11,6 +11,8 @@ import LocationInput from '../components/Inputs/LocationInput';
 import SaveButton from '../components/Buttons/SaveButton';
 import { useSelector, useDispatch } from 'react-redux';
 import { setFilter } from '../actions/filter';
+import { validMinMaxPrice } from '../utils/utils';
+import Popup from '../components/Modals/Popup';
 
 const Filter = ({ navigation }) => {
 	const dispatch = useDispatch();
@@ -41,21 +43,34 @@ const Filter = ({ navigation }) => {
 	};
 
 	const onSave = () => {
-		const newFilters = {
-			category: categorySelected?.name,
-			condition: statusSelected,
-			maxPrice: values.maxPrice.length > 0 ? values.maxPrice : null,
-			minPrice: values.minPrice.length > 0 ? values.minPrice : null,
-			location: profileLocation.latitude
-				? {
-						latitude: profileLocation.latitude,
-						longitude: profileLocation.longitude,
-				  }
-				: location,
-		};
+		try {
+			const isValid = validMinMaxPrice(values.minPrice, values.maxPrice);
+			console.log(isValid);
+			if (isValid) {
+				const newFilters = {
+					category: categorySelected?.name || null,
+					condition: statusSelected,
+					maxPrice: values.maxPrice.length > 0 ? values.maxPrice : null,
+					minPrice: values.minPrice.length > 0 ? values.minPrice : null,
+					location: profileLocation.latitude
+						? {
+								...profileLocation,
+						  }
+						: location,
+				};
 
-		dispatch(setFilter(newFilters));
-		navigation.goBack();
+				dispatch(setFilter(newFilters));
+				navigation.goBack();
+			}
+		} catch ({ message }) {
+			Popup.show({
+				type: 'Danger',
+				title: '¡Oh no!',
+				textBody: message,
+				buttontext: 'Aceptar',
+				callback: () => Popup.hide(),
+			});
+		}
 	};
 
 	return (
@@ -109,10 +124,12 @@ const Filter = ({ navigation }) => {
 				<Text style={styles.label}>Ubicación (radio de 5km): </Text>
 				<View style={styles.optionsContainer}>
 					<LocationInput
-					actualLocation={city}
-						onPress={() => navigation.navigate('SearchLocation', {
-							type: 'filter',
-						})}
+						actualLocation={city}
+						onPress={() =>
+							navigation.navigate('SearchLocation', {
+								type: 'filter',
+							})
+						}
 					/>
 				</View>
 				<SaveButton onPress={onSave} text="Aplicar" />

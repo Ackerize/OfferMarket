@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, SafeAreaView, View } from 'react-native';
-import { Searchbar } from 'react-native-paper';
+import { Searchbar, Chip } from 'react-native-paper';
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
 import { useDebouncedCallback } from 'use-debounce';
 import axios from 'axios';
@@ -10,7 +10,9 @@ import ProductList from '../components/Products/ProductList';
 import FilterButton from '../components/Buttons/FilterButton';
 import { useSelector, useDispatch } from 'react-redux';
 import { filterArray } from '../utils/utils';
-import { clearFilter } from '../actions/filter';
+import { clearFilter, setFilter } from '../actions/filter';
+import { map } from 'lodash';
+import { clear } from '../actions/profile';
 
 const Search = ({ navigation }) => {
 	const [value, setValue] = useState('');
@@ -36,16 +38,16 @@ const Search = ({ navigation }) => {
 
 	useEffect(() => {
 		if (products && products.length > 0) {
-			const filtersArray = Object.entries(filters).filter(([key, value]) => value)
-			setFilteredProducts(
-				filterArray(products, filtersArray),
+			const filtersArray = Object.entries(filters).filter(
+				([key, value]) => value,
 			);
+			setFilteredProducts(filterArray(products, filtersArray));
 		}
 	}, [filters]);
 
 	useEffect(() => {
 		dispatch(clearFilter());
-	}, [])
+	}, []);
 
 	useEffect(() => {
 		if (search.length > 1) {
@@ -76,7 +78,45 @@ const Search = ({ navigation }) => {
 					focusable={true}
 				/>
 			</View>
-			{products && products.length > 0 && <FilterButton onPress={onFilter} />}
+			{products && products.length > 0 && (
+				<View style={styles.ScrollView}>
+					<ScrollView
+						style={styles.filtersContainer}
+						horizontal={true}
+						showsHorizontalScrollIndicator={false}>
+						<FilterButton onPress={onFilter} />
+						<View style={styles.chipContainer}>
+							{map(filters, (value, key) => {
+								if (value) {
+									return (
+										<Chip
+											key={key}
+											style={styles.chip}
+											onClose={() => {
+												dispatch(
+													setFilter({
+														...filters,
+														[key]: null,
+													}),
+												);
+
+												if (key === 'location') {
+													dispatch(clear());
+												}
+											}}>
+											{key === 'minPrice' || key === 'maxPrice'
+												? `${key.substring(0, 3)}: $${value}`
+												: key === 'location'
+												? `${value.name}`
+												: `${value}`}
+										</Chip>
+									);
+								}
+							})}
+						</View>
+					</ScrollView>
+				</View>
+			)}
 
 			<ScrollView>
 				<ProductList navigation={navigation} data={filteredProducts} />
@@ -115,5 +155,15 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.25,
 		shadowRadius: 3.84,
 		elevation: 5,
+	},
+	chipContainer: {
+		flexDirection: 'row',
+		alignSelf: 'center',
+	},
+	ScrollView: {
+		width: '100%',
+	},
+	chip: {
+		marginHorizontal: 5,
 	},
 });
