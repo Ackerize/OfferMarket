@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import {
 	StyleSheet,
 	Text,
@@ -7,19 +7,21 @@ import {
 	TextInput,
 	TouchableOpacity,
 	ScrollView,
-} from 'react-native'
-import LoginImage from '../assets/img/register.svg'
-import Icon from 'react-native-vector-icons/dist/FontAwesome'
-import FocusAwareStatusBar from '../components/FocusAwareStatusBar'
-import { useFormik } from 'formik'
-import { startRegisterWithEmailAndPassword } from '../actions/auth'
-import { useDispatch, useSelector } from 'react-redux'
+} from 'react-native';
+import LoginImage from '../assets/img/register.svg';
+import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
+import { useFormik } from 'formik';
+import { startRegisterWithEmailAndPassword } from '../actions/auth';
+import { useDispatch, useSelector } from 'react-redux';
 import Loading from 'react-native-loading-spinner-overlay';
-import { Button } from 'react-native-paper'
+import { Button } from 'react-native-paper';
+import { validRegister } from '../utils/utils';
+import { showToast } from '../components/Modals/CustomToast';
 
 const Register = ({ navigation }) => {
 	const { loading } = useSelector(state => state.ui);
-	const dispatch = useDispatch()
+	const dispatch = useDispatch();
 	const formRegister = useFormik({
 		initialValues: {
 			displayName: '',
@@ -27,22 +29,27 @@ const Register = ({ navigation }) => {
 			password: '',
 			repeatPassword: '',
 		},
-	})
+	});
 
-	const { email, password, displayName } = formRegister.values
+	const { email, password, displayName, repeatPassword } = formRegister.values;
 
 	const handleRegister = e => {
-		e.preventDefault()
-		dispatch(startRegisterWithEmailAndPassword(email, password, displayName))
-	}
+		e.preventDefault();
+		try {
+			if (validRegister(displayName, email, password, repeatPassword)) {
+				dispatch(
+					startRegisterWithEmailAndPassword(email, password, displayName),
+				);
+			}
+		} catch ({ message }) {
+			showToast('error', '¡Oh no!', message);
+		}
+	};
 
 	return (
 		<SafeAreaView style={styles.mainContainer}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
-			<Loading
-				visible={loading}
-				textContent='Cargando...'
-			/>
+			<Loading visible={loading} textContent="Cargando..." />
 			<ScrollView
 				style={styles.viewContainer}
 				contentContainerStyle={styles.positionView}
@@ -98,7 +105,7 @@ const Register = ({ navigation }) => {
 							secureTextEntry={true}
 						/>
 					</View>
-					<Button onPress={handleRegister} style={styles.btn}>
+					<Button mode='contained' onPress={handleRegister} style={styles.btn}>
 						<Text style={styles.btnText}>Crear Cuenta</Text>
 					</Button>
 					<View style={{ marginTop: 10 }}>
@@ -115,10 +122,10 @@ const Register = ({ navigation }) => {
 				</View>
 			</ScrollView>
 		</SafeAreaView>
-	)
-}
+	);
+};
 
-export default Register
+export default Register;
 
 const styles = StyleSheet.create({
 	mainContainer: {
@@ -195,4 +202,4 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		paddingTop: 15,
 	},
-})
+});

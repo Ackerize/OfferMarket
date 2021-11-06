@@ -23,8 +23,6 @@ const Search = ({ navigation }) => {
 
 	const filters = useSelector(state => state.filters);
 
-	console.log(filters);
-
 	const debounced = useDebouncedCallback(value => {
 		setSearch(value);
 	}, 700);
@@ -39,7 +37,6 @@ const Search = ({ navigation }) => {
 	useEffect(() => {
 		if (products && products.length > 0) {
 			const filtersArray = Object.entries(filters).filter(([key, value]) => value)
-			console.log(filtersArray);
 			setFilteredProducts(
 				filterArray(products, filtersArray),
 			);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
 import {
 	ScrollView,
@@ -11,6 +11,7 @@ import { firebase } from '../utils/firebase-config';
 import { useSelector } from 'react-redux';
 import Spinner from '../components/Spinner';
 import Alert from '../components/Alert';
+import moment from 'moment';
 
 const Notifications = ({ navigation, route }) => {
 	const notis = route?.params?.notifications;
@@ -67,34 +68,39 @@ const Notifications = ({ navigation, route }) => {
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
 			<Title style={styles.title}>Notificaciones</Title>
 			<ScrollView>
-				{notifications.map((noti, index) => (
-					<>
-						{noti.read ? (
-							<Person
-								avatar={noti.seller.photo}
-								title={noti.seller.name}
-								subtitle={noti.message}
-								date="Hace 2 días"
-								notifications={0}
-								key={index}
-								action={() => handleOnPress(noti.id, noti.product)}
-							/>
-						) : (
-							<TouchableWithoutFeedback
-								style={styles.newNotiContainer}
-								onPress={() => handleOnPress(noti.id, noti.product)}>
+				{notifications.map((noti, index) => {
+					const today = moment().format('DD/MM/YYYY');
+					const newDate = moment(noti.date).format('DD/MM/YYYY');
+					const time = moment(noti.date).format('HH:mm');
+					return (
+						<>
+							{noti.read ? (
 								<Person
 									avatar={noti.seller.photo}
 									title={noti.seller.name}
 									subtitle={noti.message}
-									date="Hace 20 min"
+									date={today === newDate ? time : newDate}
 									notifications={0}
 									key={index}
+									action={() => handleOnPress(noti.id, noti.product)}
 								/>
-							</TouchableWithoutFeedback>
-						)}
-					</>
-				))}
+							) : (
+								<TouchableWithoutFeedback
+									style={styles.newNotiContainer}
+									onPress={() => handleOnPress(noti.id, noti.product)}>
+									<Person
+										avatar={noti.seller.photo}
+										title={noti.seller.name}
+										subtitle={noti.message}
+										date={today === newDate ? time : newDate}
+										notifications={0}
+										key={index}
+									/>
+								</TouchableWithoutFeedback>
+							)}
+						</>
+					);
+				})}
 			</ScrollView>
 		</SafeAreaView>
 	);

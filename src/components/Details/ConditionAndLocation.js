@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 const ConditionAndLocation = ({ condition, location, name }) => {
-	console.log(location);
 	const { name: city, ...coords } = location;
 	return (
 		<View style={styles.details}>

@@ -42,7 +42,7 @@ const ProductForm = ({ navigation, route }) => {
 		}
 	}, []);
 
-	const conditionData = [{ id: 1, value: 'Nuevo' }, { id: 2, pvalue: 'Usado' }];
+	const conditionData = [{ id: 1, value: 'Nuevo' }, { id: 2, value: 'Usado' }];
 
 	const cat = product
 		? categoriesData.find(cate => cate.value === product.category)
@@ -79,105 +79,110 @@ const ProductForm = ({ navigation, route }) => {
 				category: null,
 				condition: null,
 				seller: uid,
-				location
+				location,
 		  };
-
-		  console.log(location);
 
 	const onSubmit = async values => {
 		if (!loading) {
-			values = {
-				...values,
-				category: categorySelected.value,
-				condition: conditionSelected.value,
-				location: location,
-				images,
-			};
-
-			const isValid = validateProductForm(values);
-
-			if (isValid) {
-				dispatch(startLoading());
-				const urls = images.map(async image => {
-					const source = 'data:image/jpg;base64,' + image.data;
-					const fileUrl = await fileUpload(source);
-					return fileUrl;
-				});
-
-				values.images = await Promise.all(urls);
-
-				const { error, message } = await createNewProduct({
+			try {
+				values = {
 					...values,
-					price: Number(values.price),
-					brand: values.brand.length > 0 ? values.brand : null,
-				});
+					category: categorySelected.value,
+					condition: conditionSelected.value,
+					location: location,
+					images,
+				};
 
-				if (!error) {
-					showToast('success', 'Producto creado', message);
-					navigation.goBack();
-				} else {
-					showToast('error', '¡Oh no!', message);
+				const isValid = validateProductForm(values);
+
+				if (isValid) {
+					dispatch(startLoading());
+					const urls = images.map(async image => {
+						const source = 'data:image/jpg;base64,' + image.data;
+						const fileUrl = await fileUpload(source);
+						return fileUrl;
+					});
+
+					values.images = await Promise.all(urls);
+
+					const { error, message } = await createNewProduct({
+						...values,
+						price: Number(values.price),
+						brand: values.brand.length > 0 ? values.brand : null,
+					});
+
+					if (!error) {
+						showToast('success', 'Producto creado', message);
+						navigation.goBack();
+					} else {
+						showToast('error', '¡Oh no!', message);
+					}
+					dispatch(finishLoading());
 				}
+			} catch ({ message }) {
 				dispatch(finishLoading());
-			} else {
 				Popup.show({
 					type: 'Danger',
 					title: '¡Oh no!',
-					textBody: 'Debe de llenar todos los campos obligatorios',
+					textBody: message,
 					buttontext: 'Aceptar',
 					callback: () => Popup.hide(),
 				});
+
 			}
 		}
 	};
 
 	const onUpdate = async values => {
 		if (!loading) {
-			values = {
-				...values,
-				category: categorySelected.value,
-				condition: conditionSelected.value,
-				location: location,
-				images,
-			};
+			try {
+				values = {
+					...values,
+					category: categorySelected.value,
+					condition: conditionSelected.value,
+					location: location,
+					images,
+				};
 
-			const isValid = validateProductForm(values);
+				const isValid = validateProductForm(values);
 
-			if (isValid) {
-				dispatch(startLoading());
-				const urls = images.map(async image => {
-					if (image?.data) {
-						const source = 'data:image/jpg;base64,' + image.data;
-						const fileUrl = await fileUpload(source);
-						return fileUrl;
+				if (isValid) {
+					dispatch(startLoading());
+					const urls = images.map(async image => {
+						if (image?.data) {
+							const source = 'data:image/jpg;base64,' + image.data;
+							const fileUrl = await fileUpload(source);
+							return fileUrl;
+						}
+						if (image?.path) return image.path;
+						return image;
+					});
+					const imageUploads = await Promise.all(urls);
+
+					values.images = [...new Set(imageUploads)];
+					const { error, message } = await updateProduct(
+						{
+							...values,
+							price: Number(values.price),
+							brand: (values?.brand && values.brand.length > 0) ? values.brand : null,
+						},
+						product._id,
+					);
+
+					if (!error) {
+						showToast('success', 'Producto actualizado', message);
+						navigation.goBack();
+					} else {
+						showToast('error', '¡Oh no!', message);
 					}
-					if (image?.path) return image.path;
-					return image;
-				});
-				const imageUploads = await Promise.all(urls);
-
-				values.images = [...new Set(imageUploads)];
-				const { error, message } = await updateProduct(
-					{
-						...values,
-						price: Number(values.price),
-						brand: values.brand.length > 0 ? values.brand : null,
-					},
-					product._id,
-				);
-
-				if (!error) {
-					showToast('success', 'Producto actualizado', message);
-					navigation.goBack();
-				} else {
-					showToast('error', '¡Oh no!', message);
+					dispatch(finishLoading());
 				}
+			} catch ({ message }) {
 				dispatch(finishLoading());
-			} else {
 				Popup.show({
 					type: 'Danger',
 					title: '¡Oh no!',
-					textBody: 'Debe de llenar todos los campos obligatorios',
+					textBody: message,
 					buttontext: 'Aceptar',
 					callback: () => Popup.hide(),
 				});
@@ -201,6 +206,7 @@ const ProductForm = ({ navigation, route }) => {
 							/>
 							<Input
 								label="Nombre:"
+								mandatory={true}
 								value={values.name}
 								onChangeText={handleChange('name')}
 								onBlur={handleBlur('name')}
@@ -213,12 +219,14 @@ const ProductForm = ({ navigation, route }) => {
 							/>
 							<Input
 								label="Descripción:"
+								mandatory={true}
 								value={values.description}
 								onChangeText={handleChange('description')}
 								onBlur={handleBlur('description')}
 							/>
 							<Input
 								label="Precio:"
+								mandatory={true}
 								type="numeric"
 								value={values.price.toString()}
 								onChangeText={handleChange('price')}

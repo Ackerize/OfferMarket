@@ -55,27 +55,31 @@ const ProfileForm = ({ navigation, route }) => {
 
 	const onSubmit = async values => {
 		if (!loading) {
-			values = { ...values, photo: profileImage, location: location };
-			const isValid = validateProfileForm(values);
-			const source = 'data:image/jpg;base64,' + profileImage;
-			if (isValid) {
-				dispatch(startLoading());
-				const fileUrl = await fileUpload(source);
+			try {
+				values = { ...values, photo: profileImage, location: location };
+				const isValid = validateProfileForm(values);
+				const source = 'data:image/jpg;base64,' + profileImage;
+				if (isValid) {
+					dispatch(startLoading());
+					const fileUrl = await fileUpload(source);
 
-				const { error, message } = await createNewProfile({
-					...values,
-					photo: fileUrl,
-				});
+					const { error, message } = await createNewProfile({
+						...values,
+						photo: fileUrl,
+					});
 
-				if (!error) {
-					dispatch(updateHasProfile());
-					showToast('success', 'Perfil creado', message);
-					navigation.navigate('Home');
-					dispatch(clear());
-				} else {
-					showToast('error', '¡Oh no!', message);
+					if (!error) {
+						dispatch(updateHasProfile());
+						showToast('success', 'Perfil creado', message);
+						navigation.navigate('Home');
+						dispatch(clear());
+					} else {
+						showToast('error', '¡Oh no!', message);
+					}
+					dispatch(finishLoading());
 				}
-				dispatch(finishLoading());
+			} catch ({ message }) {
+				showToast('error', '¡Oh no!', message);
 			}
 		}
 	};
@@ -83,33 +87,40 @@ const ProfileForm = ({ navigation, route }) => {
 	const onUpdate = async values => {
 		if (profileImage || profileInfo.photo) {
 			if (!loading) {
-				let source;
-				let fileUrl;
-				dispatch(startLoading());
+				try {
+					let source;
+					let fileUrl;
+					dispatch(startLoading());
 
-				if (profileImage) {
-					source = 'data:image/jpg;base64,' + profileImage;
-					fileUrl = await fileUpload(source);
-				} else {
-					fileUrl = profileInfo.photo;
-				}
+					const isValid = validateProfileForm(values);
 
-				const { error, message } = await updateProfile(
-					{
-						...values,
-						photo: fileUrl,
-						location,
-					},
-					uid,
-				);
-				if (!error) {
-					showToast('success', 'Perfil actualizado', message);
-					navigation.goBack();
-					dispatch(clear());
-				} else {
+					if (profileImage) {
+						source = 'data:image/jpg;base64,' + profileImage;
+						fileUrl = await fileUpload(source);
+					} else {
+						fileUrl = profileInfo.photo;
+					}
+
+					const { error, message } = await updateProfile(
+						{
+							...values,
+							photo: fileUrl,
+							location,
+						},
+						uid,
+					);
+					if (!error) {
+						showToast('success', 'Perfil actualizado', message);
+						navigation.goBack();
+						dispatch(clear());
+					} else {
+						showToast('error', '¡Oh no!', message);
+					}
+					dispatch(finishLoading());
+				} catch ({ message }) {
 					showToast('error', '¡Oh no!', message);
+					dispatch(finishLoading());
 				}
-				dispatch(finishLoading());
 			}
 		} else {
 			Popup.show({

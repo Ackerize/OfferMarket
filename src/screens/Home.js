@@ -79,6 +79,10 @@ const Home = ({ navigation }) => {
 				setNotifications([]);
 			}
 		});
+
+		return () => {
+			notifications.off();
+		};
 	}, []);
 
 	useEffect(() => {

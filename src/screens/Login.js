@@ -20,6 +20,8 @@ import {
 	startLoginEmailPassword,
 } from '../actions/auth';
 import Loading from 'react-native-loading-spinner-overlay';
+import { validLogin } from '../utils/utils';
+import { showToast } from '../components/Modals/CustomToast';
 
 const Login = ({ navigation }) => {
 	const dispatch = useDispatch();
@@ -39,7 +41,14 @@ const Login = ({ navigation }) => {
 
 	const handleNormalLogin = e => {
 		e.preventDefault();
-		dispatch(startLoginEmailPassword(email, password));
+
+		try {
+			if (validLogin(email, password)) {
+				dispatch(startLoginEmailPassword(email, password));
+			}
+		} catch ({ message }) {
+			showToast('error', '¡Oh no!', message);
+		}
 	};
 
 	const handleGoogleLogin = () => {
@@ -53,10 +62,7 @@ const Login = ({ navigation }) => {
 	return (
 		<SafeAreaView style={styles.mainContainer}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
-			<Loading
-				visible={loading}
-				textContent={'Loading...'}
-			/>
+			<Loading visible={loading} textContent={'Loading...'} />
 			<View style={styles.imageContainer}>
 				<LoginImage />
 			</View>

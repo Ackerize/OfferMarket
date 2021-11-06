@@ -6,7 +6,7 @@ const Input = ({
 	label,
 	type = 'default',
 	value,
-	mandatory = true,
+	mandatory = false,
 	onBlur,
 	onChangeText,
 }) => {

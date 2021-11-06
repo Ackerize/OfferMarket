@@ -5,6 +5,7 @@ import auth from '@react-native-firebase/auth';
 import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 import { createNewUser } from '../api/users';
 import { finishLoading, startLoading } from './ui';
+import { showToast } from '../components/Modals/CustomToast';
 
 export const startLoginEmailPassword = (email, password) => {
 	return dispatch => {
@@ -20,18 +21,28 @@ export const startLoginEmailPassword = (email, password) => {
 						login(user.uid, user.displayName, user.email, 'email', hasProfile),
 					);
 					dispatch(finishLoading());
-				} catch (e) {
-					console.log(e);
+				} catch (error) {
+					console.log(error);
 				}
 			})
-			.catch(e => {
-				console.log(e);
+			.catch(({ code }) => {
+				switch (code) {
+					case 'auth/invalid-email':
+						showToast('error', '¡Oh no!', 'El correo electrónico no es válido');
+						break;
+					case 'auth/user-not-found':
+					case 'auth/wrong-password':
+						showToast('error', '¡Oh no!', 'Credenciales incorrectas');
+						break;
+					default:
+						console.log(code);
+						break;
+				}
 			});
 	};
 };
 
 export const startGoogleLogin = () => {
-	console.log('clicked');
 	return async dispatch => {
 		const { idToken } = await GoogleSignin.signIn();
 
@@ -136,11 +147,37 @@ export const startRegisterWithEmailAndPassword = (
 					} = await createNewUser({ uid: user.uid, email: user.email });
 
 					dispatch(
-						login(user.uid, actualUser.displayName, user.email, 'email', hasProfile),
+						login(
+							user.uid,
+							actualUser.displayName,
+							user.email,
+							'email',
+							hasProfile,
+						),
 					);
 					dispatch(finishLoading());
 				} catch (e) {
 					console.log(e);
+				}
+			})
+			.catch(({ code }) => {
+				switch (code) {
+					case 'auth/invalid-email':
+						showToast('error', '¡Oh no!', 'El correo electrónico no es válido');
+						break;
+					case 'auth/email-already-in-use':
+						showToast(
+							'error',
+							'¡Oh no!',
+							'Ese correo electrónico ya se encuentra en uso',
+						);
+						break;
+					case 'auth/weak-password':
+						showToast('error', '¡Oh no!', 'La contraseña es muy débil');
+						break;
+					default:
+						console.log(code);
+						break;
 				}
 			});
 	};

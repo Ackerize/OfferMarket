@@ -43,8 +43,6 @@ const SearchLocation = ({ route }) => {
 		dispatch(selectLocation({ ...coords, name }));
 	};
 
-	console.log(type);
-
 	return (
 		<View style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />

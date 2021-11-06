@@ -30,8 +30,6 @@ const Filter = ({ navigation }) => {
 		maxPrice: maxPrice || '',
 	});
 
-	console.log({ location, profileLocation });
-
 	const [statusSelected, setStatusSelected] = useState(condition);
 
 	const [categorySelected, setCategorySelected] = useState(

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import moment from 'moment';
-import React, { useState, useRef, useEffect, Fragment } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
 	StyleSheet,
 	SafeAreaView,
@@ -8,6 +8,7 @@ import {
 	TextInput,
 	ScrollView,
 	Dimensions,
+	Keyboard,
 } from 'react-native';
 import { Avatar, Text, Menu, TouchableRipple } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -39,10 +40,6 @@ const PersonalChat = ({ navigation, route }) => {
 	const openMenu = () => setVisible(true);
 
 	const closeMenu = () => setVisible(false);
-
-	// useEffect(() => {
-	// 	chatScrollRef.current.scrollTo({ y: windowHeight });
-	// }, []);
 
 	useEffect(() => {
 		const chatBuyer = firebase.database().ref(`/chats/${idBuyer}/${idSeller}`);
@@ -134,6 +131,24 @@ const PersonalChat = ({ navigation, route }) => {
 		}
 	}, [isLoading]);
 
+	useEffect(() => {
+		showLastMessage();
+	}, [messages]);
+
+	useEffect(() => {
+		Keyboard.addListener('keyboardDidShow', showLastMessage);
+
+		return () => {
+			Keyboard.removeListener('keyboardDidShow', showLastMessage);
+		};
+	}, []);
+
+	const showLastMessage = () => {
+		if (chatScrollRef.current) {
+			chatScrollRef.current.scrollToEnd({ animated: true });
+		}
+	};
+
 	const onSendMessage = () => {
 		const message = {
 			author: idBuyer,
@@ -159,11 +174,10 @@ const PersonalChat = ({ navigation, route }) => {
 			.database()
 			.ref(`/chats/${idSeller}/${idBuyer}/${date}`)
 			.push(message)
-			.then((url) => {
+			.then(url => {
 				const idMessage = String(url)
 					.split('/')
 					.pop();
-				console.log(idMessage);
 				firebase
 					.database()
 					.ref(`/chats/${idSeller}/${idBuyer}/${date}/${idMessage}`)
@@ -240,7 +254,7 @@ const PersonalChat = ({ navigation, route }) => {
 							return (
 								<>
 									<View style={styles.dateContainer} key={date}>
-										<Text style={styles.date}>
+										<Text style={styles.date} key={date + 'TAG'}>
 											{formatDay === today ? 'Hoy' : formatDay}
 										</Text>
 									</View>
