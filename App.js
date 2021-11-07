@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler'
 import { NavigationContainer } from '@react-navigation/native'
-import { Provider as PaperProvider } from 'react-native-paper'
+import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper'
 import React from 'react'
 import StackNavigation from './src/navigation/StackNavigation'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
@@ -14,6 +14,11 @@ import { PersistGate } from 'redux-persist/integration/react'
 LogBox.ignoreLogs(['Setting a timer for a long period of time']); // ignore specific logs
 LogBox.ignoreAllLogs(true)
 
+const theme = {
+	...DefaultTheme,
+	dark: false,
+  };
+
 const App = () => {
 	const { store, persistor } = reduxStore()
 
@@ -21,7 +26,7 @@ const App = () => {
 		<Provider store={store}>
 			<PersistGate loading={null} persistor={persistor}>
 				<SafeAreaProvider>
-					<PaperProvider>
+					<PaperProvider theme={theme}>
 						<Root>
 							<NavigationContainer>
 								<StackNavigation />

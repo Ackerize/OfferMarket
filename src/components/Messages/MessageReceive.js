@@ -6,6 +6,7 @@ const MessageReceive = ({ message, time }) => {
 		<View style={styles.messageReceiveContainer}>
 			<View style={styles.messageReceive}>
 				<Text style={styles.messageReceiveContent}>{message}</Text>
+				<View style={styles.timeContainer} />
 				<View style={styles.viewTime}>
 					<Text style={styles.receiveTime}>{time}</Text>
 				</View>
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		alignItems: 'center',
 		minWidth: '30%',
-		maxWidth: '85%',
+		maxWidth: '80%',
 		padding: 10,
 		paddingHorizontal: 15,
 		borderRadius: 15,
@@ -53,5 +54,16 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 		justifyContent: 'flex-end',
 		height: '100%',
+		position: 'absolute',
+		right: 10,
+		bottom: 7,
+	},
+	timeContainer: {
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'flex-end',
+		justifyContent: 'flex-end',
+		height: '100%',
+		width: 40,
 	},
 });

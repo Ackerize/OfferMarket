@@ -22,7 +22,7 @@ const Person = ({
 				<Avatar.Image size={60} source={{ uri: avatar }} />
 				<View style={styles.informationContainer}>
 					<Text style={styles.date}>{date}</Text>
-					<Text style={styles.person}>{title}</Text>
+					<Text numberOfLines={1} style={styles.person}>{title}</Text>
 					<View style={styles.lastMessage}>
 						{type === 'message' && (
 							read ? <Read /> : sent ? <Sent color='#ABACAE' /> : <Received color='#ABACAE' />
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
 		color: '#000',
 		fontWeight: 'bold',
 		lineHeight: 20,
+		maxWidth: '75%',
 	},
 	message: {
 		fontSize: 17,

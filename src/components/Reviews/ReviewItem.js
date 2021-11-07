@@ -29,7 +29,7 @@ const ReviewItem = ({ review }) => {
 				</View>
 			</View>
 			<Text style={styles.comment}>
-				{ comment }
+				{ comment.length > 0 ? comment : 'Sin comentario' }
 			</Text>
 			<View style={styles.line} />
 		</View>

@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
 		borderRadius: 15,
 		borderTopRightRadius: 0,
 		justifyContent: 'space-between',
-		flexWrap: 'wrap',
+		flexWrap: 'nowrap',
 		alignItems: 'center',
 		minWidth: '30%',
 		maxWidth: '85%',
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
 	messageSendContent: {
 		color: '#fff',
 		fontSize: 16,
-		maxWidth: '100%',
+		maxWidth: '80%',
 	},
 	sendTime: {
 		fontSize: 13,

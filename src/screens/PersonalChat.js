@@ -115,6 +115,7 @@ const PersonalChat = ({ navigation, route }) => {
 	useEffect(() => {
 		axios.get(`${API_HOST}/profiles/${idSeller}`).then(({ data }) => {
 			setSellerProfile(data.data);
+			showLastMessage();
 		});
 	}, []);
 
@@ -214,7 +215,7 @@ const PersonalChat = ({ navigation, route }) => {
 			<View style={styles.header}>
 				<View style={styles.contactInformation}>
 					<Avatar.Image size={55} source={{ uri: photo }} />
-					<Text style={styles.name}>{name}</Text>
+					<Text numberOfLines={1} style={styles.name}>{name}</Text>
 				</View>
 				<TouchableRipple onPress={openMenu} style={styles.touchable}>
 					<Menu
