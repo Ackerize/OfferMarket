@@ -16,7 +16,7 @@ import moment from 'moment';
 const Notifications = ({ navigation, route }) => {
 	const notis = route?.params?.notifications;
 
-	const [notifications, setNotifications] = useState(notis);
+	const [notifications, setNotifications] = useState(notis.reverse());
 
 	const { uid } = useSelector(state => state.auth);
 
