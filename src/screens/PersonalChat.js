@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
 import MessageReceive from '../components/Messages/MessageReceive';
 import MessageSent from '../components/Messages/MessageSent';
+import ConfirmModal from '../components/Modals/ConfirmModal';
 import { showToast } from '../components/Modals/CustomToast';
 import ModalRating from '../components/Modals/ModalRating';
 import Spinner from '../components/Spinner';
@@ -34,6 +35,8 @@ const PersonalChat = ({ navigation, route }) => {
 	const [dates, setDates] = useState([]);
 	const [idMessageSent, setIdMessageSent] = useState('');
 	const [isLoading, setIsLoading] = useState(true);
+	const [visibleModal, setVisibleModal] = useState(false);
+	const [confirm, setConfirm] = useState(false);
 
 	const chatScrollRef = useRef();
 
@@ -190,19 +193,31 @@ const PersonalChat = ({ navigation, route }) => {
 			});
 	};
 
+	useEffect(() => {
+		if (confirm) {
+			
+			setMessages(null);
+			firebase
+				.database()
+				.ref(`/chats/${idBuyer}/${idSeller}`)
+				.remove()
+				.then(() => {
+					showToast(
+						'success',
+						'Chat eliminado',
+						'Se eliminó el chat con éxito',
+					);
+					navigation.goBack();
+				})
+				.catch(() =>
+					showToast('error', '¡Oh no!', 'Ocurrió un error. Inténtalo de nuevo'),
+				);
+		}
+	}, [confirm]);
+
 	const onDeleteChat = () => {
 		closeMenu();
-		firebase
-			.database()
-			.ref(`/chats/${idBuyer}/${idSeller}`)
-			.remove()
-			.then(() => {
-				showToast('success', 'Chat eliminado', 'Se eliminó el chat con éxito');
-				navigation.navigate('Home');
-			})
-			.catch(() =>
-				showToast('error', '¡Oh no!', 'Ocurrió un error. Inténtalo de nuevo'),
-			);
+		setVisibleModal(true);
 	};
 
 	if (!messages || !sellerProfile) return <Spinner />;
@@ -212,10 +227,18 @@ const PersonalChat = ({ navigation, route }) => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
+			<ConfirmModal
+				visible={visibleModal}
+				setVisible={setVisibleModal}
+				setConfirm={setConfirm}
+				title="¿Desea borrar la conversación?"
+			/>
 			<View style={styles.header}>
 				<View style={styles.contactInformation}>
 					<Avatar.Image size={55} source={{ uri: photo }} />
-					<Text numberOfLines={1} style={styles.name}>{name}</Text>
+					<Text numberOfLines={1} style={styles.name}>
+						{name}
+					</Text>
 				</View>
 				<TouchableRipple onPress={openMenu} style={styles.touchable}>
 					<Menu
@@ -253,6 +276,7 @@ const PersonalChat = ({ navigation, route }) => {
 						{dates.map(date => {
 							const formatDay = date.replace(/-/g, '/');
 							const today = moment().format('DD/MM/YYYY');
+							console.log(messages);
 							return (
 								<>
 									<View style={styles.dateContainer} key={date}>
@@ -260,7 +284,7 @@ const PersonalChat = ({ navigation, route }) => {
 											{formatDay === today ? 'Hoy' : formatDay}
 										</Text>
 									</View>
-									{messages[date].map(message =>
+									{messages[date]?.map(message =>
 										message.author === idBuyer ? (
 											<MessageSent
 												key={message.idMessage}

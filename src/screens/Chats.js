@@ -4,7 +4,6 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { Title } from 'react-native-paper';
 import Person from '../components/Person';
 import FocusAwareStatusBar from '../components/FocusAwareStatusBar';
-import { API_HOST } from '../utils/constants';
 import { firebase } from '../utils/firebase-config';
 import { useSelector } from 'react-redux';
 import { getProfile } from '../api/profiles';
@@ -19,7 +18,7 @@ const Chats = ({ navigation }) => {
 	const { uid } = useSelector(state => state.auth);
 
 	const [chats, setChats] = useState(null);
-	const [messages, setMessages] = useState({});
+	const [messages, setMessages] = useState(null);
 
 	useEffect(() => {
 		firebase
@@ -73,6 +72,7 @@ const Chats = ({ navigation }) => {
 					});
 				} else {
 					setChats([]);
+					setMessages({});
 				}
 			});
 
@@ -90,7 +90,7 @@ const Chats = ({ navigation }) => {
 			idSeller,
 		});
 
-	if (!chats) {
+	if (!chats || !messages) {
 		return (
 			<SafeAreaView style={styles.container}>
 				<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
@@ -116,6 +116,7 @@ const Chats = ({ navigation }) => {
 			<ScrollView style={styles.scrollView}>
 				{chats.length > 0 &&
 					chats.map(item => {
+						console.log(messages);
 						const today = moment().format('DD/MM/YYYY');
 						const { author, read, sent, text, time } = messages[
 							item.user

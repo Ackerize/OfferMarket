@@ -22,6 +22,7 @@ import { useSelector } from 'react-redux';
 import FavoriteButton from '../components/Buttons/FavoriteButton';
 import DeleteButton from '../components/Buttons/DeleteButton';
 import { useIsFocused } from '@react-navigation/native';
+import ConfirmModal from '../components/Modals/ConfirmModal';
 
 const heightScreen = Dimensions.get('window').height;
 
@@ -29,11 +30,11 @@ const Detail = ({ navigation, route }) => {
 	const isFocused = useIsFocused();
 	const [selected, setSelected] = useState(true);
 	const idProduct = route?.params?.id;
-
 	const { uid } = useSelector(state => state.auth);
-
 	const [productData, setProductData] = useState(null);
 	const [isFavoriteProduct, setIsFavoriteProduct] = useState(null);
+	const [confirm, setConfirm] = useState(false);
+	const [visible, setVisible] = useState(false);
 
 	useEffect(() => {
 		if (isFocused) {
@@ -74,6 +75,29 @@ const Detail = ({ navigation, route }) => {
 				});
 		}
 	}, [isFocused]);
+
+	useEffect(() => {
+		if (confirm) {
+			axios
+				.delete(`${API_HOST}/products/${idProduct}`)
+				.then(({ data }) => {
+					const { error, message } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+					} else {
+						showToast('success', 'Producto eliminado', message);
+						navigation.goBack();
+					}
+				})
+				.catch(({ response: { data } }) => {
+					const { error, message, errorMessage } = data;
+					if (error) {
+						showToast('error', '¡Oh no!', message);
+						console.log({ errorMessage });
+					}
+				});
+		}
+	}, [confirm]);
 
 	if (!productData || isFavoriteProduct === null) return <Spinner />;
 
@@ -139,24 +163,7 @@ const Detail = ({ navigation, route }) => {
 	};
 
 	const handleDelete = () => {
-		axios
-			.delete(`${API_HOST}/products/${idProduct}`)
-			.then(({ data }) => {
-				const { error, message } = data;
-				if (error) {
-					showToast('error', '¡Oh no!', message);
-				} else {
-					showToast('success', 'Producto eliminado', message);
-					navigation.goBack();
-				}
-			})
-			.catch(({ response: { data } }) => {
-				const { error, message, errorMessage } = data;
-				if (error) {
-					showToast('error', '¡Oh no!', message);
-					console.log({ errorMessage });
-				}
-			});
+		setVisible(true);
 	};
 
 	const handleEdit = () => {
@@ -170,6 +177,12 @@ const Detail = ({ navigation, route }) => {
 	return (
 		<SafeAreaView style={styles.principalContainer}>
 			<FocusAwareStatusBar barStyle="dark-content" backgroundColor="white" />
+			<ConfirmModal
+				visible={visible}
+				setVisible={setVisible}
+				setConfirm={setConfirm}
+				title="¿Desea borrar el producto?"
+			/>
 			{idSeller === uid ? (
 				<DeleteButton onPress={handleDelete} />
 			) : (
