@@ -116,7 +116,6 @@ const Chats = ({ navigation }) => {
 			<ScrollView style={styles.scrollView}>
 				{chats.length > 0 &&
 					chats.map(item => {
-						console.log(messages);
 						const today = moment().format('DD/MM/YYYY');
 						if (messages[item.user]) {
 							const { author, read, sent, text, time } = messages[

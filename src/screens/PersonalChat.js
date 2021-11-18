@@ -276,7 +276,6 @@ const PersonalChat = ({ navigation, route }) => {
 						{dates.map(date => {
 							const formatDay = date.replace(/-/g, '/');
 							const today = moment().format('DD/MM/YYYY');
-							console.log(messages);
 							return (
 								<>
 									<View style={styles.dateContainer} key={date}>

@@ -45,7 +45,6 @@ const Filter = ({ navigation }) => {
 	const onSave = () => {
 		try {
 			const isValid = validMinMaxPrice(values.minPrice, values.maxPrice);
-			console.log(isValid);
 			if (isValid) {
 				const newFilters = {
 					category: categorySelected?.name || null,
