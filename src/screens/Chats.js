@@ -118,25 +118,27 @@ const Chats = ({ navigation }) => {
 					chats.map(item => {
 						console.log(messages);
 						const today = moment().format('DD/MM/YYYY');
-						const { author, read, sent, text, time } = messages[
-							item.user
-						][0].message;
-						const itemDate = messages[item.user][0].date.replace(/-/g, '/');
+						if (messages[item.user]) {
+							const { author, read, sent, text, time } = messages[
+								item.user
+							][0]?.message;
+							const itemDate = messages[item.user][0]?.date.replace(/-/g, '/');
 
-						return (
-							<Person
-								key={item.user}
-								avatar={item.photo}
-								title={item.name}
-								subtitle={text}
-								date={itemDate === today ? time : itemDate}
-								notifications={countUnreadMessages(messages[item.user], uid)}
-								action={() => action(item.user)}
-								type="message"
-								read={author === uid ? read : false}
-								sent={sent}
-							/>
-						);
+							return (
+								<Person
+									key={item.user}
+									avatar={item.photo}
+									title={item.name}
+									subtitle={text}
+									date={itemDate === today ? time : itemDate}
+									notifications={countUnreadMessages(messages[item.user], uid)}
+									action={() => action(item.user)}
+									type="message"
+									read={author === uid ? read : false}
+									sent={sent}
+								/>
+							);
+						}
 					})}
 			</ScrollView>
 		</SafeAreaView>
