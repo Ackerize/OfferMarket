@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1082374728024",
+    "firebase_url": "https://offermarket-d6c31-default-rtdb.firebaseio.com",
+    "project_id": "offermarket-d6c31",
+    "storage_bucket": "offermarket-d6c31.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1082374728024:android:1cca5604ea0cad4a629d2d",
+        "android_client_info": {
+          "package_name": "com.offermarket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1082374728024-9nkb75rmoh9gilgl1g9nuhufd38iq5hn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdY8q7z-5FiOLJcYXh7H0-Rrmu2MQzdTY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1082374728024-9nkb75rmoh9gilgl1g9nuhufd38iq5hn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
